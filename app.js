@@ -3,7 +3,9 @@ const rp = require('request-promise');
 const express = require('express');
 const app = express();
 
-const PORT = "3978";
+// const PORT = "3978";
+var PORT = normalizePort(process.env.PORT || '3978');
+app.set('port', port);
 
 var builder = require('botbuilder');
 
