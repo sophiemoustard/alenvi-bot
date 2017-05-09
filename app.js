@@ -4,6 +4,23 @@ const express = require('express');
 const app = express();
 
 // const PORT = "3978";
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
 var PORT = normalizePort(process.env.PORT || '3978');
 app.set('port', port);
 
