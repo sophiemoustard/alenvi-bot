@@ -22,7 +22,7 @@ function normalizePort(val) {
 }
 
 var PORT = normalizePort(process.env.PORT || '3978');
-app.set('port', port);
+app.set('port', PORT);
 
 var builder = require('botbuilder');
 
