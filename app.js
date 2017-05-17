@@ -110,7 +110,24 @@ bot.dialog("/connection", [].concat(
     var user = ba.profile(session, "facebook");
     //var user = results.response;
     console.log(user);
-    // console.log("hello");
+
+    var payload = {
+      'email': user.emails[0].value,
+      'id': user.id
+    }
+    rp.post({
+      url: "http://localhost:3000/api/users/botauth/facebook",
+      json: true,
+      body: payload,
+      resolveWithFullResponse: true,
+      time: true
+    }).then(function(parsedBody) {
+      console.log(parsedBody.body);
+      console.log("Duration: " + parsedBody.timings.end);
+      session.endDialog("Bonjour " + user.name.givenName + " :) Merci d'utiliser Pigi ! Que puis-je pour toi ?");
+    }).catch(function(err) {
+      console.error(err);
+    })
 
     // call facebook and get something using user.accessToken
     var client = restify.createJsonClient({
