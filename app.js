@@ -1,7 +1,6 @@
 "use strict";
 
 const path = require('path');
-const request = require('request');
 const rp = require('request-promise');
 
 const builder = require('botbuilder');
@@ -99,6 +98,7 @@ bot.dialog('/', new builder.IntentDialog()
 );
 
 bot.dialog("/hello", (session, args) => {
+  console.log(session);
     session.endDialog("Bonjour ! Je peux t'aider à obtenir des informations de Facebook. Essaye d'écrire 'Connexion'.");
     console.log(session);
 });
