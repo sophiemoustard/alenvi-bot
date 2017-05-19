@@ -9,12 +9,7 @@ const botauth = require("botauth");
 const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 
-const WEBSITE_HOSTNAME = "https://8fd4418d.ngrok.io";
-const MICROSOFT_APP_ID = "***REMOVED***";
-const MICROSOFT_APP_PASSWORD = "***REMOVED***";
-const FACEBOOK_APP_ID = "***REMOVED***";
-const FACEBOOK_APP_SECRET = "***REMOVED***";
-const ***REMOVED*** = "***REMOVED***";
+const config = require('./config');
 
 const PORT = process.env.PORT || '3978';
 
@@ -29,16 +24,20 @@ app.use(restify.queryParser());
 
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: MICROSOFT_APP_ID,
-    appPassword: MICROSOFT_APP_PASSWORD
+    appId: config.MICROSOFT_APP_ID,
+    appPassword: config.MICROSOFT_APP_PASSWORD
 });
 
-var bot = new builder.UniversalBot(connector, {
-  localizerSettings: {
-    botLocalePath : path.join(__dirname, "./helpers/locale"),
-    defaultLocale: "fr_fr"
-  }
-});
+var bot = new builder.UniversalBot(connector);
+// , function(session) {
+//
+// }
+bot.set('persistConversationData', true);
+
+bot.set('localizerSettings', {
+  botLocalePath : path.join(__dirname, "./helpers/locale"),
+  defaultLocale: "fr_FR"
+})
 
 const logUserConversation = (event) => {
     console.log('message: ' + event.text + ', user: ' + event.address.user.name);
@@ -67,11 +66,11 @@ app.post('/api/messages', connector.listen());
 // }
 
 var ba = new botauth.BotAuthenticator(app, bot, {
-  baseUrl: WEBSITE_HOSTNAME, secret: ***REMOVED***
+  baseUrl: config.WEBSITE_HOSTNAME, secret: config.***REMOVED***
 }).provider("facebook", (options) => {
   return new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID || FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET || FACEBOOK_APP_SECRET,
+    clientID: process.env.FACEBOOK_APP_ID || config.FACEBOOK_APP_ID,
+    clientSecret: process.env.FACEBOOK_APP_SECRET || config.FACEBOOK_APP_SECRET,
     callbackURL: options.callbackURL,
     profileFields: ['id', 'emails', 'name', 'photos']
   }, (accessToken, refreshToken, profile, done) => {
@@ -86,20 +85,29 @@ app.get("/", (req, res) => {
   res.send("facebook");
 });
 
+// bot.on('conversationUpdate', function (message) {
+//     if (message.membersAdded) {
+//         message.membersAdded.forEach(function (identity) {
+//             if (identity.id === message.address.bot.id) {
+//                 bot.beginDialog(message.address, '/hello');
+//             }
+//         });
+//     }
+// });
+
 bot.dialog('/', new builder.IntentDialog()
     .matches(/^bonjour/i, "/hello")
     .matches(/^connexion/i, "/connection")
     .matches(/^d[ée]connexion/i, "/logout")
     // .matches(/^signin/i, "/signin")
     .onDefault((session, args) => {
-      console.log(session.message.address.user);
       session.endDialog("Je n'ai pas compris. Essaie de le dire autrement !");
     })
 );
 
 bot.dialog("/hello", (session, args) => {
   console.log(session);
-    session.endDialog("Bonjour ! Je peux t'aider à obtenir des informations de Facebook. Essaye d'écrire 'Connexion'.");
+    session.endDialog("Bonjour, je m'appelle Pigi ! Je peux t'aider à obtenir des informations de Facebook. Essaye d'écrire 'Connexion'.");
     console.log(session);
 });
 
