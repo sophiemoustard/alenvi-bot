@@ -1,7 +1,7 @@
 {
     "cancelled" : "Tu as bien annulé ton authentification.",
-    "connect_prompt" : "Connecte-toi à Facebook. Tu peux dire 'cancel' pour revenir.",
+    "connect_prompt" : "Connecte-toi à Facebook. Tu peux dire 'annuler' pour revenir.",
     "connect_button" : "Se connecter à Facebook",
     "reloaded" : "Redémarré",
-    "unauthorized" : "Le code que vous avez entré n'est pas valide ou votre autorisation a expiré. Veuillez reessayer, ou dites 'cancel' pour arrêter d'essayer."
+    "unauthorized" : "Le code que tu as entré n'est pas valide ou a expiré. Essaie encore, ou dis 'annuler' pour arrêter d'essayer."
 }
