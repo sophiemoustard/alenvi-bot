@@ -11,6 +11,8 @@ const FacebookStrategy = require("passport-facebook").Strategy;
 
 const config = require('./config');
 
+const _ = require('lodash');
+
 const PORT = process.env.PORT || '3978';
 
 const restify = require('restify');
@@ -85,34 +87,19 @@ app.get("/", (req, res) => {
   res.send("facebook");
 });
 
-bot.on('conversationUpdate', function (message) {
-    if (message.membersAdded) {
-        message.membersAdded.forEach(function (identity) {
-            if (identity.id === message.address.bot.id) {
-                bot.beginDialog(message.address, '/hello_first');
-            }
-        });
-    }
-});
-
-// [
-//     function (session, args, next) {
-//         if (!session.userData.name) {
-//             session.beginDialog('/profile');
-//         } else {
-//             next();
-//         }
-//     },
-//     function (session, results) {
-//         session.send('Hello %s!', session.userData.name);
+// bot.on('conversationUpdate', function (message) {
+//     if (message.membersAdded) {
+//         message.membersAdded.forEach(function (identity) {
+//             if (identity.id === message.address.bot.id) {
+//                 bot.beginDialog(message.address, '/hello_first');
+//         });
 //     }
-// ]
+// });
 
 bot.dialog('/', new builder.IntentDialog()
-    .matches(/^bonjour/i, "/hello")
     .matches(/^connexion/i, "/connection")
     .matches(/^d[ée]connexion/i, "/logout")
-    // .matches(/^signin/i, "/signin")
+    .matches(/coucou|bonjour|bonsoir|hello|hi|hey|salut/i, "/hello")
     .onDefault(
       (session, args, next) => {
         session.beginDialog("/not_understand");
@@ -121,38 +108,44 @@ bot.dialog('/', new builder.IntentDialog()
 );
 
 bot.dialog("/not_understand", (session, args) => {
+  console.log("/NOT_UNDERSTAND");
   session.sendTyping();
-  session.endDialog("Pardonne-moi, je n'ai pas compris. Peux-tu répéter autrement ?");
+  session.endDialog("Je n'ai pas compris . Peux-tu répéter autrement ?");
 })
 
-bot.dialog("/hello_first", (session, args) => {
-  session.sendTyping();
-  session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
-  session.sendTyping();
-  session.send("Il semblerait que nous ne nous connaissions pas encore ! Veux-tu bien t'authentifier grâce à Facebook, afin que je puisse te reconnaître ?");
-  session.beginDialog("/connection");
-});
+bot.dialog("/hello_first", [
+  (session, args) => {
+    console.log("/HELLO_FIRST");
+    session.sendTyping();
+    session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
+    session.endDialog("Il semblerait que nous ne nous connaissions pas encore ! Veux-tu bien écrire \"Connexion\" afin de t'authentifier grâce à Facebook, pour que je puisse te reconnaître ?");
+  }
+]);
 
 bot.dialog("/hello", [
   (session, args) => {
-    console.log(session.message);
-    session.sendTyping();
-    builder.Prompts.choice(session, "Hello " + session.userData.alenvi.user.firstname + "! 😉 Comment puis-je t’aider ?", "Modifier planning|Consulter planning|Bénéficiaires|Equipe|Infos");
+    console.log("/HELLO");
+    if (!session.userData.alenvi.id) {
+      session.beginDialog('/hello_first');
+    } else {
+      session.sendTyping();
+      builder.Prompts.choice(session, "Hello " + session.userData.alenvi.user.firstname + "! 😉 Comment puis-je t’aider ?", "Modifier planning|Consulter planning|Bénéficiaires|Equipe|Infos");
+    }
   },
   (session, results) => {
     if (results.response) {
-      // session.endDialog("Hello " + session.userData.alenvi.user.firstname + "! 😉 Comment puis-je t’aider ?");
-      console.log(results.response);
-      session.endDialog("Tu as choisi " + results.response.entity);
+      if (!session.userData.alenvi.id) {
+        console.log(results.response);
+        session.endDialog("Tu as choisi " + results.response.entity);
+      }
     }
-    else
-      session.beginDialog("/not_understand");
   }
 ]);
 
 bot.dialog("/connection", [].concat(
   ba.authenticate("facebook"),
   (session, results) => {
+    console.log("/CONNECTION");
     //get the facebook profile
     session.sendTyping();
     var user = ba.profile(session, "facebook");
@@ -161,14 +154,22 @@ bot.dialog("/connection", [].concat(
     if (user) {
       if (user.id) {
         session.userData.facebook = user;
-        var payload = {
-          'email': user.emails[0].value,
-          'id': user.id
+        var payload = {};
+        if (user.emails) {
+          payload = {
+            'email': user.emails[0].value,
+            'id': user.id
+          }
         }
+        else
+          payload = {
+            'id': user.id
+          }
+        var newPayload = _.pickBy(payload);
         rp.post({
           url: "http://localhost:3000/api/users/botauth/facebook",
           json: true,
-          body: payload,
+          body: newPayload,
           resolveWithFullResponse: true,
           time: true
         }).then(function(parsedBody) {
@@ -179,52 +180,57 @@ bot.dialog("/connection", [].concat(
           session.beginDialog('/hello');
         }).catch(function(err) {
           console.error(err);
+          if (err.statusCode == 404)
+            session.endDialog("Je n'arrive pas à te trouver chez Alenvi :( Essaie de contacter un(e) coach, il / elle devrait pouvoir résoudre ce problème !");
         })
-
-        // call facebook and get something using user.accessToken
-        // var client = restify.createJsonClient({
-        //   url: 'https://graph.facebook.com',
-        //   accept : 'application/json',
-        //   headers : {
-        //     "Authorization" : `OAuth ${ user.accessToken }`
-        //   }
-        // });
-        //
-        // client.get(`/v2.9/me/picture?redirect=0`, (err, req, res, obj) => {
-        //   if(!err) {
-        //     console.log(obj);
-        //     var msg = new builder.Message()
-        //     .attachments([
-        //       new builder.HeroCard(session)
-        //       .text(user.displayName)
-        //       .images([
-        //         new builder.CardImage(session).url(obj.data.url)
-        //       ])
-        //     ]);
-        //     session.endDialog(msg);
-        //   } else {
-        //     console.log(err);
-        //     session.endDialog("Il y a eu un problème au moment de récupérer ton profil.");
-        //   }
-        // });
       }
     }
   }
-));
+))
 
 bot.dialog("/logout", [
   (session, args, next) => {
+    console.log("/LOGOUT");
     session.sendTyping();
     builder.Prompts.confirm(session, "Es-tu sûr de vouloir te déconnecter ?");
   }, (session, args) => {
+    session.sendTyping();
     if(args.response) {
       ba.logout(session, "facebook");
-      session.endDialog("Tu es bien déconnecté.");
+      session.endDialog("Tu es bien déconnecté. J'espère te revoir bientôt !");
+      // session.beginDialog('/hello_first');
     } else {
-      session.endDialog("Tu es toujours connecté.");
+      session.endDialog("Tu es toujours connecté :)");
     }
   }
-]);
+])
+
+// call facebook and get something using user.accessToken
+// var client = restify.createJsonClient({
+//   url: 'https://graph.facebook.com',
+//   accept : 'application/json',
+//   headers : {
+//     "Authorization" : `OAuth ${ user.accessToken }`
+//   }
+// });
+//
+// client.get(`/v2.9/me/picture?redirect=0`, (err, req, res, obj) => {
+//   if(!err) {
+//     console.log(obj);
+//     var msg = new builder.Message()
+//     .attachments([
+//       new builder.HeroCard(session)
+//       .text(user.displayName)
+//       .images([
+//         new builder.CardImage(session).url(obj.data.url)
+//       ])
+//     ]);
+//     session.endDialog(msg);
+//   } else {
+//     console.log(err);
+//     session.endDialog("Il y a eu un problème au moment de récupérer ton profil.");
+//   }
+// });
 
 // bot.dialog('/signin', [
 //   function (session) {
