@@ -1,9 +1,9 @@
 "use strict";
 
 const path = require('path');
-const request = require('request');
 const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
+const _ = require('lodash');
 
 const builder = require('botbuilder');
 const botauth = require("botauth");
@@ -12,8 +12,7 @@ const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 
 const config = require('./config');
-
-const _ = require('lodash');
+// const ogust = require('./ogust.js');
 
 const PORT = process.env.PORT || '3978';
 
@@ -99,20 +98,21 @@ bot.on('conversationUpdate', function (message) {
 });
 
 //=========================================================
-// Bots Dialogs
+// Root Dialog
 //=========================================================
 
 bot.dialog('/', new builder.IntentDialog()
     // .matches(/^connexion/i, "/connection")
     .matches(/^d[ée]connexion/i, "/logout_facebook")
     .matches(/coucou|bonjour|bonsoir|hello|hi|hey|salut/i, "/hello")
+    // .matches(/Consulter planning/i, "/show_planning")
     // .matches(/^log in|login/i, "/login")
     .onDefault(
       (session, args, next) => {
         // Facebook account_linking
         // if already linked
-        console.log("SESSION USERDATA = ");
-        console.log(session.userData);
+        // console.log("SESSION USERDATA = ");
+        // console.log(session.userData);
         if (session.message.sourceEvent.account_linking) {
           console.log('TOKEN =');
           var token = session.message.sourceEvent.account_linking.authorization_code;
@@ -122,7 +122,7 @@ bot.dialog('/', new builder.IntentDialog()
             // Persist username under the userData
             jwt.verify(token, process.env.TOKEN_SECRET || config.TOKEN_SECRET, function(err, decoded) {
               if (err) {
-                console.log("ERROR VERIFY TOKEN");
+                console.error("ERROR VERIFY TOKEN");
                 console.error(err);
                 if (err.name === "JsonWebTokenError") {
                   session.endDialog("Il y a eu un problème avec ta demande :/");
@@ -135,7 +135,8 @@ bot.dialog('/', new builder.IntentDialog()
                 console.log(decoded);
                 session.userData.alenvi = decoded;
 
-                session.endDialog('Compte Facebook lié à Alenvi, merci ' + session.userData.alenvi.firstname + ' :)');
+                session.send('Compte Facebook lié à Alenvi, merci ' + session.userData.alenvi.firstname + ' :)');
+                session.beginDialog('/hello');
               }
             });
           } else if (authorizationStatus === 'unlinked') {
@@ -153,7 +154,6 @@ bot.dialog('/', new builder.IntentDialog()
           //   // endDialog('You are known as ' + session.userData.alenvi.firstname + ' - type "unlink account" to try out unlinking');
           // }
           // else {
-            console.log("WENT IN /NOT_UNDERSTAND");
             session.beginDialog("/not_understand");
           // }
         }
@@ -161,88 +161,20 @@ bot.dialog('/', new builder.IntentDialog()
     )
 );
 
-bot.dialog("/login_facebook", (session) => {
-  var message = new builder.Message(session).sourceEvent({
-    facebook: {
-      attachment: {
-        type: 'template',
-        payload: {
-          template_type: 'generic',
-          elements: [{
-            title: 'Bienvenue sur la liaison de compte',
-            // image_url: "http://localhost:3000/images/Pigi.png",
-            buttons: [{
-              type: 'account_link',
-              url: "http://localhost:3000/api/users/bot/facebook/account_linking"
-            }]
-          }]
-        }
-      }
-    }
-  });
-  session.endDialog(message);
-})
+bot.dialog("/not_understand", require("./dialogs/notUnderstand"));
 
-bot.dialog("/logout_facebook", (session) => {
-  request({
-    url: 'https://graph.facebook.com/v2.6/me/unlink_accounts',
-    method: 'POST',
-    qs: {
-      access_token: process.env.FACEBOOK_PAGE_TOKEN || config.FACEBOOK_PAGE_TOKEN
-    },
-    body: {
-      psid: session.message.address.user.id
-    },
-    json: true
-  }, function (error, response, body) {
-    if (!error && response.statusCode === 200) {
-      session.endDialog();
-    } else {
-      session.endDialog('Il y a eu un problème au moment de te déconnecter :(');
-    }
-  });
-});
+bot.dialog("/login_facebook", require("./dialogs/facebookLoginLogout").login);
+bot.dialog("/logout_facebook", require("./dialogs/facebookLoginLogout").logout);
 
-bot.dialog("/not_understand", (session, args) => {
-  console.log("/NOT_UNDERSTAND");
-  session.sendTyping();
-  session.endDialog("Je n'ai pas compris . Peux-tu répéter autrement ?");
-})
+bot.dialog("/hello_first", require("./dialogs/hello").hello_first);
+bot.dialog("/hello", require("./dialogs/hello").hello);
 
-bot.dialog("/hello_first", [
-  (session, args) => {
-    console.log("/HELLO_FIRST");
-    session.sendTyping();
-    session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
-    session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier chez Alenvi grâce à Facebook, pour que je puisse te reconnaître ?");
-    session.beginDialog('/login_facebook');
-  }
-]);
+bot.dialog("/select_planning", require("./dialogs/showPlanning").select);
+bot.dialog("/show_my_planning", require("./dialogs/showPlanning").showMine);
 
-bot.dialog("/hello", [
-  (session, args) => {
-    console.log("/HELLO");
-    console.log("USERDATA =");
-    console.log(session.userData);
-    if (!session.userData.alenvi) {
-      session.beginDialog('/hello_first');
-    } else {
-      session.sendTyping();
-      builder.Prompts.choice(session, "Hello " + session.userData.alenvi.firstname + "! 😉 Comment puis-je t’aider ?", "Modifier planning|Consulter planning|Bénéficiaires|Equipe|Infos");
-    }
-  },
-  (session, results) => {
-    if (results.response) {
-      if (session.userData.alenvi) {
-        console.log(results.response);
-        session.endDialog("Tu as choisi " + results.response.entity);
-      }
-      else {
-        session.endDialog();
-      }
-    }
-  }
-]);
+//=========================================================
+// Tests
+//=========================================================
 
 // bot.dialog("/connection", [].concat(
 //   ba.authenticate("facebook"),
@@ -307,9 +239,6 @@ bot.dialog("/hello", [
 //   }
 // ])
 
-/*
-** TESTS
-*/
 // rp.post({
 //   uri: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
 //   form: {

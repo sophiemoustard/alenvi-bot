@@ -6,5 +6,10 @@ module.exports = {
   'FACEBOOK_APP_SECRET': "***REMOVED***",
   'FACEBOOK_PAGE_TOKEN': "EAAN47LGyyhsBAEGfwh2nZBK2JYYVs432ZCVujDY9U1n7RQOClCLlrmJgQmqsj6CJkCg4Fz7L2ANSWguzO3fTZBW0pfMbwX4pZBZC3Sf1RE04luxKp8eEL5Hv6ywKs2DSUbVnKjbZCvBjTIrCC7XCtv12eeu8xZAAAZB6pfZAuD3kkPgZDZD",
   '***REMOVED***': "***REMOVED***",
-  'TOKEN_SECRET': "Alenvi"
+  'TOKEN_SECRET': "Alenvi",
+  Ogust: {
+    'API_LINK': "https://my.ogust.com/api/v2/apiogust.php?method=",
+    'PUBLIC_KEY': "***REMOVED***",
+    'PRIVATE_KEY': "***REMOVED***"
+  }
 }
