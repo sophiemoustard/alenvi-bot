@@ -11,7 +11,7 @@ const moment = require('moment');
 ** Login and get token
 ** Method: POST
 */
-module.exports = function() {
+exports.getToken = function(next) {
   var dateTime = new moment();
   var payload = {
     'key': Ogust.PUBLIC_KEY,
@@ -40,9 +40,12 @@ module.exports = function() {
     // getSalariesByEmployeeId(parsedBody.body.token, 266254102, { "nbPerPage": 20, "pageNum": 1 });
     // getAllSalaries(parsedBody.body.token, { "nbPerPage": 20, "pageNum": 1});
     // getTeamByEmployeeSector(parsedBody.body.token, '1b*', { "nbPerPage": 20, "pageNum": 1 });
+    next(null, parsedBody.body);
   }).catch(function (err) {
     console.error(err);
+    next(err, null);
   })
+  // return result;
 }
 
 // login();

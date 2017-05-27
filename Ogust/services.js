@@ -20,7 +20,7 @@ const moment = require('moment');
 
 ** METHOD: POST
 */
-exports.getAllServices = function(token, timeOption, pageOption) {
+exports.getAllServices = function(token, timeOption, pageOption, next) {
   var interval = getInterval(timeOption);
   var payload = {
     "token": token,
@@ -40,8 +40,10 @@ exports.getAllServices = function(token, timeOption, pageOption) {
     console.log("GET ALL SERVICES:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
 
@@ -59,7 +61,7 @@ exports.getAllServices = function(token, timeOption, pageOption) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeId = function(token, id, timeOption, pageOption) {
+exports.getServicesByEmployeeId = function(token, id, timeOption, pageOption, next) {
   var interval = getInterval(timeOption);
   var payload = {
     "token": token,
@@ -80,8 +82,10 @@ exports.getServicesByEmployeeId = function(token, id, timeOption, pageOption) {
     console.log("GET SERVICES BY EMPLOYEE ID:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
 
@@ -99,7 +103,7 @@ exports.getServicesByEmployeeId = function(token, id, timeOption, pageOption) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByCustomerId = function(token, id, timeOption, pageOption) {
+exports.getServicesByCustomerId = function(token, id, timeOption, pageOption, next) {
   var interval = getInterval(timeOption);
   var payload = {
     "token": token,
@@ -120,8 +124,10 @@ exports.getServicesByCustomerId = function(token, id, timeOption, pageOption) {
     console.log("GET SERVICES BY CUSTOMER ID:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
 

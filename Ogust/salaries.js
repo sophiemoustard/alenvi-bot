@@ -15,7 +15,7 @@ const rp = require('request-promise');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getSalariesByEmployeeId = function(token, id, pageOption) {
+exports.getSalariesByEmployeeId = function(token, id, pageOption, next) {
   var payload = {
     "token": token,
     "id_employee": id,
@@ -33,8 +33,10 @@ exports.getSalariesByEmployeeId = function(token, id, pageOption) {
     console.log("GET SALARIES BY EMPLOYEE ID:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
 
@@ -47,7 +49,7 @@ exports.getSalariesByEmployeeId = function(token, id, pageOption) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getAllSalaries = function(token, pageOption) {
+exports.getAllSalaries = function(token, pageOption, next) {
   var payload = {
     "token": token,
     "nbperpage": pageOption.nbPerPage,
@@ -64,7 +66,9 @@ exports.getAllSalaries = function(token, pageOption) {
     console.log("GET ALL SALARIES:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
