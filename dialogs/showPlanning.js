@@ -1,5 +1,7 @@
 const builder = require('botbuilder');
-const token = require('../Ogust/login');
+const token = require('../Ogust/token');
+const employee = require('../Ogust/employees');
+const services = require('../Ogust/services');
 
 //=========================================================
 // Select planning
@@ -39,7 +41,12 @@ exports.select = [
 //=========================================================
 exports.showMine = [
   (session, args) => {
-    console.log(token());
+    token.getToken(function(err, getToken) {
+      // session.userData.alenvi.employee_id
+      services.getServicesByEmployeeId(getToken.token, 249180689, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "week" }, { "nbPerPage": 20, "pageNum": 1 }, function(err, getServices) {
+      })
+    });
+        // session.userData.ogust = getEmployee;
     session.endDialog("Merci !");
   }
 ]

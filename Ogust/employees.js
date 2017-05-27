@@ -11,7 +11,7 @@ const rp = require('request-promise');
 ** - token: token after login
 ** Method: POST
 */
-exports.getEmployees = function(token, pageOption) {
+exports.getEmployees = function(token, pageOption, next) {
   var payload = {
     'token': token,
     'nbperpage': pageOption.nbPerPage,
@@ -29,8 +29,10 @@ exports.getEmployees = function(token, pageOption) {
     console.log("GET EMPLOYEES:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
 
@@ -41,7 +43,7 @@ exports.getEmployees = function(token, pageOption) {
 ** - id: employee id
 ** Method: POST
 */
-exports.getEmployeeByEmployeeId = function(token, id, pageOption) {
+exports.getEmployeeByEmployeeId = function(token, id, pageOption, next) {
   var payload = {
     'token': token,
     'nbperpage': pageOption.nbPerPage,
@@ -60,7 +62,9 @@ exports.getEmployeeByEmployeeId = function(token, id, pageOption) {
     console.log("GET EMPLOYEE BY EMPLOYEE ID:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }

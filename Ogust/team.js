@@ -15,7 +15,7 @@ const rp = require('request-promise');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getTeamByEmployeeSector = function(token, sector, pageOption) {
+exports.getTeamByEmployeeSector = function(token, sector, pageOption, next) {
   var payload = {
     "token": token,
     "nbperpage": pageOption.nbPerPage,
@@ -33,7 +33,9 @@ exports.getTeamByEmployeeSector = function(token, sector, pageOption) {
     console.log("GET TEAM BY EMPLOYEE SECTOR:");
     console.log(parsedBody.body);
     console.log("Duration: " + parsedBody.timings.end);
+    next(null, parsedBody.body);
   }).catch(function(err) {
     console.error(err);
+    next(err, null);
   })
 }
