@@ -172,6 +172,8 @@ bot.dialog("/hello", require("./dialogs/hello").hello);
 bot.dialog("/select_planning", require("./dialogs/showPlanning").select);
 bot.dialog("/show_my_planning", require("./dialogs/showPlanning").showMine);
 
+bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
+
 //=========================================================
 // Tests
 //=========================================================
