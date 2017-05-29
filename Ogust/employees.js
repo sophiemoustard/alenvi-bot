@@ -37,7 +37,7 @@ exports.getEmployees = function(token, pageOption, next) {
 }
 
 /*
-** Get all employee by employee id
+** Get an employee by employee id
 ** PARAMS:
 ** - token: token after login
 ** - id: employee id
