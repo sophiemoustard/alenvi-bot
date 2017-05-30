@@ -46,8 +46,6 @@ exports.select = [
 //=========================================================
 exports.showMine = [
   (session, args) => {
-    console.log("ARGS =");
-    console.log(args);
     checkOgustToken(session, function(err, isGood) {
       if (err) {
         session.endDialog("Mince, je n'ai pas réussi à récupérer ton autorisation pour obtenir ces informations :/ Si le problème persiste, essaye de contacter un administrateur !");
@@ -56,6 +54,7 @@ exports.showMine = [
         if (args) {
           if (args.weekSelected || args.weekSelected == 0) {
             var days = getDaysByWeekOffset(args.weekSelected);
+            // We have to use session.dialogData to save the week selected in waterfall
             session.dialogData.weekSelected = args.weekSelected;
           }
         }
@@ -63,7 +62,7 @@ exports.showMine = [
           var days = getDaysByWeekOffset();
           session.dialogData.weekSelected = 0;
         }
-        // var days = getDaysByWeekOffset(null, 1);
+        session.dialogData.days = days;
         builder.Prompts.choice(session, "Pour quel jour souhaites-tu consulter ton planning ?", days, { maxRetries: 3 });
       }
     });
@@ -71,43 +70,27 @@ exports.showMine = [
   (session, results) => {
     if (results.response) {
       console.log(results.response);
-      switch (results.response.entity) {
-        case "Précédent":
-          console.log("PREVIOUS WEEK!")
-          return session.beginDialog("/show_my_planning", { weekSelected: --session.dialogData.weekSelected });
-          break;
-        case "Suivant":
-          console.log("NEXT WEEK!")
-          return session.beginDialog("/show_my_planning", { weekSelected: ++session.dialogData.weekSelected });
-          break;
-        case "tchouy":
-          console.log("La communauté");
-          break;
+      // We have to use args to save the offset of the week in the new dialog, because session.dialogData is unset in each new dialog
+      if (results.response.entity == "Précédent") {
+        return session.beginDialog("/show_my_planning", { weekSelected: --session.dialogData.weekSelected });
+      }
+      else if (results.response.entity == "Suivant") {
+        return session.beginDialog("/show_my_planning", { weekSelected: ++session.dialogData.weekSelected });
+      }
+      else {
+        if (session.dialogData.days[results.response.entity]) {
+          getPlanningByChosenDay(session, results);
+        }
       }
     }
-    services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, "20170602", { "nbPerPage": 20, "pageNum": 1 }, function(err, getServices) {
-      if (err) {
-        session.endDialog("Zut, je n'ai pas réussi à récupérer ton planning :/ Si le problème persiste, essaye de contacter un administrateur !");
-      } else {
-        console.log("Service data");
-        _.forEach(getServices.array_service.result, function(serviceData) {
-          console.log(serviceData);
-          customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, serviceData.id_customer, { "nbPerPage": 20, "pageNum": 1 }, function(err, getCustomer) {
-            if (err)
-            session.endDialog("Oups, je n'ai pas réussi à récupérer les personnes concernées par tes interventions :/ Si le problème persiste, essaye de contacter un administrateur !");
-            // console.log(getCustomer);
-            console.log(getCustomer.customer.title + ". " + getCustomer.customer.first_name + " " + getCustomer.customer.last_name);
-          });
-        })
-      }
-    })
-    session.endDialog("Merci !");
   }
 ]
 
-// var days = getDaysByWeekOffset(-X); : -X = get all days from -X week before current one
-// var days = getDaysByWeekOffset(); : no param, get current week
-// var days = getDaysByWeekOffset(X); : X = get all days from +X week after current one
+/*
+** var days = getDaysByWeekOffset(-X); : -X = get all days from -X week before current one, assuming current = 0
+** var days = getDaysByWeekOffset([0]); : no param or 0, get current week, assuming current = 0
+** var days = getDaysByWeekOffset(X); : X = get all days from +X week after current one, assuming current = 0
+*/
 var getDaysByWeekOffset = function(offset) {
   var currentDate = moment();
   var weekStart = currentDate.clone().startOf('week');
@@ -118,22 +101,73 @@ var getDaysByWeekOffset = function(offset) {
     if (offset > 0) {
       weekStart.add(Math.abs(offset), 'week');
     }
-    if (offset == 0) {
-      weekStart = currentDate.clone().startOf('week');
-    }
   }
-  // var weekEnd = currentDate.clone().endOf('week');
-  // var days = [];
   var days = {};
+  // add a 'Précédent' result to the object so it appears in first
   days["Précédent"] = {};
+  // We push all days from a week, to then display it with the good format
   for (var i = 0; i <= 6; i++) {
-    // days.push(moment(weekStart).add(i, 'days').format("DD/MM"));
+    // user format
     var dayUserFormat = moment(weekStart).add(i, 'days');
     days[dayUserFormat.format("DD/MM")] = {};
+    // ogust format
     days[dayUserFormat.format("DD/MM")].dayOgustFormat = dayUserFormat.format("YYYYMMDD");
   }
+  // add a 'Suivant' result to the object so it appears in last
   days["Suivant"] = {};
-  console.log("DAYS =");
-  console.log(days);
   return days;
+}
+
+var getPlanningByChosenDay = function(session, results) {
+  var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
+  // Get services by employee id and the day the user chose
+  services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 }, function(err, getServices) {
+    if (err) {
+      return session.endDialog("Zut, je n'ai pas réussi à récupérer ton planning :/ Si le problème persiste, essaye de contacter un administrateur !");
+    } else {
+      if (getServices.array_service.result.length == 0) {
+        return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
+      }
+      else {
+        var servicesToAdd = [];
+        // Counter so we can know when the forEach loop is over to make it synchronous
+        var counter = 0;
+        // // Sort results by date
+        var sortedServicesByDate = [];
+        for (k in getServices.array_service.result) {
+          sortedServicesByDate.push(getServices.array_service.result[k]);
+        }
+        sortedServicesByDate.sort(function(service1, service2) {
+          return (service1.start_date - service2.start_date);
+        })
+        for (var i = 0; i < sortedServicesByDate.length; i++) {
+          console.log(i);
+          // var serviceData = getServices.array_service.result[key];
+          // Get a customer by its id for each of the service
+          customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, sortedServicesByDate[i].id_customer, { "nbPerPage": 20, "pageNum": 1 }, function(err, getCustomer) {
+            if (err) {
+              return session.endDialog("Oups, je n'ai pas réussi à récupérer les personnes concernées par tes interventions :/ Si le problème persiste, essaye de contacter un administrateur !");
+            }
+            counter++;
+            console.log("counter = " + counter);
+            console.log("i = " + i);
+            console.log("sortedServicesByDate[i].start_date =")
+            console.log(sortedServicesByDate[i].start_date);
+            var startDate = moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("HH:mm");
+            var endDate = moment(sortedServicesByDate[i].end_date, "YYYYMMDDHHmm").format("HH:mm");
+            var firstName = getCustomer.customer.first_name ? getCustomer.customer.first_name + " " : "";
+            servicesToAdd.push(getCustomer.customer.title + ". " + firstName + getCustomer.customer.last_name + ": " + startDate + "-" + endDate);
+            if (counter === sortedServicesByDate.length) {
+              var servicesToDisplay = servicesToAdd.join('  \n');
+              session.send("Interventions le " + moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("DD/MM/YYYY") + ":  \n" + servicesToDisplay);
+              // session.send(servicesToDisplay);
+              return session.endDialog();
+            }
+          });
+        }
+        // Object.keys(getServices.array_service.result).forEach(function(key) {
+        // })
+      }
+    }
+  })
 }
