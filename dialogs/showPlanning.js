@@ -79,7 +79,7 @@ exports.showMine = [
       }
       else {
         if (session.dialogData.days[results.response.entity]) {
-          getPlanningByChosenDay(session, results);
+          return getPlanningByChosenDay(session, results);
         }
       }
     }
@@ -118,56 +118,112 @@ var getDaysByWeekOffset = function(offset) {
   return days;
 }
 
-var getPlanningByChosenDay = function(session, results) {
+// services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 })
+//         .then(toto)
+//         .catch(function(err){
+//           console.log(err)
+//         })
+//
+// function toto(getServices){
+//   if (getServices.body.array_service.result.length == 0) {
+//     return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
+//   } else {
+//     const sortedServicesByDate = await fillAndSortArrByStartDate(getServices.body.array_service.result);
+//     var servicesToAdd = [];
+//     for (var i = 0; i < sortedServicesByDate.length; i++) {
+//       console.log("Coucou ? i = " + i);
+//       const getCustomer = await customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, sortedServicesByDate[i].id_customer, { "nbPerPage": 20, "pageNum": 1 });
+//       console.log("MERDE");
+//       var startDate = moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("HH:mm");
+//       var endDate = moment(sortedServicesByDate[i].end_date, "YYYYMMDDHHmm").format("HH:mm");
+//       var firstName = getCustomer.body.customer.first_name ? getCustomer.body.customer.first_name + " " : "";
+//       servicesToAdd.push(getCustomer.body.customer.title + ". " + firstName + getCustomer.body.customer.last_name + ": " + startDate + "-" + endDate);
+//       var servicesToDisplay = servicesToAdd.join('  \n');
+//     }
+//     session.send("Interventions le " + results.response.entity + ":  \n" + servicesToDisplay);
+//     return session.endDialog();
+//   }
+// }
+
+async function getPlanningByChosenDay(session, results) {
+  session.sendTyping();
   var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
   // Get services by employee id and the day the user chose
-  services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 }, function(err, getServices) {
-    if (err) {
-      return session.endDialog("Zut, je n'ai pas réussi à récupérer ton planning :/ Si le problème persiste, essaye de contacter un administrateur !");
-    } else {
-      if (getServices.array_service.result.length == 0) {
-        return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
-      }
-      else {
-        var servicesToAdd = [];
-        // Counter so we can know when the forEach loop is over to make it synchronous
-        var counter = 0;
-        // // Sort results by date
-        var sortedServicesByDate = [];
-        for (k in getServices.array_service.result) {
-          sortedServicesByDate.push(getServices.array_service.result[k]);
-        }
-        sortedServicesByDate.sort(function(service1, service2) {
-          return (service1.start_date - service2.start_date);
-        })
-        for (var i = 0; i < sortedServicesByDate.length; i++) {
-          console.log(i);
-          // var serviceData = getServices.array_service.result[key];
-          // Get a customer by its id for each of the service
-          customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, sortedServicesByDate[i].id_customer, { "nbPerPage": 20, "pageNum": 1 }, function(err, getCustomer) {
-            if (err) {
-              return session.endDialog("Oups, je n'ai pas réussi à récupérer les personnes concernées par tes interventions :/ Si le problème persiste, essaye de contacter un administrateur !");
-            }
-            counter++;
-            console.log("counter = " + counter);
-            console.log("i = " + i);
-            console.log("sortedServicesByDate[i].start_date =")
-            console.log(sortedServicesByDate[i].start_date);
-            var startDate = moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("HH:mm");
-            var endDate = moment(sortedServicesByDate[i].end_date, "YYYYMMDDHHmm").format("HH:mm");
-            var firstName = getCustomer.customer.first_name ? getCustomer.customer.first_name + " " : "";
-            servicesToAdd.push(getCustomer.customer.title + ". " + firstName + getCustomer.customer.last_name + ": " + startDate + "-" + endDate);
-            if (counter === sortedServicesByDate.length) {
-              var servicesToDisplay = servicesToAdd.join('  \n');
-              session.send("Interventions le " + moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("DD/MM/YYYY") + ":  \n" + servicesToDisplay);
-              // session.send(servicesToDisplay);
-              return session.endDialog();
-            }
-          });
-        }
+  const getServices = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
+  if (getServices.body.array_service.result.length == 0) {
+    return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
+  } else {
+    const sortedServicesByDate = await fillAndSortArrByStartDate(getServices.body.array_service.result);
+    var servicesToAdd = [];
+    for (var i = 0; i < sortedServicesByDate.length; i++) {
+      console.log("Coucou ? i = " + i);
+      const getCustomer = await customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, sortedServicesByDate[i].id_customer, { "nbPerPage": 20, "pageNum": 1 });
+      console.log("MERDE");
+      var startDate = moment(sortedServicesByDate[i].start_date, "YYYYMMDDHHmm").format("HH:mm");
+      var endDate = moment(sortedServicesByDate[i].end_date, "YYYYMMDDHHmm").format("HH:mm");
+      var firstName = getCustomer.body.customer.first_name ? getCustomer.body.customer.first_name + " " : "";
+      servicesToAdd.push(getCustomer.body.customer.title + ". " + firstName + getCustomer.body.customer.last_name + ": " + startDate + "-" + endDate);
+      var servicesToDisplay = servicesToAdd.join('  \n');
+    }
+    session.send("Interventions le " + results.response.entity + ":  \n" + servicesToDisplay);
+    return session.endDialog();
+  }
+}
+
+  // services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 }, function(err, getServices) {
+  //   if (err) {
+  //     return session.endDialog("Zut, je n'ai pas réussi à récupérer ton planning :/ Si le problème persiste, essaye de contacter un administrateur !");
+  //   } else {
+  //     if (getServices.array_service.result.length == 0) {
+  //       return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
+  //     }
+  //     else {
+  //       var servicesToAdd = [];
+        // var counter2 = sortedServicesByDate.length;
+        // _.forEach(sortedServicesByDate, function(serviceData) {
+        //   customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, serviceData.id_customer, { "nbPerPage": 20, "pageNum": 1 }, function(err, getCustomer) {
+        //     if (err) {
+        //       return session.endDialog("Oups, je n'ai pas réussi à récupérer les personnes concernées par tes interventions :/ Si le problème persiste, essaye de contacter un administrateur !");
+        //     }
+        //     console.log("IS SORTED ?");
+        //     console.log(serviceData);
+        //     --counter2;
+        //     console.log("Coucou ?");
+        //     var startDate = moment(serviceData.start_date, "YYYYMMDDHHmm").format("HH:mm");
+        //     var endDate = moment(serviceData.end_date, "YYYYMMDDHHmm").format("HH:mm");
+        //     var firstName = getCustomer.customer.first_name ? getCustomer.customer.first_name + " " : "";
+        //     servicesToAdd.push(getCustomer.customer.title + ". " + firstName + getCustomer.customer.last_name + ": " + startDate + "-" + endDate);
+        //     console.log(counter2);
+        //     if (counter2 === 0) {
+        //       console.log("Coucou 3?");
+        //       var servicesToDisplay = servicesToAdd.join('  \n');
+        //       session.send("Interventions le " + moment(serviceData.start_date, "YYYYMMDDHHmm").format("DD/MM/YYYY") + ":  \n" + servicesToDisplay);
+        //       // session.send(servicesToDisplay);
+        //       return session.endDialog();
+        //     }
+        //   });
+        // })
+
+        // for (k in getServices.array_service.result) {
+        // sortedServicesByDate.push(getServices.array_service.result[k]);
+        // }
+
         // Object.keys(getServices.array_service.result).forEach(function(key) {
         // })
-      }
-    }
+  //     }
+  //   }
+  // })
+// }
+
+const fillAndSortArrByStartDate = async (getServiceResult) => {
+  var sortedServicesByDate = [];
+  for (k in getServiceResult) {
+    sortedServicesByDate.push(getServiceResult[k]);
+  }
+  console.log("UNSORTED = ");
+  console.log(sortedServicesByDate);
+  await sortedServicesByDate.sort(function(service1, service2) {
+    return (service1.start_date - service2.start_date);
   })
+  return sortedServicesByDate;
 }
