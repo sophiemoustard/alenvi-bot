@@ -100,7 +100,7 @@ exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOpt
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdAndDate = function(token, id, date, pageOption, next) {
+exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption, next) => {
   var payload = {
     "token": token,
     "id_employee": id,
@@ -109,24 +109,25 @@ exports.getServicesByEmployeeIdAndDate = function(token, id, date, pageOption, n
     "nbperpage": pageOption.nbPerPage,
     "pagenum": pageOption.pageNum
   }
-  rp.post({
+  return rp.post({
     url: Ogust.API_LINK + "searchService",
     json: true,
     body: payload,
     resolveWithFullResponse: true,
     time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET SERVICES BY EMPLOYEE ID:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
+  });
 }
 
+// .then(function(parsedBody) {
+//   console.log("--------------");
+//   console.log("GET SERVICES BY EMPLOYEE ID:");
+//   console.log(parsedBody.body);
+//   console.log("Duration: " + parsedBody.timings.end);
+//   next(null, parsedBody.body);
+// }).catch(function(err) {
+//   console.error(err);
+//   next(err, null);
+// })
 
 /*
 ** Get services by customer id

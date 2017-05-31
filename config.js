@@ -1,6 +1,5 @@
 module.exports = {
-  'WEBSITE_HOSTNAME': "https://8fd4418d.ngrok.io",
-  // 'WEBSITE_HOSTNAME': "https://c1f594d9.ngrok.io",
+  'WEBSITE_HOSTNAME': "https://d619f5cc.ngrok.io",
   'MICROSOFT_APP_ID': "845d6eba-e003-4f10-82c5-1d6fe9d712e6",
   'MICROSOFT_APP_PASSWORD': "RCJP0v0q7yexo1tqc5Beuid",
   'FACEBOOK_APP_ID': "977382919031323",

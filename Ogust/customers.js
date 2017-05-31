@@ -17,20 +17,22 @@ exports.getCustomerByCustomerId = function(token, id, pageOption, next) {
     "pagenum": pageOption.pageNum,
     'id_customer': id
   }
-  rp.post({
+  return rp.post({
     url: Ogust.API_LINK + "getCustomer",
     json: true,
     body: payload,
     resolveWithFullResponse: true,
     time: true
-  }).then(function(parsedBody) {
-    // console.log("--------------");
-    // console.log("GET CUSTOMER BY CUSTOMER ID:");
-    // console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
+  });
+
+  // .then(function(parsedBody) {
+  //   // console.log("--------------");
+  //   // console.log("GET CUSTOMER BY CUSTOMER ID:");
+  //   // console.log(parsedBody.body);
+  //   console.log("Duration: " + parsedBody.timings.end);
+  //   next(null, parsedBody.body);
+  // }).catch(function(err) {
+  //   console.error(err);
+  //   next(err, null);
+  // })
 }
