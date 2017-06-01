@@ -3,14 +3,22 @@ const moment = require('moment');
 const employee = require('../Ogust/employees');
 const services = require('../Ogust/services');
 const customers = require('../Ogust/customers');
+const team = require('../Ogust/team');
 
 exports.getPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
     var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
     // Get services by employee id and the day the user chose from prompt
-    var getServices = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, 249180689, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
-    if (getServices.body.array_service.result.length == 0) {
+    // employee_id = 249180689 for testing (Aurélie)
+    // or session.userData.alenvi.employee_id in prod
+    var getServices = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.isMe ? session.userData.alenvi.employee_id : session.dialogData.myCorworkerChosen, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
+    if (getServices.body.status == "KO") {
+      throw new Error("Error while getting services: " + getServices.body.message);
+    }
+    console.log("Interventions =");
+    console.log(getServices.body.array_service.result);
+    if (Object.keys(getServices.body.array_service.result).length == 0) {
       return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
     } else {
       let sortedServicesByDate = await fillAndSortArrByStartDate(getServices.body.array_service.result);
@@ -20,7 +28,7 @@ exports.getPlanningByChosenDay = async (session, results) => {
     }
   } catch(err) {
     console.error(err);
-    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaye de contacter un administrateur !");
+    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaie de contacter un administrateur !");
   }
 }
 
@@ -73,6 +81,7 @@ exports.getDaysByWeekOffset = (offset) => {
   // Add a 'Précédent' result to the object so it appears in first
   days["Précédent"] = {};
   // Add all days from a week, to then display it with the good format
+  // Prompt understandable object
   for (var i = 0; i <= 6; i++) {
     // Add user format to prompt
     var dayUserFormat = moment(weekStart).add(i, 'days');
@@ -83,4 +92,28 @@ exports.getDaysByWeekOffset = (offset) => {
   // add a 'Suivant' result to the object so it appears in last
   days["Suivant"] = {};
   return days;
+}
+
+exports.getTeamToDisplayBySector = async (session) => {
+  const getTeam = await team.getTeamByEmployeeBySector(session.userData.ogust.tokenConfig.token, session.userData.alenvi.sector, { "nbPerPage": 20, "pageNum": 1 });
+  if (getTeam.body.status == "KO") {
+    throw new Error("Error while getting team by employee sector: " + getTeam.body.message);
+  }
+  var getTeamResult = getTeam.body.array_employee.result;
+  console.log(getTeamResult);
+  if (Object.keys(getTeamResult).length == 0) {
+    return session.endDialog("Il semble que tu sois le pillier de ta communauté ! :)");
+  } else {
+    // Prompt understandable object
+    var teamToDisplay = {};
+    for (k in getTeamResult) {
+      if (getTeamResult[k].id_employee != session.userData.alenvi.employee_id) {
+        teamToDisplay[getTeamResult[k].first_name + " " + getTeamResult[k].last_name] = {};
+        teamToDisplay[getTeamResult[k].first_name + " " + getTeamResult[k].last_name].employee_id = getTeamResult[k].id_employee;
+      }
+    }
+    console.log("TEAM TO DISPLAY =");
+    console.log(teamToDisplay);
+    return teamToDisplay;
+  }
 }

@@ -170,7 +170,8 @@ bot.dialog("/hello_first", require("./dialogs/hello").hello_first);
 bot.dialog("/hello", require("./dialogs/hello").hello);
 
 bot.dialog("/select_planning", require("./dialogs/showPlanning").select);
-bot.dialog("/show_my_planning", require("./dialogs/showPlanning").showMine);
+bot.dialog("/show_planning", require("./dialogs/showPlanning").showPlanning);
+bot.dialog("/show_another_auxiliary_planning", require("./dialogs/showPlanning").showAnotherAuxiliaryPlanning);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
