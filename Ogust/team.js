@@ -15,27 +15,30 @@ const rp = require('request-promise');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getTeamByEmployeeSector = function(token, sector, pageOption, next) {
-  var payload = {
-    "token": token,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum,
-    "sector": sector
-  }
-  rp.post({
+exports.getTeamByEmployeeBySector = (token, sector, pageOption) => {
+  var options = {
     url: Ogust.API_LINK + "searchEmployee",
     json: true,
-    body: payload,
+    body: {
+      "token": token,
+      "nbperpage": pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum,
+      "sector": sector, // "1b*" for testing purpose
+      "status": 'A', // = "Actif"
+      "nature": 'S' // = "Salarié"
+    },
     resolveWithFullResponse: true,
     time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET TEAM BY EMPLOYEE SECTOR:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
+  }
+  return rp.post(options);
+  // .then(function(parsedBody) {
+  //   console.log("--------------");
+  //   console.log("GET TEAM BY EMPLOYEE SECTOR:");
+  //   console.log(parsedBody.body);
+  //   console.log("Duration: " + parsedBody.timings.end);
+  //   next(null, parsedBody.body);
+  // }).catch(function(err) {
+  //   console.error(err);
+  //   next(err, null);
+  // })
 }
