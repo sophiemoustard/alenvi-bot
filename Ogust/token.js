@@ -8,10 +8,10 @@ const moment = require('moment');
 /********** AUTHENTIFICATION **********/
 
 /*
-** Login and get token
+** Get token from Ogust base
 ** Method: POST
 */
-exports.getToken = function(next) {
+exports.getToken = () => {
   var dateTime = new moment();
   var payload = {
     'key': Ogust.PUBLIC_KEY,
@@ -21,17 +21,18 @@ exports.getToken = function(next) {
   var joinPayload = payload.key + '+' + payload.request + '+' + payload.time;
   var hash = crypto.createHmac('sha1', Ogust.PRIVATE_KEY).update(joinPayload).digest('hex');
   payload['api_signature'] = hash.toUpperCase();
-  rp.post({
+  return rp.post({
     uri: Ogust.API_LINK + "getToken",
     body: payload,
     json: true,
     resolveWithFullResponse: true,
     time: true
-  }).then(function (parsedBody) {
-    console.log("--------------");
-    console.log("LOGIN AND GET TOKEN:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
+  });
+  // .then(function (parsedBody) {
+  //   console.log("--------------");
+  //   console.log("LOGIN AND GET TOKEN:");
+  //   console.log(parsedBody.body);
+  //   console.log("Duration: " + parsedBody.timings.end);
     // getEmployees(parsedBody.body.token, { "nbPerPage": 20, "pageNum": 1 });
     // getEmployeeByEmployeeId(parsedBody.body.token, 266254102, { "nbPerPage": 1, "pageNum": 1 });
     // getAllServices(parsedBody.body.token, { "slotToSub": 2, "slotToAdd": 2, "intervalType": "month" }, { "nbPerPage": 20, "pageNum": 1 });
@@ -40,11 +41,11 @@ exports.getToken = function(next) {
     // getSalariesByEmployeeId(parsedBody.body.token, 266254102, { "nbPerPage": 20, "pageNum": 1 });
     // getAllSalaries(parsedBody.body.token, { "nbPerPage": 20, "pageNum": 1});
     // getTeamByEmployeeSector(parsedBody.body.token, '1b*', { "nbPerPage": 20, "pageNum": 1 });
-    next(null, parsedBody.body);
-  }).catch(function (err) {
-    console.error(err);
-    next(err, null);
-  })
+  //   next(null, parsedBody.body);
+  // }).catch(function (err) {
+  //   console.error(err);
+  //   next(err, null);
+  // })
   // return result;
 }
 

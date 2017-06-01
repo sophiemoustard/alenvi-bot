@@ -61,32 +61,23 @@ exports.getAllServices = function(token, timeOption, pageOption, next) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOption, next) {
+exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOption) {
   var interval = getInterval(timeOption);
-  var payload = {
-    "token": token,
-    "id_employee": id,
-    "status": "@!=|" + 'N',
-    "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  rp.post({
+  var option = {
     url: Ogust.API_LINK + "searchService",
     json: true,
-    body: payload,
+    body: {
+      "token": token,
+      "id_employee": id,
+      "status": "@!=|" + 'N',
+      "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
+      "nbperpage": pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum
+    },
     resolveWithFullResponse: true,
     time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET SERVICES BY EMPLOYEE ID:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
+  }
+  return rp.post(option);
 }
 
 /*
@@ -100,22 +91,33 @@ exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOpt
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption, next) => {
-  var payload = {
-    "token": token,
-    "id_employee": id,
-    "status": "@!=|" + 'N',
-    "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  return rp.post({
+exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
+  var option = {
     url: Ogust.API_LINK + "searchService",
     json: true,
-    body: payload,
+    body: {
+      "token": token,
+      "id_employee": id,
+      "status": "@!=|" + 'N',
+      "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
+      "nbperpage": pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum
+    },
     resolveWithFullResponse: true,
     time: true
-  });
+  }
+  return rp.post(option);
+  //   .then(function(parsedBody) {
+  //   console.log("--------------");
+  //   console.log("GET SERVICES BY EMPLOYEE ID:");
+  //   console.log(parsedBody.body);
+  //   console.log("Duration: " + parsedBody.timings.end);
+  //   // next(null, parsedBody.body);
+  //   return parsedBody.body;
+  // }).catch(function(err) {
+  //   console.error(err);
+  //   return err;
+  // })
 }
 
 // .then(function(parsedBody) {
