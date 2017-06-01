@@ -10,20 +10,20 @@ const rp = require('request-promise');
 ** - id: customer id
 ** Method: POST
 */
-exports.getCustomerByCustomerId = function(token, id, pageOption, next) {
-  var payload = {
-    'token': token,
-    'nbperpage': pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum,
-    'id_customer': id
-  }
-  return rp.post({
+exports.getCustomerByCustomerId = (token, id, pageOption) => {
+  var options = {
     url: Ogust.API_LINK + "getCustomer",
     json: true,
-    body: payload,
+    body: {
+      'token': token,
+      'nbperpage': pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum,
+      'id_customer': id
+    },
     resolveWithFullResponse: true,
     time: true
-  });
+  }
+  return rp.post(options);
 
   // .then(function(parsedBody) {
   //   // console.log("--------------");
