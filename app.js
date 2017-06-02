@@ -161,6 +161,10 @@ bot.dialog('/', new builder.IntentDialog()
     )
 );
 
+//=========================================================
+// Dialogs routing
+//=========================================================
+
 bot.dialog("/not_understand", require("./dialogs/notUnderstand"));
 
 bot.dialog("/login_facebook", require("./dialogs/facebookLoginLogout").login);
@@ -172,6 +176,7 @@ bot.dialog("/hello", require("./dialogs/hello").hello);
 bot.dialog("/select_planning", require("./dialogs/showPlanning").select);
 bot.dialog("/show_planning", require("./dialogs/showPlanning").showPlanning);
 bot.dialog("/show_another_auxiliary_planning", require("./dialogs/showPlanning").showAnotherAuxiliaryPlanning);
+// bot.dialog("/show_community_planning", require("./dialogs/showPlanning").showPlanning);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 

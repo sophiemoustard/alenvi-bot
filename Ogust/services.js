@@ -17,34 +17,51 @@ const moment = require('moment');
 ** - pageOption:
 ** --- nbPerPage: X (number of results returned per pages)
 ** --- pageNum: Y (number of pages)
-
 ** METHOD: POST
 */
-exports.getAllServices = function(token, timeOption, pageOption, next) {
-  var interval = getInterval(timeOption);
-  var payload = {
-    "token": token,
-    "status": "@!=|" + 'N',
-    "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  rp.post({
+exports.getAllServicesInRange = function(token, timeOption, pageOption) {
+  var interval = getIntervalInRange(timeOption);
+  var options = {
     url: Ogust.API_LINK + "searchService",
     json: true,
-    body: payload,
+    body: {
+      "token": token,
+      "status": "@!=|" + 'N',
+      "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
+      "nbperpage": pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum
+    },
     resolveWithFullResponse: true,
     time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET ALL SERVICES:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
+  }
+  return rp.post(options);
+  // .then(function(parsedBody) {
+  //   console.log("--------------");
+  //   console.log("GET ALL SERVICES:");
+  //   console.log(parsedBody.body);
+  //   console.log("Duration: " + parsedBody.timings.end);
+  //   next(null, parsedBody.body);
+  // }).catch(function(err) {
+  //   console.error(err);
+  //   next(err, null);
+  // })
+}
+
+exports.getAllServicesByInDate = (token, date, pageOption) => {
+  var option = {
+    url: Ogust.API_LINK + "searchService",
+    json: true,
+    body: {
+      "token": token,
+      "status": "@!=|" + 'N',
+      "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
+      "nbperpage": pageOption.nbPerPage,
+      "pagenum": pageOption.pageNum
+    },
+    resolveWithFullResponse: true,
+    time: true
+  }
+  return rp.post(option);
 }
 
 /*
@@ -62,7 +79,7 @@ exports.getAllServices = function(token, timeOption, pageOption, next) {
 ** METHOD: POST
 */
 exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOption) {
-  var interval = getInterval(timeOption);
+  var interval = getIntervalInRange(timeOption);
   var option = {
     url: Ogust.API_LINK + "searchService",
     json: true,
@@ -146,7 +163,7 @@ exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
 ** METHOD: POST
 */
 exports.getServicesByCustomerId = function(token, id, timeOption, pageOption, next) {
-  var interval = getInterval(timeOption);
+  var interval = getIntervalInRange(timeOption);
   var payload = {
     "token": token,
     "id_customer": id,
@@ -181,7 +198,7 @@ exports.getServicesByCustomerId = function(token, id, timeOption, pageOption, ne
 ** --- slotToAdd (time in number to add)
 ** --- intervalType: "day", "week", "year", "hour"...
 */
-var getInterval = function(timeOption) {
+var getIntervalInRange = function(timeOption) {
   timeOption.slotToSub = Math.abs(timeOption.slotToSub);
   timeOption.slotToAdd = Math.abs(timeOption.slotToAdd);
   var dateNow = moment();
@@ -191,3 +208,7 @@ var getInterval = function(timeOption) {
   }
   return finalInterval;
 }
+
+// var getIntervalByDayOffset = function(offset) {
+//
+// }
