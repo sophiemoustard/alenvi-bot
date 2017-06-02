@@ -12,12 +12,14 @@ exports.getPlanningByChosenDay = async (session, results) => {
     // Get services by employee id and the day the user chose from prompt
     // employee_id = 249180689 for testing (Aurélie)
     // or session.userData.alenvi.employee_id in prod
-    var getServices = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.isMe ? session.userData.alenvi.employee_id : session.dialogData.myCorworkerChosen, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
+    if (session.dialogData.isCommunity) {
+      var getServices = await services.getAllServicesInDate(session.userData.ogust.tokenConfig.token, session.dialogData.myCoworkerChosen ? session.dialogData.myCoworkerChosen.employee_id : session.userData.alenvi.employee_id, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
+    } else {
+      var getServices = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.myCoworkerChosen ? session.dialogData.myCoworkerChosen.employee_id : session.userData.alenvi.employee_id, dayChosen, { "nbPerPage": 20, "pageNum": 1 });
+    }
     if (getServices.body.status == "KO") {
       throw new Error("Error while getting services: " + getServices.body.message);
     }
-    console.log("Interventions =");
-    console.log(getServices.body.array_service.result);
     if (Object.keys(getServices.body.array_service.result).length == 0) {
       return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
     } else {
@@ -32,6 +34,15 @@ exports.getPlanningByChosenDay = async (session, results) => {
   }
 }
 
+// exports.getCommunityPlanningByChosenDay = async (session, results) => {
+//   try {
+//     session.sendTyping();
+//     var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
+//     var communityServicesByDay = await services.getAllServicesByCommunityAndDate(session.userData.ogust.tokenConfig.token, { "nbPerPage": 20, "pageNum": 1 })
+//   }
+// }
+
+// Get all services applied to a specific customer, and format it to display then
 const getServicesToDisplay = async (session, sortedServicesByDate) => {
   var servicesToDisplay = [];
   for (var i = 0; i < sortedServicesByDate.length; i++) {
@@ -50,11 +61,6 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
   return servicesToDisplay.join('  \n');
 }
 
-/*
-** var days = getDaysByWeekOffset(-X); : -X = get all days from -X week before current one, assuming current = 0
-** var days = getDaysByWeekOffset([0]); : no param or 0, get current week, assuming current = 0
-** var days = getDaysByWeekOffset(X); : X = get all days from +X week after current one, assuming current = 0
-*/
 const fillAndSortArrByStartDate = async (getServiceResult) => {
   var sortedServicesByDate = [];
   for (k in getServiceResult) {
@@ -66,6 +72,12 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
   return sortedServicesByDate;
 }
 
+/*
+** var days = getDaysByWeekOffset(-X); : -X = get all days from -X week before current one, assuming current = 0
+** var days = getDaysByWeekOffset([0]); : no param or 0, get current week, assuming current = 0
+** var days = getDaysByWeekOffset(X); : X = get all days from +X week after current one, assuming current = 0
+*/
+// Get days be week offset, used in generic show_planning
 exports.getDaysByWeekOffset = (offset) => {
   var currentDate = moment();
   var weekStart = currentDate.clone().startOf('week');
