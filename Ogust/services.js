@@ -19,7 +19,7 @@ const moment = require('moment');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getAllServicesInRange = function(token, timeOption, pageOption) {
+exports.getServicesInRange = function(token, timeOption, pageOption) {
   var interval = getIntervalInRange(timeOption);
   var options = {
     url: Ogust.API_LINK + "searchService",
@@ -27,6 +27,7 @@ exports.getAllServicesInRange = function(token, timeOption, pageOption) {
     body: {
       "token": token,
       "status": "@!=|" + 'N',
+      "type": "I",
       "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
       "nbperpage": pageOption.nbPerPage,
       "pagenum": pageOption.pageNum
@@ -47,13 +48,14 @@ exports.getAllServicesInRange = function(token, timeOption, pageOption) {
   // })
 }
 
-exports.getAllServicesByInDate = (token, date, pageOption) => {
+exports.getServicesByDate = (token, date, pageOption) => {
   var option = {
     url: Ogust.API_LINK + "searchService",
     json: true,
     body: {
       "token": token,
       "status": "@!=|" + 'N',
+      "type": "I",
       "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
       "nbperpage": pageOption.nbPerPage,
       "pagenum": pageOption.pageNum
@@ -87,6 +89,7 @@ exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOpt
       "token": token,
       "id_employee": id,
       "status": "@!=|" + 'N',
+      "type": "I",
       "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
       "nbperpage": pageOption.nbPerPage,
       "pagenum": pageOption.pageNum
@@ -116,6 +119,7 @@ exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
       "token": token,
       "id_employee": id,
       "status": "@!=|" + 'N',
+      "type": "I", // Intervention
       "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
       "nbperpage": pageOption.nbPerPage,
       "pagenum": pageOption.pageNum
@@ -168,6 +172,7 @@ exports.getServicesByCustomerId = function(token, id, timeOption, pageOption, ne
     "token": token,
     "id_customer": id,
     "status": "@!=|" + 'N',
+    "type": "I", // Intervention
     "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
     "nbperpage": pageOption.nbPerPage,
     "pagenum": pageOption.pageNum
