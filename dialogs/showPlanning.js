@@ -2,8 +2,10 @@ const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const getPlanningByChosenDay = require('../helpers/planning').getPlanningByChosenDay;
+const getCommunityPlanningByChosenDay = require('../helpers/planning').getCommunityPlanningByChosenDay;
 const getDaysByWeekOffset = require('../helpers/planning').getDaysByWeekOffset;
-const getTeamToDisplayBySector = require('../helpers/planning').getTeamToDisplayBySector;
+const getTeamBySector = require('../helpers/planning').getTeamBySector;
+const formatListOtherAuxiliaries = require('../helpers/planning').formatListOtherAuxiliaries;
 
 //=========================================================
 // Root 'Select planning' dialog
@@ -11,7 +13,7 @@ const getTeamToDisplayBySector = require('../helpers/planning').getTeamToDisplay
 exports.select = [
   (session, args) => {
     session.sendTyping();
-    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxilière|La communauté");
+    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxilière|Ma communauté");
   },
   (session, results) => {
     if (results.response) {
@@ -24,7 +26,7 @@ exports.select = [
           case "Un(e) auxilière":
             session.beginDialog("/show_another_auxiliary_planning");
             break;
-          case "La communauté":
+          case "Ma communauté":
             session.beginDialog("/show_planning", { weekSelected: 0, myCoworkerChosen: "", isCommunity: true });
             break;
         }
@@ -37,7 +39,8 @@ exports.select = [
 ];
 
 //=========================================================
-// Show a planning, user connected one by default ; generic function shared by all selected dialog
+// Show a planning, user connected one by default
+// Generic function shared by my own planning and another auxiliary planning
 //=========================================================
 exports.showPlanning = [
   async (session, args) => {
@@ -94,7 +97,13 @@ exports.showPlanning = [
       }
       else {
         if (session.dialogData.days[results.response.entity]) {
-          return getPlanningByChosenDay(session, results);
+          // My community planning
+          if (session.dialogData.isCommunity) {
+            return getCommunityPlanningByChosenDay(session, results);
+          } else {
+            // My planning and another auxiliary planning
+            return getPlanningByChosenDay(session, results);
+          }
         }
       }
     }
@@ -110,7 +119,8 @@ exports.showAnotherAuxiliaryPlanning = [
       await checkOgustToken(session);
       session.sendTyping();
       // Get list of coworkers
-      const myCoworkers = await getTeamToDisplayBySector(session);
+      const myRawCoworkers = await getTeamBySector(session);
+      const myCoworkers = await formatListOtherAuxiliaries(session, myRawCoworkers);
       // Put the list in dialogData so we can compare it in next function
       session.dialogData.myCoworkers = myCoworkers;
       builder.Prompts.choice(session, "Quel(le) auxiliaire précisément ?", myCoworkers, { maxRetries: 3 });
