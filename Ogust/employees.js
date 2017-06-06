@@ -88,7 +88,7 @@ exports.getEmployeesBySector = (token, sector, pageOption) => {
       "token": token,
       "nbperpage": pageOption.nbPerPage,
       "pagenum": pageOption.pageNum,
-      "sector": "1b*", // "1b*" for testing purpose, sector in prod
+      "sector": sector, // "1b*" for testing purpose, sector in prod
       "status": 'A', // = "Actif"
       "nature": 'S' // = "Salarié"
     },
