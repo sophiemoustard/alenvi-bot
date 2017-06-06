@@ -83,7 +83,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
     session.sendTyping();
     var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
     var workingHoursRaw = await getWorkHoursByDay(session, dayChosen);
-    var workingHoursToDisplay = formatCommunityWorkingHours(workingHoursRaw);
+    var workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
     session.send("Planning de ta communauté le " + results.response.entity + ":  \n" + workingHoursToDisplay);
     return session.endDialog();
   } catch(err) {
@@ -124,22 +124,16 @@ const getWorkHoursByDay = async (session, dayChosen) => {
 
 const formatCommunityWorkingHours = async (workingHours) => {
   var planningToDisplay = [];
-  console.log("WORKING HOURS");
-  console.log(workingHours);
   for (k in workingHours) {
     var obj = workingHours[k];
-    console.log("test 1");
-    var planningToAdd = obj.first_name + " " + obj.last_name + "\n";
+    var planningToAdd = obj.first_name + " " + obj.last_name + ":  \n";
     for (indexService in obj) {
-      console.log("test 2");
-      planningToAdd += obj[indexService].start_date + " - " + obj[indexService].end_date + "\n";
+      if (obj[indexService].start_date && obj[indexService].end_date) {
+        planningToAdd += obj[indexService].start_date + " - " + obj[indexService].end_date + "  \n";
+      }
     }
-    console.log("PLANNING TO ADD =");
-    console.log(planningToAdd);
     planningToDisplay.push(planningToAdd);
   }
-  console.log("PLANNING TO DISPLAY = ");
-  console.log(planningToDisplay);
   return planningToDisplay.join('  \n');
 }
 
