@@ -83,9 +83,13 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
     session.sendTyping();
     var dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
     var workingHoursRaw = await getWorkHoursByDay(session, dayChosen);
-    var workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
-    session.send("Planning de ta communauté le " + results.response.entity + ":  \n" + workingHoursToDisplay);
-    return session.endDialog();
+    if (Object.keys(workingHoursRaw).length == 0) {
+      return session.endDialog("Aucune intervention de prévue ce jour-là ! :)");
+    } else {
+      var workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
+      session.send("Planning de ta communauté le " + results.response.entity + ":  \n" + workingHoursToDisplay);
+      return session.endDialog();
+    }
   } catch(err) {
     console.error(err);
     return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter un administrateur !");
