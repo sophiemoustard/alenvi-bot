@@ -1,3 +1,22 @@
 {
-  "default_error": "Désolé mais je me suis écrasé en route ! :( Tu peux réessayer autrement ? Si le problème persiste, essaie de contacter un administrateur !"
+  "default_text": "Je n'ai pas compris, dis-le moi autrement stp :)",
+  "default_number": "Je n'ai pas compris, dis-moi un nombre stp :)",
+  "default_confirm": "Je n'ai pas compris, dis-moi 'oui' ou 'non' stp :)",
+  "default_choice": "Je n'ai pas compris, choisis une des réponses de la liste stp :)",
+  "default_time": "Je n'ai pas reconnu le temps entré, dis-le moi avec le bon format (MM/DD/YYYY HH:MM:SS) stp :)",
+  "default_file": "Je n'ai pas reçu de fichier, réessaye stp :)",
+  "default_error": "Désolé mais je me suis écrasé en route ! :( Réessaye autrement stp, et si le problème persiste, essaie de contacter un administrateur !",
+  "list_or": " ou ",
+  "list_or_more": ", ou ",
+  "confirm_yes": "oui",
+  "confirm_no": "non",
+  "boolean_choices": "true=oui, Oui, y,yes,yep,sure,ok,\u1F44D,\u1F44C|false=non, Non, n,no,nope,\u1F44E,\u270B,\u1F590",
+  "number_terms": "0=zero|1=un|2=deux|3=trois|4=quatre|5=cinq|6=six|7=sept|8=huit|9=neuf|10=dix|11=onze|12=douze|13=treize|14=quatorze|15=quinze|16=seize|17=dix-sept|18=dix-huit|19=dix-neuf|20=vingt",
+  "number_ordinals": "1=1er,premier|2=2ème,second|3=3ème, troisième|4=4ème,quatrième|5=5ème,cinquième|6=6ème,sixième|7=7ème,septième|8=8ème,huitième|9=9ème,neufième|10=10ème,dixième",
+  "number_minValue_error": "Le nombre que tu as dit est en dessous du minimum autorisé ( %(minValue)d ). Entre un nombre valide stp :)",
+  "number_maxValue_error": "Le nombre que tu as dit est au dessus du maximum autorisé ( %(maxValue)d ). Entre un nombre valide stp :)",
+  "number_range_error": "Le nombre que tu as entré est en dehors de la plage autorisée ( de %(minValue)d à %(maxValue)d ). Entre un nombre valide stp :)",
+  "number_integer_error": "Tu ne m'as dis un nombre entier. Dis-moi un nombre sans virgule stp :)",
+  "yesExp": "^(1|oui|Oui|y|yes|yep|sure|ok|true)(\\W|$)",
+  "noExp": "^(2|non|Non|n|no|nope|not|false)(\\W|$)"
 }
