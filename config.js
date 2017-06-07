@@ -11,5 +11,8 @@ module.exports = {
     'API_LINK': "https://my.ogust.com/api/v2/apiogust.php?method=",
     'PUBLIC_KEY': "24994193332347792252",
     'PRIVATE_KEY': "70D6D865FF2F7671"
+  },
+  Slack: {
+    'TOKEN': "xoxb-186442362724-VuA61egPYzNmY3WlbF4jRFiz"
   }
 }

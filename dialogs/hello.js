@@ -23,6 +23,8 @@ exports.hello = [
       session.beginDialog('/hello_first');
     } else {
       session.sendTyping();
+      // console.log("SESSION =");
+      // console.log(session);
       builder.Prompts.choice(session, "Hello " + session.userData.alenvi.firstname + "! 😉 Comment puis-je t’aider ?", "Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos");
     }
   },
