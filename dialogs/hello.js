@@ -34,10 +34,10 @@ exports.hello = [
         console.log(results.response);
         switch (results.response.entity) {
           case "Consulter planning":
-            session.beginDialog("/select_planning");
+            session.beginDialog("/select_show_planning");
             break;
           case "Modifier planning":
-            console.log("Modify planning");
+            session.beginDialog("/select_modify_planning");
             break;
           case "Bénéficiaires":
             console.log("Beneficiaires");

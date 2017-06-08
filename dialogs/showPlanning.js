@@ -8,12 +8,12 @@ const getTeamBySector = require('../helpers/planning').getTeamBySector;
 const formatListOtherAuxiliaries = require('../helpers/planning').formatListOtherAuxiliaries;
 
 //=========================================================
-// Root 'Select planning' dialog
+// Root 'Select show planning' dialog
 //=========================================================
 exports.select = [
   (session, args) => {
     session.sendTyping();
-    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxilière|Ma communauté");
+    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxiliaire|Ma communauté");
   },
   (session, results) => {
     if (results.response) {
@@ -23,7 +23,7 @@ exports.select = [
           case "Le miens":
             session.beginDialog("/show_planning", { weekSelected: 0, myCoworkerChosen: "", isCommunity: false });
             break;
-          case "Un(e) auxilière":
+          case "Un(e) auxiliaire":
             session.beginDialog("/show_another_auxiliary_planning");
             break;
           case "Ma communauté":

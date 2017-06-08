@@ -173,10 +173,13 @@ bot.dialog("/logout_facebook", require("./dialogs/facebookLoginLogout").logout);
 bot.dialog("/hello_first", require("./dialogs/hello").hello_first);
 bot.dialog("/hello", require("./dialogs/hello").hello);
 
-bot.dialog("/select_planning", require("./dialogs/showPlanning").select);
+bot.dialog("/select_show_planning", require("./dialogs/showPlanning").select);
 bot.dialog("/show_planning", require("./dialogs/showPlanning").showPlanning);
 bot.dialog("/show_another_auxiliary_planning", require("./dialogs/showPlanning").showAnotherAuxiliaryPlanning);
 // bot.dialog("/show_community_planning", require("./dialogs/showPlanning").showPlanning);
+
+bot.dialog("/select_modify_planning", require("./dialogs/modifyPlanning").select);
+bot.dialog("/ask_for_request", require("./dialogs/modifyPlanning").askForRequest);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
