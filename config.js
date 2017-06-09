@@ -13,6 +13,11 @@ module.exports = {
     'PRIVATE_KEY': "***REMOVED***"
   },
   Slack: {
-    'TOKEN': "***REMOVED***"
+    'TOKEN': "***REMOVED***",
+    channels: {
+      "1b*": "G5QLJ49KL",
+      "2b*": "G5QLHLTPC",
+      "*": "G5QLJ49KL"
+    }
   }
 }
