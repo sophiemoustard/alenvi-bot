@@ -4,14 +4,10 @@ const moment = require('moment');
 const token = require('../Ogust/token');
 
 exports.checkToken = async (session) => {
-  if (!session.userData.ogust) {
-    session.userData.ogust = {};
-  }
-  if (!session.userData.ogust.tokenConfig) {
-    session.userData.ogust.tokenConfig = {};
-    session.userData.ogust.tokenConfig.token = "";
-    session.userData.ogust.tokenConfig.expireDate = "";
-  }
+  session.userData.ogust = session.userData.ogust || {};
+  session.userData.ogust.tokenConfig = session.userData.ogust.tokenConfig || {};
+  session.userData.ogust.tokenConfig.token = session.userData.ogust.tokenConfig.token || "";
+  session.userData.ogust.tokenConfig.expireDate = session.userData.ogust.tokenConfig.expireDate || "";
   if (session.userData.ogust.tokenConfig.token == "") {
     await addTokenToSession(session);
   }

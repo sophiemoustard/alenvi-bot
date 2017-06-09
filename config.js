@@ -13,6 +13,11 @@ module.exports = {
     'PRIVATE_KEY': "70D6D865FF2F7671"
   },
   Slack: {
-    'TOKEN': "xoxb-186442362724-VuA61egPYzNmY3WlbF4jRFiz"
+    'TOKEN': "xoxb-186442362724-VuA61egPYzNmY3WlbF4jRFiz",
+    channels: {
+      "1b*": "G5QLJ49KL",
+      "2b*": "G5QLHLTPC",
+      "*": "G5QLJ49KL"
+    }
   }
 }

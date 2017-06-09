@@ -12,7 +12,6 @@ const passport = require("passport");
 const FacebookStrategy = require("passport-facebook").Strategy;
 
 const config = require('./config');
-// const ogust = require('./ogust.js');
 
 const PORT = process.env.PORT || '3978';
 
@@ -41,7 +40,9 @@ bot.set('localizerSettings', {
 })
 
 const logUserConversation = (event) => {
+  if (event.text) {
     console.log('message: ' + event.text + ', user: ' + event.address.user.name);
+  }
 };
 
 // Middleware for logging
@@ -50,6 +51,9 @@ bot.use({
         logUserConversation(event);
         next();
     },
+    // botbuilder: (session, next) => {
+    //   console.log(session.message.text);
+    // },
     send: function (event, next) {
         logUserConversation(event);
         next();
@@ -104,7 +108,7 @@ bot.on('conversationUpdate', function (message) {
 bot.dialog('/', new builder.IntentDialog()
     // .matches(/^connexion/i, "/connection")
     .matches(/^d[ée]connexion/i, "/logout_facebook")
-    .matches(/coucou|bonjour|bonsoir|hello|hi|hey|salut/i, "/hello")
+    .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, "/hello")
     // .matches(/Consulter planning/i, "/show_planning")
     // .matches(/^log in|login/i, "/login")
     .onDefault(
