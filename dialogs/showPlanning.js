@@ -9,7 +9,7 @@ const planning = require('../helpers/planning');
 
 const whichPlanning = (session, args) => {
     session.sendTyping();
-    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxiliaire|Ma communauté");
+    builder.Prompts.choice(session, "Quel planning souhaites-tu consulter en particulier ?", "Le miens|Un(e) auxiliaire|Ma communauté", {maxRetries: 0});
 }
 
 const redirectToDaySelected = (session, results) => {
@@ -31,6 +31,8 @@ const redirectToDaySelected = (session, results) => {
     else {
       session.endDialog("Vous devez vous connecter pour accéder à cette fonctionnalité ! :)");
     }
+  } else {
+    session.cancelDialog(0, "/hello");
   }
 }
 
@@ -68,7 +70,7 @@ const whichDay = async (session, args) => {
     } else {
       targetPlanning = "ton planning";
     }
-    builder.Prompts.choice(session, "Pour quel jour souhaites-tu consulter " + targetPlanning + " ?", days, { maxRetries: 3 });
+    builder.Prompts.choice(session, "Pour quel jour souhaites-tu consulter " + targetPlanning + " ?", days, {maxRetries: 0});
   } catch(err) {
     console.error(err);
     return session.endDialog("Mince, je n'ai pas réussi à récupérer ton autorisation pour obtenir ces informations :/ Si le problème persiste, essaie de contacter un administrateur !");
@@ -77,7 +79,6 @@ const whichDay = async (session, args) => {
 
 const handleWeeksOrGetPlanningSelected = (session, results) => {
   if (results.response) {
-    console.log(results.response);
     // We have to use args to save the offset of the week in the new dialog, because session.dialogData is unset in each new dialog
     if (results.response.entity == "Précédent") {
       var params = {
@@ -106,6 +107,8 @@ const handleWeeksOrGetPlanningSelected = (session, results) => {
         }
       }
     }
+  } else {
+    session.cancelDialog(0, "/hello");
   }
 }
 
@@ -124,7 +127,7 @@ const whichAuxiliary = async (session, args) => {
     const myCoworkers = await planning.formatListOtherAuxiliaries(session, myRawCoworkers);
     // Put the list in dialogData so we can compare it in next function
     session.dialogData.myCoworkers = myCoworkers;
-    builder.Prompts.choice(session, "Quel(le) auxiliaire précisément ?", myCoworkers, { maxRetries: 3 });
+    builder.Prompts.choice(session, "Quel(le) auxiliaire précisément ?", myCoworkers, {maxRetries: 0});
   } catch (err) {
     console.error(err);
     return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter un administrateur !");
@@ -132,7 +135,7 @@ const whichAuxiliary = async (session, args) => {
 }
 
 const redirectToShowPlanning = (session, results) => {
-  if (results.response.entity) {
+  if (results.response) {
     if (session.dialogData.myCoworkers[results.response.entity]) {
       var params = {
         weekSelected: 0,
@@ -141,6 +144,8 @@ const redirectToShowPlanning = (session, results) => {
       }
       return session.beginDialog("/show_planning", params);
     }
+  } else {
+    session.cancelDialog(0, "/hello");
   }
 }
 
