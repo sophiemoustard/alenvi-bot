@@ -35,7 +35,7 @@ var bot = new builder.UniversalBot(connector);
 bot.set('persistConversationData', true);
 
 bot.set('localizerSettings', {
-  botLocalePath : path.join(__dirname, "./helpers/locale"),
+  botLocalePath : path.join(__dirname, "./locale"),
   defaultLocale: "fr_FR"
 })
 
