@@ -10,11 +10,11 @@ const config = require('../config');
 
 const whichDeclaration = (session, args) => {
   session.sendTyping();
-  builder.Prompts.choice(session, "Que souhaites-tu déclarer ?", "Heures internes|Modif. intervention");
+  builder.Prompts.choice(session, "Que souhaites-tu déclarer ?", "Heures internes|Modif. intervention", {maxRetries: 0});
 }
 
 const redirectToDeclarationSelected = (session, results) => {
-  if (results.response != null) {
+  if (results.response) {
     console.log(results.response);
     if (session.userData.alenvi) {
       console.log(results.response);
@@ -32,7 +32,6 @@ const redirectToDeclarationSelected = (session, results) => {
     }
   }
   else {
-    console.log(results.response);
     session.cancelDialog(0, "/hello");
   }
 }
@@ -43,7 +42,7 @@ exports.select = [whichDeclaration, redirectToDeclarationSelected];
 // 'Request to coach' dialog
 //=========================================================
 
-const requestDescription = (session, args) => {
+const promptDescription = (session, args) => {
   session.sendTyping();
   builder.Prompts.text(session, "Décris-moi les heures internes que tu souhaites déclarer (jour, heure, tâche)  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)");
   // var card = new builder.HeroCard(session)
@@ -65,8 +64,10 @@ const handleRequest = async (session, results) => {
   try {
     if (results.response) {
       console.log(results.response);
-      if (/^annuler$/i.test(results.response)){
-        session.endDialog("Tu as bien annulé ta demande ! Reparle-moi quand tu veux :)");
+      if (/^annuler|anuler$/i.test(results.response)){
+        session.sendTyping();
+        session.send("Tu as bien annulé ta demande ! :)");
+        session.replaceDialog("/select_modify_planning");
       } else {
         let author = session.userData.alenvi.firstname + " " + session.userData.alenvi.lastname;
         let date = moment().format('DD/MM/YYYY, HH:mm');
@@ -88,7 +89,7 @@ const handleRequest = async (session, results) => {
   }
 }
 
-exports.askForRequest = [requestDescription, handleRequest];
+exports.askForRequest = [promptDescription, handleRequest];
 
 const sendRequestToSlack = (author, date, textToSend, sector) => {
   // var message = new builder.Message(session).sourceEvent({
