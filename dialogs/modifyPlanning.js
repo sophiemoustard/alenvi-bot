@@ -69,10 +69,16 @@ const handleRequest = async (session, results) => {
         session.send("Tu as bien annulé ta demande ! :)");
         session.replaceDialog("/select_modify_planning");
       } else {
-        let author = session.userData.alenvi.firstname + " " + session.userData.alenvi.lastname;
-        let date = moment().format('DD/MM/YYYY, HH:mm');
+        let options = {
+          type: "Heures internes",
+          author: session.userData.alenvi.firstname + " " + session.userData.alenvi.lastname,
+          dateRequest: moment().format('DD/MM/YYYY, HH:mm'),
+          textToSend: results.response,
+          sector: session.userData.alenvi.sector,
+          target: session.userData.alenvi.firstname + " " + session.userData.alenvi.lastname
+        }
         // let textToSend = author + ":\n" + results.response;
-        var sent = await sendRequestToSlack(author, date, results.response, session.userData.alenvi.sector);
+        var sent = await sendRequestToSlack(options);
         if (sent.ok == false) {
           throw new Error(sent);
         }
@@ -91,58 +97,36 @@ const handleRequest = async (session, results) => {
 
 exports.askForRequest = [promptDescription, handleRequest];
 
-const sendRequestToSlack = (author, date, textToSend, sector) => {
-  // var message = new builder.Message(session).sourceEvent({
-  //   slack: {
-  //     "channel": config.Slack.channels[sector], // "G5QLJ49KL",
-  //     "attachments": JSON.stringify([
-  //       {
-  //         "callback_id": "request_processed",
-  //         "title": "Demande:",
-  //         "text": textToSend,
-  //         "fields": [
-  //           {
-  //             "title": "Name",
-  //             "value": author,
-  //             "short": true
-  //           },
-  //           {
-  //             "title": "Date",
-  //             "value": date,
-  //             "short": true
-  //           }
-  //         ],
-  //         "actions": [
-  //           {
-  //             "name": "is_processed",
-  //             "text": "Traité",
-  //             "type": "button",
-  //             // "value": "done"
-  //           }
-  //         ]
-  //       }
-  //     ])
-  //   }
-
+const sendRequestToSlack = (payload) => {
   var options = {
     uri: "https://slack.com/api/chat.postMessage",
     form: {
-      "token": "***REMOVED***",
-      "channel": config.Slack.channels[sector], // "G5QLJ49KL",
+      "token": process.env.SLACK_TOKEN || config.Slack.TOKEN,
+      "channel": config.Slack.channels[payload.sector], // "G5QLJ49KL",
       "attachments": JSON.stringify([
         {
           "callback_id": "request_processed",
           "title": "Demande:",
-          "text": textToSend,
+          "text": payload.textToSend,
           "fields": [
             {
-              "title": "Name",
-              "value": author,
+              "title": "Auteur:",
+              "value": payload.author,
               "short": true
             },
             {
-              "title": "Date",
-              "value": date,
+              "title": "Date requête:",
+              "value": payload.dateRequest,
+              "short": true
+            },
+            {
+              "title": "Concerné(e):",
+              "value": payload.target,
+              "short": true
+            },
+            {
+              "title": "Type:",
+              "value": payload.type,
               "short": true
             }
           ]
@@ -163,3 +147,35 @@ const sendRequestToSlack = (author, date, textToSend, sector) => {
   }
   return rp.post(options);
 }
+
+// var message = new builder.Message(session).sourceEvent({
+//   slack: {
+//     "channel": config.Slack.channels[sector], // "G5QLJ49KL",
+//     "attachments": JSON.stringify([
+//       {
+//         "callback_id": "request_processed",
+//         "title": "Demande:",
+//         "text": textToSend,
+//         "fields": [
+//           {
+//             "title": "Name",
+//             "value": author,
+//             "short": true
+//           },
+//           {
+//             "title": "Date",
+//             "value": date,
+//             "short": true
+//           }
+//         ],
+//         "actions": [
+//           {
+//             "name": "is_processed",
+//             "text": "Traité",
+//             "type": "button",
+//             // "value": "done"
+//           }
+//         ]
+//       }
+//     ])
+//   }

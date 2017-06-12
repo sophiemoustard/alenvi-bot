@@ -102,7 +102,7 @@ const handleWeeksOrGetPlanningSelected = (session, results) => {
         if (session.dialogData.isCommunity) {
           return planning.getCommunityPlanningByChosenDay(session, results);
         } else {
-          // My planning and another auxiliary planning
+          // My planning or another auxiliary planning
           return planning.getPlanningByChosenDay(session, results);
         }
       }
