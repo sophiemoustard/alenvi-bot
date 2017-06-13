@@ -124,7 +124,7 @@ const whichAuxiliary = async (session, args) => {
     session.sendTyping();
     // Get list of coworkers
     const myRawCoworkers = await planning.getTeamBySector(session);
-    const myCoworkers = await planning.formatListOtherAuxiliaries(session, myRawCoworkers);
+    const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
     // Put the list in dialogData so we can compare it in next function
     session.dialogData.myCoworkers = myCoworkers;
     builder.Prompts.choice(session, "Quel(le) auxiliaire précisément ?", myCoworkers, {maxRetries: 0});

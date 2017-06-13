@@ -88,7 +88,7 @@ exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOpt
     body: {
       "token": token,
       "id_employee": id,
-      "status": "@!=|" + 'N',
+      "status": "R", // Récurrent
       "type": "I",
       "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
       "nbperpage": pageOption.nbPerPage,
