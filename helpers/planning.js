@@ -62,16 +62,32 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
   return servicesToDisplay.join('  \n');
 }
 
-exports.formatListOtherAuxiliaries = async (session, myTeam) => {
+exports.formatPromptListPersons = async (session, persons, field) => {
   // Prompt understandable object
-  var teamToDisplay = {};
-  for (k in myTeam) {
-    if (myTeam[k].id_employee != session.userData.alenvi.employee_id) {
-      teamToDisplay[myTeam[k].first_name + " " + myTeam[k].last_name] = {};
-      teamToDisplay[myTeam[k].first_name + " " + myTeam[k].last_name].employee_id = myTeam[k].id_employee;
+  var personsToDisplay = {};
+  if (field == 'id_employee') {
+    for (k in persons) {
+      if (persons[k].id_employee != session.userData.alenvi.employee_id) {
+        personsToDisplay[persons[k].first_name + " " + persons[k].last_name] = {};
+        personsToDisplay[persons[k].first_name + " " + persons[k].last_name].employee_id = persons[k].id_employee;
+      }
     }
   }
-  return teamToDisplay;
+  else if (field == 'id_customer'){
+    for (k in persons) {
+      if (persons[k].first_name) {
+        personsToDisplay[persons[k].title + " " + persons[k].first_name + " " + persons[k].last_name] = {};
+        personsToDisplay[persons[k].title + " " + persons[k].first_name + " " + persons[k].last_name].customer_id = persons[k].id_customer;
+      }
+      else {
+        personsToDisplay[persons[k].title + " " + persons[k].last_name] = {};
+        personsToDisplay[persons[k].title + " " + persons[k].last_name].customer_id = persons[k].id_customer;
+      }
+    }
+    personsToDisplay["Autre"] = {};
+    personsToDisplay["Autre"].customer_id = 0;
+  }
+  return personsToDisplay;
 }
 
 //=========================================================

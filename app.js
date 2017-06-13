@@ -183,6 +183,7 @@ bot.dialog("/show_another_auxiliary_planning", require("./dialogs/showPlanning")
 // bot.dialog("/show_community_planning", require("./dialogs/showPlanning").showPlanning);
 
 bot.dialog("/select_modify_planning", require("./dialogs/modifyPlanning").select);
+bot.dialog("/show_customers", require("./dialogs/modifyPlanning").showCustomers);
 bot.dialog("/ask_for_request", require("./dialogs/modifyPlanning").askForRequest);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
