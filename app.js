@@ -1,63 +1,64 @@
-"use strict";
+
 
 const path = require('path');
-const rp = require('request-promise');
+// const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
-const _ = require('lodash');
+// const _ = require('lodash');
 
 const builder = require('botbuilder');
-const botauth = require("botauth");
+// const botauth = require('botauth');
 
-const passport = require("passport");
-const FacebookStrategy = require("passport-facebook").Strategy;
+// const passport = require('passport');
+// const FacebookStrategy = require('passport-facebook').Strategy;
 
 const config = require('./config');
 
 const PORT = process.env.PORT || '3978';
 
 const restify = require('restify');
+
 const app = restify.createServer();
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
 
-//=========================================================
+// =========================================================
 // Bot Setup
-//=========================================================
+// =========================================================
 
 // Create chat bot
-var connector = new builder.ChatConnector({
-    appId: config.MICROSOFT_APP_ID,
-    appPassword: config.MICROSOFT_APP_PASSWORD
+const connector = new builder.ChatConnector({
+  appId: config.MICROSOFT_APP_ID,
+  appPassword: config.MICROSOFT_APP_PASSWORD,
 });
 
-var bot = new builder.UniversalBot(connector);
+const bot = new builder.UniversalBot(connector);
 
 bot.set('persistConversationData', true);
 
 bot.set('localizerSettings', {
-  botLocalePath : path.join(__dirname, "./locale"),
-  defaultLocale: "fr_FR"
-})
+  botLocalePath: path.join(__dirname, './locale'),
+  defaultLocale: 'fr_FR',
+});
 
 const logUserConversation = (event) => {
   if (event.text) {
-    console.log('message: ' + event.text + ', user: ' + event.address.user.name);
+    console.log(`message: ${event.text}, user: ${event.address.user.name}`);
   }
 };
 
 // Middleware for logging
 bot.use({
-    receive: function (event, next) {
-        logUserConversation(event);
-        next();
-    },
-    // botbuilder: (session, next) => {
-    //   console.log(session.message.text);
-    // },
-    send: function (event, next) {
-        logUserConversation(event);
-        next();
-    }
+  receive(event, next) {
+    logUserConversation(event);
+    next();
+  },
+  // botbuilder: (session, next) => {
+  //   console.log(session.message.text);
+  // },
+  send(event, next) {
+    logUserConversation(event);
+    next();
+  },
 });
 
 app.post('/api/messages', connector.listen());
@@ -70,30 +71,28 @@ app.post('/api/messages', connector.listen());
 //   profileFields: ['id', 'emails', 'name', 'photos']
 // }
 
-var ba = new botauth.BotAuthenticator(app, bot, {
-  baseUrl: config.WEBSITE_HOSTNAME, secret: config.***REMOVED***
-}).provider("facebook", (options) => {
-  return new FacebookStrategy({
-    clientID: process.env.FACEBOOK_APP_ID || config.FACEBOOK_APP_ID,
-    clientSecret: process.env.FACEBOOK_APP_SECRET || config.FACEBOOK_APP_SECRET,
-    callbackURL: options.callbackURL,
-    profileFields: ['id', 'emails', 'name', 'photos']
-  }, (accessToken, refreshToken, profile, done) => {
-    profile.accessToken = accessToken;
-    profile.refreshToken = refreshToken;
-    console.log(profile);
-    return done(null, profile);
-  });
-});
+// const ba = new botauth.BotAuthenticator(app, bot, {
+//   baseUrl: config.WEBSITE_HOSTNAME, secret: config.***REMOVED***,
+// }).provider('facebook', options => new FacebookStrategy({
+//   clientID: process.env.FACEBOOK_APP_ID || config.FACEBOOK_APP_ID,
+//   clientSecret: process.env.FACEBOOK_APP_SECRET || config.FACEBOOK_APP_SECRET,
+//   callbackURL: options.callbackURL,
+//   profileFields: ['id', 'emails', 'name', 'photos'],
+// }, (accessToken, refreshToken, profile, done) => {
+//   profile.accessToken = accessToken;
+//   profile.refreshToken = refreshToken;
+//   console.log(profile);
+//   return done(null, profile);
+// }));
 
-app.get("/", (req, res) => {
-  res.send("facebook");
+app.get('/', (req, res) => {
+  res.send('facebook');
 });
 
 // First time connection
-bot.on('conversationUpdate', function (message) {
+bot.on('conversationUpdate', (message) => {
   if (message.membersAdded) {
-    message.membersAdded.forEach(function (identity) {
+    message.membersAdded.forEach((identity) => {
       if (identity.id === message.address.bot.id) {
         bot.beginDialog(message.address, '/hello_first');
       }
@@ -101,96 +100,81 @@ bot.on('conversationUpdate', function (message) {
   }
 });
 
-//=========================================================
+// =========================================================
 // Root Dialog
-//=========================================================
+// =========================================================
 
 bot.dialog('/', new builder.IntentDialog()
-    // .matches(/^connexion/i, "/connection")
-    .matches(/^d[ée]connexion/i, "/logout_facebook")
-    .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, "/hello")
-    // .matches(/Consulter planning/i, "/show_planning")
-    // .matches(/^log in|login/i, "/login")
-    .onDefault(
-      (session, args, next) => {
-        // Facebook account_linking
-        // if already linked
-        // console.log("SESSION USERDATA = ");
-        // console.log(session.userData);
-        if (session.message.sourceEvent.account_linking) {
-          console.log('TOKEN =');
-          var token = session.message.sourceEvent.account_linking.authorization_code;
-          console.log(token);
-          var authorizationStatus = session.message.sourceEvent.account_linking.status;
-          if (authorizationStatus === 'linked') {
-            // Persist username under the userData
-            jwt.verify(token, process.env.TOKEN_SECRET || config.TOKEN_SECRET, function(err, decoded) {
-              if (err) {
-                console.error("ERROR VERIFY TOKEN");
-                console.error(err);
-                if (err.name === "JsonWebTokenError") {
-                  session.endDialog("Il y a eu un problème avec ta demande :/");
-                }
-                if (err.name === "TokenExpiredError") {
-                  session.endDialog("Ta demande a expiré !");
-                }
-              } else {
-                console.log("DECODED !");
-                console.log(decoded);
-                session.userData.alenvi = decoded;
-
-                session.send('Compte Facebook lié à Alenvi, merci ' + session.userData.alenvi.firstname + ' :)');
-                session.beginDialog('/hello');
-              }
-            });
-          } else if (authorizationStatus === 'unlinked') {
-            // Remove username from the userData
-            delete session.userData.alenvi;
-            session.endDialog('Compte Facebook bien délié ! Reviens-vite :)');
+  // .matches(/^connexion/i, "/connection")
+  .matches(/^d[ée]connexion/i, '/logout_facebook')
+  .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, '/hello')
+  // .matches(/Consulter planning/i, "/show_planning")
+  // .matches(/^log in|login/i, "/login")
+  .onDefault((session) => {
+    // Facebook account_linking
+    // if already linked
+    if (session.message.sourceEvent.account_linking) {
+      console.log('TOKEN =');
+      const token = session.message.sourceEvent.account_linking.authorization_code;
+      console.log(token);
+      const authorizationStatus = session.message.sourceEvent.account_linking.status;
+      if (authorizationStatus === 'linked') {
+        jwt.verify(token, process.env.TOKEN_SECRET || config.TOKEN_SECRET, (err, decoded) => {
+          if (err) {
+            console.error('ERROR VERIFY TOKEN');
+            console.error(err);
+            if (err.name === 'JsonWebTokenError') {
+              session.endDialog('Il y a eu un problème avec ta demande :/');
+            }
+            if (err.name === 'TokenExpiredError') {
+              session.endDialog('Ta demande a expiré !');
+            }
           } else {
-            session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');
+            console.log('DECODED !');
+            console.log(decoded);
+            session.userData.alenvi = decoded;
+            session.send(`Compte Facebook lié à Alenvi, merci ${session.userData.alenvi.firstname} :)`);
+            session.beginDialog('/hello');
           }
-        }
-        else {
-          // if (session.userData.alenvi) {
-          //   console.log("WENT IN /HELLO");
-          //   session.beginDialog('/hello');
-          //   // endDialog('You are known as ' + session.userData.alenvi.firstname + ' - type "unlink account" to try out unlinking');
-          // }
-          // else {
-            session.beginDialog("/not_understand");
-          // }
-        }
+        });
+      } else if (authorizationStatus === 'unlinked') {
+        delete session.userData.alenvi;
+        session.endDialog('Compte Facebook bien délié ! Reviens-vite :)');
+      } else {
+        session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');
       }
-    )
+    } else {
+      session.beginDialog('/not_understand');
+    }
+  })
 );
 
-//=========================================================
+// =========================================================
 // Dialogs routing
-//=========================================================
+// =========================================================
 
-bot.dialog("/not_understand", require("./dialogs/notUnderstand"));
+bot.dialog('/not_understand', require('./dialogs/notUnderstand'));
 
-bot.dialog("/login_facebook", require("./dialogs/facebookLoginLogout").login);
-bot.dialog("/logout_facebook", require("./dialogs/facebookLoginLogout").logout);
+bot.dialog('/login_facebook', require('./dialogs/facebookLoginLogout').login);
+bot.dialog('/logout_facebook', require('./dialogs/facebookLoginLogout').logout);
 
-bot.dialog("/hello_first", require("./dialogs/hello").hello_first);
-bot.dialog("/hello", require("./dialogs/hello").hello);
+bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
+bot.dialog('/hello', require('./dialogs/hello').hello);
 
-bot.dialog("/select_show_planning", require("./dialogs/showPlanning").select);
-bot.dialog("/show_planning", require("./dialogs/showPlanning").showPlanning);
-bot.dialog("/show_another_auxiliary_planning", require("./dialogs/showPlanning").showAnotherAuxiliaryPlanning);
+bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
+bot.dialog('/show_planning', require('./dialogs/showPlanning').showPlanning);
+bot.dialog('/show_another_auxiliary_planning', require('./dialogs/showPlanning').showAnotherAuxiliaryPlanning);
 // bot.dialog("/show_community_planning", require("./dialogs/showPlanning").showPlanning);
 
-bot.dialog("/select_modify_planning", require("./dialogs/modifyPlanning").select);
-bot.dialog("/show_customers", require("./dialogs/modifyPlanning").showCustomers);
-bot.dialog("/ask_for_request", require("./dialogs/modifyPlanning").askForRequest);
+bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
+bot.dialog('/show_customers', require('./dialogs/modifyPlanning').showCustomers);
+bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
-//=========================================================
+// =========================================================
 // Tests
-//=========================================================
+// =========================================================
 
 // bot.dialog("/connection", [].concat(
 //   ba.authenticate("facebook"),
@@ -226,12 +210,16 @@ bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 //           console.log(parsedBody.body);
 //           console.log("Duration: " + parsedBody.timings.end);
 //           session.userData.alenvi = parsedBody.body.data;
-//           session.send("Merci " + session.userData.alenvi.user.firstname + ", tu es maintenant bien lié à Alenvi grâce à Facebook ! :)");
+//           session.send("Merci "
+//           + session.userData.alenvi.user.firstname
+//           + ", tu es maintenant bien lié à Alenvi grâce à Facebook ! :)");
 //           session.beginDialog('/hello');
 //         }).catch(function(err) {
 //           console.error(err);
 //           if (err.statusCode == 404)
-//             session.endDialog("Je n'arrive pas à te trouver chez Alenvi :( Essaie de contacter un(e) coach, il / elle devrait pouvoir résoudre ce problème !");
+//             session.endDialog("Je n'arrive pas à te trouver chez Alenvi :( "
+//             + Essaie de contacter un(e) coach,
+//             + il / elle devrait pouvoir résoudre ce problème !");
 //         })
 //       }
 //     }
@@ -275,6 +263,6 @@ bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 
 // Setup Server
-app.listen(PORT, function() {
+app.listen(PORT, () => {
   console.log('%s listening to port %s, server url: %s', app.name, PORT, app.url);
-})
+});

@@ -1,9 +1,7 @@
-"use strict";
-
-const Ogust = require("../config").Ogust;
+const Ogust = require('../config').Ogust;
 const rp = require('request-promise');
 
-/********** SALARIES **********/
+/** ******** SALARIES **********/
 
 /*
 ** Get salaries by employee id
@@ -15,30 +13,21 @@ const rp = require('request-promise');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getSalariesByEmployeeId = function(token, id, pageOption, next) {
-  var payload = {
-    "token": token,
-    "id_employee": id,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  rp.post({
-    url: Ogust.API_LINK + "searchSalary",
+exports.getSalariesByEmployeeId = (token, id, pageOption) => {
+  const options = {
+    url: `${Ogust.API_LINK}searchSalary`,
     json: true,
-    body: payload,
+    body: {
+      token,
+      id_employee: id,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
+    },
     resolveWithFullResponse: true,
-    time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET SALARIES BY EMPLOYEE ID:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
-}
+    time: true,
+  };
+  rp.post(options);
+};
 
 /*
 ** Get all salaries
@@ -49,26 +38,17 @@ exports.getSalariesByEmployeeId = function(token, id, pageOption, next) {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getAllSalaries = function(token, pageOption, next) {
-  var payload = {
-    "token": token,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  rp.post({
-    url: Ogust.API_LINK + "searchSalary",
+exports.getSalaries = (token, pageOption) => {
+  const options = {
+    url: `${Ogust.API_LINK}searchSalary`,
     json: true,
-    body: payload,
+    body: {
+      token,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
+    },
     resolveWithFullResponse: true,
-    time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET ALL SALARIES:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
-}
+    time: true,
+  };
+  rp.post(options);
+};

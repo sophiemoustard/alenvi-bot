@@ -1,10 +1,29 @@
-"use strict";
-
-const Ogust = require("../config").Ogust;
+const Ogust = require('../config').Ogust;
 const rp = require('request-promise');
 const moment = require('moment');
 
-/********** SERVICES **********/
+/*
+** Get a date interval using range array and interval type
+** PARAMS:
+** - timeOption:
+** --- slotToSub (time in number to subtract),
+** --- slotToAdd (time in number to add)
+** --- intervalType: "day", "week", "year", "hour"...
+*/
+const getIntervalInRange = (timeOption) => {
+  const dateNow = moment();
+  timeOption.slotToSub = Math.abs(timeOption.slotToSub);
+  timeOption.slotToAdd = Math.abs(timeOption.slotToAdd);
+  const finalInterval = {
+    intervalBwd: dateNow.subtract(timeOption.slotToSub, timeOption.intervalType).format('YYYYMMDDHHmm'),
+    // We have to (re)add slotToSub, because subtract() reallocates dateNow
+    intervalFwd: dateNow.add(timeOption.slotToAdd + timeOption.slotToSub, timeOption.intervalType).format('YYYYMMDDHHmm') };
+  return finalInterval;
+};
+
+// =========================================================
+// SERVICES
+// =========================================================
 
 /*
 ** Get all services
@@ -19,52 +38,42 @@ const moment = require('moment');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesInRange = function(token, timeOption, pageOption) {
-  var interval = getIntervalInRange(timeOption);
-  var options = {
-    url: Ogust.API_LINK + "searchService",
+exports.getServicesInRange = (token, timeOption, pageOption) => {
+  const interval = getIntervalInRange(timeOption);
+  const options = {
+    url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      "token": token,
-      "status": "@!=|" + 'N',
-      "type": "I",
-      "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
-      "nbperpage": pageOption.nbPerPage,
-      "pagenum": pageOption.pageNum
+      token,
+      status: '@!=|N',
+      type: 'I',
+      start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
     },
     resolveWithFullResponse: true,
-    time: true
-  }
+    time: true,
+  };
   return rp.post(options);
-  // .then(function(parsedBody) {
-  //   console.log("--------------");
-  //   console.log("GET ALL SERVICES:");
-  //   console.log(parsedBody.body);
-  //   console.log("Duration: " + parsedBody.timings.end);
-  //   next(null, parsedBody.body);
-  // }).catch(function(err) {
-  //   console.error(err);
-  //   next(err, null);
-  // })
-}
+};
 
 exports.getServicesByDate = (token, date, pageOption) => {
-  var option = {
-    url: Ogust.API_LINK + "searchService",
+  const option = {
+    url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      "token": token,
-      "status": "@!=|" + 'N',
-      "type": "I",
-      "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
-      "nbperpage": pageOption.nbPerPage,
-      "pagenum": pageOption.pageNum
+      token,
+      status: '@!=|N',
+      type: 'I',
+      start_date: `${'@between|'}${date}0000|${date}2359`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
     },
     resolveWithFullResponse: true,
-    time: true
-  }
+    time: true,
+  };
   return rp.post(option);
-}
+};
 
 /*
 ** Get services by employee id in range
@@ -80,25 +89,25 @@ exports.getServicesByDate = (token, date, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOption) {
-  var interval = getIntervalInRange(timeOption);
-  var option = {
-    url: Ogust.API_LINK + "searchService",
+exports.getServicesByEmployeeIdInRange = (token, id, timeOption, pageOption) => {
+  const interval = getIntervalInRange(timeOption);
+  const option = {
+    url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      "token": token,
-      "id_employee": id,
-      "status": "R", // Récurrent
-      "type": "I",
-      "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
-      "nbperpage": pageOption.nbPerPage,
-      "pagenum": pageOption.pageNum
+      token,
+      id_employee: id,
+      status: 'R', // Récurrent
+      type: 'I',
+      start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
     },
     resolveWithFullResponse: true,
-    time: true
-  }
+    time: true,
+  };
   return rp.post(option);
-}
+};
 
 /*
 ** Get services by employee id and date
@@ -112,45 +121,23 @@ exports.getServicesByEmployeeIdInRange = function(token, id, timeOption, pageOpt
 ** METHOD: POST
 */
 exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
-  var option = {
-    url: Ogust.API_LINK + "searchService",
+  const option = {
+    url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
-      "token": token,
-      "id_employee": id,
-      "status": "@!=|" + 'N',
-      "type": "I", // Intervention
-      "start_date": "@between" + '|' + date + "0000" + '|' + date + "2359",
-      "nbperpage": pageOption.nbPerPage,
-      "pagenum": pageOption.pageNum
+      token,
+      id_employee: id,
+      status: '@!=|N',
+      type: 'I', // Intervention
+      start_date: `${'@between|'}${date}0000|${date}2359`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
     },
     resolveWithFullResponse: true,
-    time: true
-  }
+    time: true,
+  };
   return rp.post(option);
-  //   .then(function(parsedBody) {
-  //   console.log("--------------");
-  //   console.log("GET SERVICES BY EMPLOYEE ID:");
-  //   console.log(parsedBody.body);
-  //   console.log("Duration: " + parsedBody.timings.end);
-  //   // next(null, parsedBody.body);
-  //   return parsedBody.body;
-  // }).catch(function(err) {
-  //   console.error(err);
-  //   return err;
-  // })
-}
-
-// .then(function(parsedBody) {
-//   console.log("--------------");
-//   console.log("GET SERVICES BY EMPLOYEE ID:");
-//   console.log(parsedBody.body);
-//   console.log("Duration: " + parsedBody.timings.end);
-//   next(null, parsedBody.body);
-// }).catch(function(err) {
-//   console.error(err);
-//   next(err, null);
-// })
+};
 
 /*
 ** Get services by customer id
@@ -166,54 +153,22 @@ exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByCustomerId = function(token, id, timeOption, pageOption, next) {
-  var interval = getIntervalInRange(timeOption);
-  var payload = {
-    "token": token,
-    "id_customer": id,
-    "status": "@!=|" + 'N',
-    "type": "I", // Intervention
-    "start_date": "@between" + '|' + interval.intervalBwd + '|' + interval.intervalFwd,
-    "nbperpage": pageOption.nbPerPage,
-    "pagenum": pageOption.pageNum
-  }
-  rp.post({
-    url: Ogust.API_LINK + "searchService",
+exports.getServicesByCustomerIdInRange = (token, id, timeOption, pageOption) => {
+  const interval = getIntervalInRange(timeOption);
+  const options = {
+    url: `${Ogust.API_LINK}searchService`,
     json: true,
-    body: payload,
+    body: {
+      token,
+      id_customer: id,
+      status: '@!=|N',
+      type: 'I', // Intervention
+      start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
+    },
     resolveWithFullResponse: true,
-    time: true
-  }).then(function(parsedBody) {
-    console.log("--------------");
-    console.log("GET SERVICES BY CUSTOMER ID:");
-    console.log(parsedBody.body);
-    console.log("Duration: " + parsedBody.timings.end);
-    next(null, parsedBody.body);
-  }).catch(function(err) {
-    console.error(err);
-    next(err, null);
-  })
-}
-
-/*
-** Get a date interval using range array and interval type
-** PARAMS:
-** - timeOption:
-** --- slotToSub (time in number to subtract),
-** --- slotToAdd (time in number to add)
-** --- intervalType: "day", "week", "year", "hour"...
-*/
-var getIntervalInRange = function(timeOption) {
-  timeOption.slotToSub = Math.abs(timeOption.slotToSub);
-  timeOption.slotToAdd = Math.abs(timeOption.slotToAdd);
-  var dateNow = moment();
-  var finalInterval = {
-      intervalBwd: dateNow.subtract(timeOption.slotToSub, timeOption.intervalType).format("YYYYMMDDHHmm"),
-      intervalFwd: dateNow.add(timeOption.slotToAdd + timeOption.slotToSub, timeOption.intervalType).format("YYYYMMDDHHmm") // We have to (re)add slotToSub, because subtract() reallocates dateNow
-  }
-  return finalInterval;
-}
-
-// var getIntervalByDayOffset = function(offset) {
-//
-// }
+    time: true,
+  };
+  return rp.post(options);
+};
