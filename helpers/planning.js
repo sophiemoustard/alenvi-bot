@@ -80,7 +80,7 @@ exports.formatPromptListPersons = async (session, persons, field) => {
       }
     }
   } else if (field === 'id_customer') {
-    for (const k of persons) {
+    for (const k in persons) {
       if (persons[k].first_name) {
         personsToDisplay[`${persons[k].title} ${persons[k].first_name} ${persons[k].last_name}`] = {};
         personsToDisplay[`${persons[k].title} ${persons[k].first_name} ${persons[k].last_name}`].customer_id = persons[k].id_customer;
@@ -115,9 +115,13 @@ const getTeamBySector = exports.getTeamBySector = async (session) => {
 
 const getWorkHoursByDay = async (session, dayChosen) => {
   const myTeam = await getTeamBySector(session);
+  const lengthTeam = Object.keys(myTeam).length;
   const workingHours = {};
   // For all people in my team, get their planning, then return it as an object well formated
   for (const i in myTeam) {
+    if (myTeam[i].id_employee == session.userData.alenvi.employee_id && lengthTeam === 1) {
+      return session.endDialog('Il semble que tu sois le premier membre de ta communauté ! :)');
+    }
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
       const getEmployeePlanningByDay = await services.getServicesByEmployeeIdAndDate(
@@ -181,6 +185,41 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 // =========================================================
 // Generic helper for planning
 // =========================================================
+
+exports.getCustomers = async (session) => {
+  // First we get services from Ogust by employee Id in a specific range
+  // 249180689 || session.userData.alenvi.employee_id
+  const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(session.userData.ogust.tokenConfig.token, 249180689, { slotToSub: 2, slotToAdd: 2, intervalType: 'week' }, { nbPerPage: 500, pageNum: 1 });
+  if (servicesInFourWeeks.body.status === 'KO') {
+    throw new Error(`Error while getting services in four weeks: ${servicesInFourWeeks.body.message}`);
+  }
+  // Put it in a variable so it's more readable
+  const servicesRawObj = servicesInFourWeeks.body.array_service.result;
+  if (Object.keys(servicesRawObj).length === 0) {
+    return session.endDialog("Il semble que tu n'aies aucune intervention de prévue d'ici 2 semaines !");
+  }
+  // Transform this services object into an array, then pop all duplicates by id_customer
+  const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
+  // Get only id_customer properties (without '0' id_customer)
+  const uniqCustomers = servicesUniqCustomers.filter(
+    (service) => {
+      if (service.id_customer != 0 && service.id_customer != '271395715') { // Not Reunion Alenvi please
+        return service;
+      }
+    }).map(service => service.id_customer); // Put it in array of id_customer
+  const myRawCustomers = [];
+  for (let i = 0; i < uniqCustomers.length; i++) {
+    const getCustomer = await customers.getCustomerByCustomerId(
+      session.userData.ogust.tokenConfig.token,
+      uniqCustomers[i],
+      { nbPerPage: 20, pageNum: 1 });
+    if (getCustomer.body.status === 'KO') {
+      throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
+    }
+    myRawCustomers.push(getCustomer.body.customer);
+  }
+  return myRawCustomers;
+};
 
 /*
 ** getDaysByWeekOffset(-X); : -X = all days from -X week before current one, assuming current = 0

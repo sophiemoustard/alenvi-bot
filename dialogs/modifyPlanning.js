@@ -1,13 +1,13 @@
 const builder = require('botbuilder');
 const rp = require('request-promise');
 const moment = require('moment');
-const _ = require('lodash');
+// const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const planning = require('../helpers/planning');
 const config = require('../config');
 
-const services = require('../Ogust/services');
-const customers = require('../Ogust/customers');
+// const services = require('../Ogust/services');
+// const customers = require('../Ogust/customers');
 
 // =========================================================
 // Root 'Select modify planning' dialog
@@ -29,7 +29,7 @@ const redirectToDeclarationSelected = (session, results) => {
           session.beginDialog('/ask_for_request');
           break;
         case 'Intervention':
-          session.beginDialog('/show_customers');
+          session.beginDialog('/change_intervention');
           break;
       }
     } else {
@@ -42,48 +42,13 @@ const redirectToDeclarationSelected = (session, results) => {
 
 exports.select = [whichDeclaration, redirectToDeclarationSelected];
 
-const getCustomers = async (session) => {
-  // First we get services from Ogust by employee Id in a specific range
-  // 249180689 || session.userData.alenvi.employee_id
-  const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(session.userData.ogust.tokenConfig.token, 249180689, { slotToSub: 2, slotToAdd: 2, intervalType: 'week' }, { nbPerPage: 500, pageNum: 1 });
-  if (servicesInFourWeeks.body.status === 'KO') {
-    throw new Error(`Error while getting services in four weeks: ${servicesInFourWeeks.body.message}`);
-  }
-  // Put it in a variable so it's more readable
-  const servicesRawObj = servicesInFourWeeks.body.array_service.result;
-  if (Object.keys(servicesRawObj).length === 0) {
-    return session.endDialog("Il semble que tu n'aies aucune intervention de prévue d'ici 2 semaines !");
-  }
-  // Transform this services object into an array, then pop all duplicates by id_customer
-  const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
-  // Get only id_customer properties (without '0' id_customer)
-  const uniqCustomers = servicesUniqCustomers.filter(
-    (service) => {
-      if (service.id_customer != 0 && service.id_customer != '271395715') { // Not Reunion Alenvi please
-        return service;
-      }
-    }).map(service => service.id_customer); // Put it in array of id_customer
-  const myRawCustomers = [];
-  for (let i = 0; i < uniqCustomers.length; i++) {
-    const getCustomer = await customers.getCustomerByCustomerId(
-      session.userData.ogust.tokenConfig.token,
-      uniqCustomers[i],
-      { nbPerPage: 20, pageNum: 1 });
-    if (getCustomer.body.status === 'KO') {
-      throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
-    }
-    myRawCustomers.push(getCustomer.body.customer);
-  }
-  const myCustomersToDisplay = await planning.formatPromptListPersons(session, myRawCustomers, 'id_customer');
-  return myCustomersToDisplay;
-};
-
 const whichCustomer = async (session) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const myCustomers = await getCustomers(session);
-    builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomers, { listStyle: builder.ListStyle.button, maxRetries: 0 });
+    const myRawCustomers = await planning.getCustomers(session);
+    const myCustomersToDisplay = await planning.formatPromptListPersons(session, myRawCustomers, 'id_customer');
+    builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomersToDisplay, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
     return session.endDialog("Flute, impossible de récupérer ta liste de bénéficiaires pour le moment :/ Réessaie, et si le problème persiste n'hésite pas à contacter un administrateur !");
@@ -189,7 +154,7 @@ const handleRequest = async (session, results) => {
   }
 };
 
-exports.showCustomers = [whichCustomer, promptDescription, handleRequest];
+exports.changeIntervention = [whichCustomer, promptDescription, handleRequest];
 exports.askForRequest = [promptDescription, handleRequest];
 
 // var message = new builder.Message(session).sourceEvent({
