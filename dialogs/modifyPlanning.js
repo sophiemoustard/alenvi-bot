@@ -61,6 +61,7 @@ const whichCustomer = async (session) => {
 
 const promptDescription = (session, args) => {
   session.sendTyping();
+  args = args || {};
   if (args.response) { // Modif. Intervention: Bénéficiaire selected
     session.dialogData.selectedPerson = args.response.entity;
     builder.Prompts.text(session, `Décris-moi les heures internes que tu souhaites déclarer (jour, heure, tâche) concernant ${args.response.entity}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
