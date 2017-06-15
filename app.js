@@ -164,11 +164,16 @@ bot.dialog('/hello', require('./dialogs/hello').hello);
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
 bot.dialog('/show_planning', require('./dialogs/showPlanning').showPlanning);
 bot.dialog('/show_another_auxiliary_planning', require('./dialogs/showPlanning').showAnotherAuxiliaryPlanning);
-// bot.dialog("/show_community_planning", require("./dialogs/showPlanning").showPlanning);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
-bot.dialog('/show_customers', require('./dialogs/modifyPlanning').showCustomers);
+bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
+
+bot.dialog('/show_my_customers', require('./dialogs/showCustomers').showCustomers);
+
+bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
+bot.dialog('/show_team', require('./dialogs/showTeam').showTeam);
+bot.dialog('/my_customers_more_details', require('./dialogs/showCustomers').moreDetails);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
