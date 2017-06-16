@@ -31,24 +31,27 @@ const formatText = async (customer) => {
 const getCardsAttachments = async (session) => {
   const myCards = [];
   const myRawCustomers = await planning.getCustomers(session);
+  console.log(myRawCustomers);
   for (const k in myRawCustomers) {
-    const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
-    const person = await formatPerson(myRawCustomers[k]);
-    const text = await formatText(myRawCustomers[k]);
-    myCards.push(
-      new builder.HeroCard(session)
-        .title(person)
-        // .subtitle('Subtitle')
-        .text(text)
-        .images([
-          builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
-        ])
-        .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
-        .buttons([
-          // builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`, 'Localisation'),
-          builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
-        ])
-    );
+    if (myRawCustomers[k].id_customer != '286871430') {
+      const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
+      const person = await formatPerson(myRawCustomers[k]);
+      const text = await formatText(myRawCustomers[k]);
+      myCards.push(
+        new builder.HeroCard(session)
+          .title(person)
+          // .subtitle('Subtitle')
+          .text(text)
+          .images([
+            builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
+          ])
+          .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
+          .buttons([
+            // builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`, 'Localisation'),
+            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
+          ])
+      );
+    }
   }
   // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
   return myCards;

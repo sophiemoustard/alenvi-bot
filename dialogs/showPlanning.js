@@ -9,7 +9,7 @@ const planning = require('../helpers/planning');
 
 const whichPlanning = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le miens|Un(e) auxiliaire|Ma communauté', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Ma communauté', { maxRetries: 0 });
 };
 
 const redirectToDaySelected = (session, results) => {
@@ -17,7 +17,7 @@ const redirectToDaySelected = (session, results) => {
     if (session.userData.alenvi) {
       console.log(results.response);
       switch (results.response.entity) {
-        case 'Le miens':
+        case 'Le mien':
           session.beginDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
           break;
         case 'Un(e) auxiliaire':
@@ -33,7 +33,7 @@ const redirectToDaySelected = (session, results) => {
       session.endDialog('Vous devez vous connecter pour accéder à cette fonctionnalité ! :)');
     }
   } else {
-    session.cancelDialog(0, '/hello');
+    session.cancelDialog(0, '/not_understand');
   }
 };
 
@@ -73,7 +73,7 @@ const whichDay = async (session, args) => {
     builder.Prompts.choice(session, `Pour quel jour souhaites-tu consulter ${targetPlanning} ?`, days, { maxRetries: 0 });
   } catch (err) {
     console.error(err);
-    return session.endDialog("Mince, je n'ai pas réussi à récupérer ton autorisation pour obtenir ces informations :/ Si le problème persiste, essaie de contacter un administrateur !");
+    return session.endDialog("Mince, je n'ai pas réussi à récupérer ton autorisation pour obtenir ces informations :/ Si le problème persiste, essaie de contacter l'équipe technique !");
   }
 };
 
@@ -106,7 +106,7 @@ const handleWeeksOrGetPlanningSelected = (session, results) => {
       return planning.getPlanningByChosenDay(session, results);
     }
   } else {
-    return session.cancelDialog(0, '/hello');
+    return session.cancelDialog(0, '/not_understand');
   }
 };
 
@@ -128,7 +128,7 @@ const whichAuxiliary = async (session) => {
     builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
   } catch (err) {
     console.error(err);
-    return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter un administrateur !");
+    return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter l'équipe technique !");
   }
 };
 
@@ -143,7 +143,7 @@ const redirectToShowPlanning = (session, results) => {
       return session.beginDialog('/show_planning', params);
     }
   } else {
-    session.cancelDialog(0, '/hello');
+    session.cancelDialog(0, '/not_understand');
   }
 };
 

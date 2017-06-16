@@ -33,7 +33,7 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
     // Then push all the interventions well displayed (without carriage return yet)
     const startDate = moment(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm').format('HH:mm');
     const endDate = moment(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm').format('HH:mm');
-    const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name} ` : '';
+    const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name.substring(0, 1)} ` : '';
     servicesToDisplay.push(`${getCustomer.body.customer.title}. ${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}`);
   }
   // Return all services to display the carriage return
@@ -57,7 +57,7 @@ exports.getPlanningByChosenDay = async (session, results) => {
       throw new Error(`Error while getting services: ${getServices.body.message}`);
     }
     if (Object.keys(getServicesResult).length === 0) {
-      return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
+      return session.endDialog('Aucune intervention ce jour-là ! :)');
     }
     const sortedServicesByDate = await fillAndSortArrByStartDate(getServicesResult);
     const servicesToDisplay = await getServicesToDisplay(session, sortedServicesByDate);
@@ -65,7 +65,7 @@ exports.getPlanningByChosenDay = async (session, results) => {
     return session.endDialog();
   } catch (err) {
     console.error(err);
-    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaie de contacter un administrateur !");
+    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaie de contacter l'équipe technique !");
   }
 };
 
@@ -75,18 +75,18 @@ exports.formatPromptListPersons = async (session, persons, field) => {
   if (field === 'id_employee') {
     for (const k in persons) {
       if (persons[k].id_employee != session.userData.alenvi.employee_id) {
-        personsToDisplay[`${persons[k].first_name} ${persons[k].last_name}`] = {};
-        personsToDisplay[`${persons[k].first_name} ${persons[k].last_name}`].employee_id = persons[k].id_employee;
+        personsToDisplay[`${persons[k].first_name} ${persons[k].last_name.substring(0, 1)}.`] = {};
+        personsToDisplay[`${persons[k].first_name} ${persons[k].last_name.substring(0, 1)}.`].employee_id = persons[k].id_employee;
       }
     }
   } else if (field === 'id_customer') {
     for (const k in persons) {
       if (persons[k].first_name) {
-        personsToDisplay[`${persons[k].title} ${persons[k].first_name} ${persons[k].last_name}`] = {};
-        personsToDisplay[`${persons[k].title} ${persons[k].first_name} ${persons[k].last_name}`].customer_id = persons[k].id_customer;
+        personsToDisplay[`${persons[k].first_name.substring(0, 1)}. ${persons[k].last_name}`] = {};
+        personsToDisplay[`${persons[k].first_name.substring(0, 1)}. ${persons[k].last_name}`].customer_id = persons[k].id_customer;
       } else {
-        personsToDisplay[`${persons[k].title} ${persons[k].last_name}`] = {};
-        personsToDisplay[`${persons[k].title} ${persons[k].last_name}`].customer_id = persons[k].id_customer;
+        personsToDisplay[`${persons[k].last_name}`] = {};
+        personsToDisplay[`${persons[k].last_name}`].customer_id = persons[k].id_customer;
       }
     }
     personsToDisplay.Autre = {};
@@ -178,7 +178,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
     return session.endDialog();
   } catch (err) {
     console.error(err);
-    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter un administrateur !");
+    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter l'équipe technique !");
   }
 };
 

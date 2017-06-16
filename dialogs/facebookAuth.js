@@ -7,6 +7,7 @@ const request = require('request');
 const config = require('../config');
 
 exports.login = (session) => {
+  console.log('WENT IN LOGIN');
   const message = new builder.Message(session).sourceEvent({
     facebook: {
       attachment: {
@@ -15,20 +16,21 @@ exports.login = (session) => {
           template_type: 'generic',
           elements: [{
             title: 'Bienvenue sur la liaison de compte',
-            // image_url: "http://localhost:3000/images/Pigi.png",
+            image_url: 'http://www.welcometothejungle.co/uploads/company/logo/alenvi.png',
             buttons: [{
               type: 'account_link',
               url: 'http://localhost:3000/api/users/bot/facebook/account_linking',
             }],
-          }],
-        },
-      },
-    },
+          }]
+        }
+      }
+    }
   });
   session.endDialog(message);
 };
 
 exports.logout = (session) => {
+  console.log('WENT IN LOGOUT');
   request({
     url: 'https://graph.facebook.com/v2.6/me/unlink_accounts',
     method: 'POST',
@@ -38,12 +40,11 @@ exports.logout = (session) => {
     body: {
       psid: session.message.address.user.id,
     },
-    json: true,
+    json: true
   }, (error, response) => {
     if (!error && response.statusCode === 200) {
-      session.endDialog();
-    } else {
-      session.endDialog('Il y a eu un problème au moment de te déconnecter :(');
+      return session.endDialog();
     }
+    return session.endDialog('Il y a eu un problème au moment de te déconnecter :(');
   });
 };

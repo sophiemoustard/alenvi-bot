@@ -36,7 +36,7 @@ const redirectToDeclarationSelected = (session, results) => {
       return session.endDialog('Tu dois te connecter pour accéder à cette fonctionnalité ! :)');
     }
   } else {
-    session.cancelDialog(0, '/hello');
+    session.cancelDialog(0, '/not_understand');
   }
 };
 
@@ -51,7 +51,7 @@ const whichCustomer = async (session) => {
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomersToDisplay, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
-    return session.endDialog("Flute, impossible de récupérer ta liste de bénéficiaires pour le moment :/ Réessaie, et si le problème persiste n'hésite pas à contacter un administrateur !");
+    return session.endDialog("Flûte, impossible de récupérer ta liste de bénéficiaires pour le moment :/ Réessaie, et si le problème persiste n'hésite pas à contacter l'équipe technique !");
   }
 };
 
@@ -64,9 +64,9 @@ const promptDescription = (session, args) => {
   args = args || {};
   if (args.response) { // Modif. Intervention: Bénéficiaire selected
     session.dialogData.selectedPerson = args.response.entity;
-    builder.Prompts.text(session, `Décris-moi les heures internes que tu souhaites déclarer (jour, heure, tâche) concernant ${args.response.entity}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
+    builder.Prompts.text(session, `Décris-moi les modifications d'intervention que tu souhaites déclarer (jour, heure, tâche) concernant ${args.response.entity}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
   } else if (args.resumed) { // User writes anything not related
-    session.cancelDialog(0, '/hello');
+    session.cancelDialog(0, '/not_understand');
   } else { // Heures Internes
     builder.Prompts.text(session, "Décris-moi les heures internes que tu souhaites déclarer (jour, heure, tâche)  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)");
   }
@@ -130,7 +130,8 @@ const handleRequest = async (session, results) => {
       if (/^annuler|anuler$/i.test(results.response)) {
         session.sendTyping();
         session.send('Tu as bien annulé ta demande ! :)');
-        session.replaceDialog('/select_modify_planning');
+        // session.replaceDialog('/select_modify_planning');
+        session.cancelDialog(0, '/hello');
       } else { // User well describe his request
         const options = {
           type: session.dialogData.selectedPerson ? 'Modif. Intervention' : 'Heures internes',
@@ -144,14 +145,14 @@ const handleRequest = async (session, results) => {
         if (sent.ok === false) {
           throw new Error(sent);
         }
-        session.endDialog('Ta demande a bien été envoyé, merci :)');
+        session.endDialog('Ta demande a bien été envoyée, merci :)');
       }
     } else {
       session.endDialog("Je n'ai pas bien reçu ta demande :/");
     }
   } catch (err) {
     console.error(err);
-    session.endDialog("Je n'ai pas réussis à envoyer ta demande aux coach, essaie encore stp :/");
+    session.endDialog("Je n'ai pas réussi à envoyer ta demande aux coach, essaie encore stp :/");
   }
 };
 

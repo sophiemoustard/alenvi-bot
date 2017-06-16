@@ -6,9 +6,9 @@ const planning = require('../helpers/planning');
 const formatPerson = async (coworker) => {
   let person = {};
   if (!coworker.first_name) {
-    person = `${coworker.title} ${coworker.last_name}`;
+    person = coworker.last_name;
   } else {
-    person = `${coworker.title} ${coworker.first_name} ${coworker.last_name}`;
+    person = `${coworker.first_name} ${coworker.last_name}`;
   }
   return person;
 };

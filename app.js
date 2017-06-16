@@ -105,14 +105,15 @@ bot.on('conversationUpdate', (message) => {
 // =========================================================
 
 bot.dialog('/', new builder.IntentDialog()
-  // .matches(/^connexion/i, "/connection")
-  .matches(/^d[ée]connexion/i, '/logout_facebook')
   .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, '/hello')
+
+  // .matches(/^connexion/i, "/connection")
   // .matches(/Consulter planning/i, "/show_planning")
   // .matches(/^log in|login/i, "/login")
   .onDefault((session) => {
     // Facebook account_linking
     // if already linked
+    console.log('WENT IN .onDefault()');
     if (session.message.sourceEvent.account_linking) {
       console.log('TOKEN =');
       const token = session.message.sourceEvent.account_linking.authorization_code;
@@ -155,8 +156,11 @@ bot.dialog('/', new builder.IntentDialog()
 
 bot.dialog('/not_understand', require('./dialogs/notUnderstand'));
 
-bot.dialog('/login_facebook', require('./dialogs/facebookLoginLogout').login);
-bot.dialog('/logout_facebook', require('./dialogs/facebookLoginLogout').logout);
+bot.dialog('/login_facebook', require('./dialogs/facebookAuth').login);
+bot.dialog('/logout_facebook', require('./dialogs/facebookAuth').logout)
+  .triggerAction({
+    matches: /^d[ée]connexion$/i
+  });
 
 bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
@@ -171,10 +175,11 @@ bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest
 
 bot.dialog('/show_my_customers', require('./dialogs/showCustomers').showCustomers);
 
-bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
 bot.dialog('/show_team', require('./dialogs/showTeam').showTeam);
 bot.dialog('/my_customers_more_details', require('./dialogs/showCustomers').moreDetails);
 
+// bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
+bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
