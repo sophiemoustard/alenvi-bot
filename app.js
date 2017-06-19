@@ -86,7 +86,7 @@ app.post('/api/messages', connector.listen());
 // }));
 
 app.get('/', (req, res) => {
-  res.send('facebook');
+  res.send('Alenvi bot :)');
 });
 
 // First time connection

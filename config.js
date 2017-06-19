@@ -1,5 +1,6 @@
 module.exports = {
-  WEBSITE_HOSTNAME: 'https://d619f5cc.ngrok.io',
+  // WEBSITE_HOSTNAME: 'https://d619f5cc.ngrok.io',
+  WEBSITE_HOSTNAME: 'https://alenvi-webapp.herokuapp.com',
   MICROSOFT_APP_ID: '***REMOVED***',
   MICROSOFT_APP_PASSWORD: '***REMOVED***',
   FACEBOOK_APP_ID: '***REMOVED***',
