@@ -15,7 +15,7 @@ exports.getEmployees = (token, pageOption) => {
       token,
       nbperpage: pageOption.nbPerPage,
       pagenum: pageOption.pageNum,
-      status: 'A',
+      status: 'A'
     },
     resolveWithFullResponse: true,
     time: true,
@@ -67,7 +67,7 @@ exports.getEmployeesBySector = (token, sector, pageOption) => {
       pagenum: pageOption.pageNum,
       sector, // "1b*" for testing purpose, sector in prod
       status: 'A', // = "Actif"
-      nature: 'S', // = "Salarié"
+      nature: 'S' // = "Salarié"
     },
     resolveWithFullResponse: true,
     time: true,
