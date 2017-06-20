@@ -51,7 +51,8 @@ exports.getPlanningByChosenDay = async (session, results) => {
       session.dialogData.myCoworkerChosen ?
         session.dialogData.myCoworkerChosen.employee_id :
         session.userData.alenvi.employee_id,
-      dayChosen, { nbPerPage: 20, pageNum: 1 });
+      dayChosen, { nbPerPage: 20, pageNum: 1 }
+    );
     const getServicesResult = getServices.body.array_service.result;
     if (getServices.body.status === 'KO') {
       throw new Error(`Error while getting services: ${getServices.body.message}`);
@@ -174,7 +175,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
     }
     const workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
-    session.send(`Planning de ta communauté le ${results.response.entity}:  \n${workingHoursToDisplay}`);
+    session.send(`Voici les créneaux horaires sur lesques tes collègues travaillent le ${results.response.entity}:  \n${workingHoursToDisplay}`);
     return session.endDialog();
   } catch (err) {
     console.error(err);
@@ -189,7 +190,12 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 exports.getCustomers = async (session) => {
   // First we get services from Ogust by employee Id in a specific range
   // 249180689 || session.userData.alenvi.employee_id
-  const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(session.userData.ogust.tokenConfig.token, 249180689, { slotToSub: 2, slotToAdd: 2, intervalType: 'week' }, { nbPerPage: 500, pageNum: 1 });
+  const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(
+    session.userData.ogust.tokenConfig.token,
+    session.userData.alenvi.employee_id,
+    { slotToSub: 2, slotToAdd: 2, intervalType: 'week' },
+    { nbPerPage: 500, pageNum: 1 }
+  );
   if (servicesInFourWeeks.body.status === 'KO') {
     throw new Error(`Error while getting services in four weeks: ${servicesInFourWeeks.body.message}`);
   }
