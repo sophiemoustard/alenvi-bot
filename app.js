@@ -9,7 +9,7 @@ const builder = require('botbuilder');
 // const passport = require('passport');
 // const FacebookStrategy = require('passport-facebook').Strategy;
 
-const config = require('./config');
+// const config = require('./config');
 
 const PORT = process.env.PORT || '3978';
 
@@ -25,8 +25,8 @@ app.use(restify.queryParser());
 
 // Create chat bot
 const connector = new builder.ChatConnector({
-  appId: config.MICROSOFT_APP_ID,
-  appPassword: config.MICROSOFT_APP_PASSWORD,
+  appId: process.env.MICROSOFT_APP_ID,
+  appPassword: process.env.MICROSOFT_APP_PASSWORD,
 });
 
 const bot = new builder.UniversalBot(connector);
@@ -118,7 +118,7 @@ bot.dialog('/', new builder.IntentDialog()
       console.log(token);
       const authorizationStatus = session.message.sourceEvent.account_linking.status;
       if (authorizationStatus === 'linked') {
-        jwt.verify(token, process.env.TOKEN_SECRET || config.TOKEN_SECRET, (err, decoded) => {
+        jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
           if (err) {
             console.error('ERROR VERIFY TOKEN');
             console.error(err);

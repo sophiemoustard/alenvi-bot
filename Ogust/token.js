@@ -12,12 +12,12 @@ const moment = require('moment');
 exports.getToken = () => {
   const dateTime = moment();
   const payload = {
-    key: Ogust.PUBLIC_KEY,
+    key: process.env.OGUST_PUBLIC_KEY,
     request: 'GET_TOKEN',
     time: `${moment().utc(dateTime).format('YYYYMMDDHHmmss')}.${Math.floor(Math.random() * ((999999 - 100000) + 1)) + 100000}`,
   };
   const joinPayload = `${payload.key}+${payload.request}+${payload.time}`;
-  const hash = crypto.createHmac('sha1', Ogust.PRIVATE_KEY).update(joinPayload).digest('hex');
+  const hash = crypto.createHmac('sha1', process.env.OGUST_PRIVATE_KEY).update(joinPayload).digest('hex');
   payload.api_signature = hash.toUpperCase();
   return rp.post({
     uri: `${Ogust.API_LINK}getToken`,
