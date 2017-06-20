@@ -56,6 +56,7 @@ const getCardsAttachments = async (session) => {
   }
   // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
   console.log('I RETURNED !');
+  console.log(myCards);
   return myCards;
 };
 
