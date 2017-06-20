@@ -39,18 +39,17 @@ const getCardsAttachments = async (session) => {
       const person = await formatPerson(myRawCustomers[k]);
       const text = await formatText(myRawCustomers[k]);
       myCards.push(
-        new builder.HeroCard(session)
-          .title(person)
-          // .subtitle('Subtitle')
-          .text(text)
-          .images([
-            builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
-          ])
-          .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
-          .buttons([
-            // builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`, 'Localisation'),
-            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
-          ])
+        // new builder.HeroCard(session)
+        //   .title(person)
+        //   .text(text)
+        //   .images([
+        //     builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
+        //   ])
+        //   .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
+        //   .buttons([
+        //     builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
+        //   ])
+        person
       );
     }
   }
@@ -75,10 +74,11 @@ const showMyCustomers = async (session) => {
     const cards = await getCardsAttachments(session);
     console.log('Got the cards !');
     console.log(Object.keys(cards).length);
-    const message = new builder.Message(session)
-      .attachmentLayout(builder.AttachmentLayout.carousel)
-      .attachments(cards);
-    session.endDialog(message);
+    // const message = new builder.Message(session)
+    //   .attachmentLayout(builder.AttachmentLayout.carousel)
+    //   .attachments(cards);
+    // session.endDialog(message);
+    session.endDialog('Test');
   } catch (err) {
     console.error(err);
     return session.endDialog("Oh non, je n'ai pas réussi à récupérer tes bénéficiaires :/ Si le problème persiste, essaie de contacter un administrateur !");
