@@ -43,9 +43,9 @@ const getCardsAttachments = async (session) => {
           .title(person)
           // .subtitle('Subtitle')
           .text(text)
-          .images([
-            builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
-          ])
+          // .images([
+          //   builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
+          // ])
           .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
           .buttons([
             // builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`, 'Localisation'),
