@@ -16,7 +16,7 @@ const config = require('../config');
 const whichDeclaration = async (session) => {
   await checkOgustToken(session);
   session.sendTyping();
-  builder.Prompts.choice(session, 'Que souhaites-tu déclarer ?', 'Heures internes|Intervention', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Que souhaites-tu déclarer ?', 'Heures internes|Modif. intervention', { maxRetries: 0 });
 };
 
 const redirectToDeclarationSelected = (session, results) => {
@@ -28,7 +28,7 @@ const redirectToDeclarationSelected = (session, results) => {
         case 'Heures internes':
           session.beginDialog('/ask_for_request');
           break;
-        case 'Intervention':
+        case 'Modif. intervention':
           session.beginDialog('/change_intervention');
           break;
       }
