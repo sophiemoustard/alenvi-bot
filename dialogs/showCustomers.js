@@ -73,7 +73,7 @@ const showMyCustomers = async (session) => {
     await checkOgustToken(session);
     const cards = await getCardsAttachments(session);
     console.log('Got the cards !');
-    console.log(Object.keys(cards).length);
+    console.log(cards);
     // const message = new builder.Message(session)
     //   .attachmentLayout(builder.AttachmentLayout.carousel)
     //   .attachments(cards);
