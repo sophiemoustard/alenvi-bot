@@ -47,7 +47,11 @@ const whichCustomer = async (session) => {
     session.sendTyping();
     await checkOgustToken(session);
     const myRawCustomers = await planning.getCustomers(session);
+    console.log('RAW CUSTOMERS =');
+    console.log(myRawCustomers);
     const myCustomersToDisplay = await planning.formatPromptListPersons(session, myRawCustomers, 'id_customer');
+    console.log('CUSTOMERS TO DISPLAY =');
+    console.log(myCustomersToDisplay);
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomersToDisplay, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
