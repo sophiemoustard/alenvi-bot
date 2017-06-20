@@ -38,14 +38,20 @@ const getCardsAttachments = async (session) => {
       const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
       const person = await formatPerson(myRawCustomers[k]);
       const text = await formatText(myRawCustomers[k]);
+      console.log('ENCODED =');
+      console.log(encoded);
+      console.log('PERSON =');
+      console.log(person);
+      console.log('TEXT =');
+      console.log(text);
       myCards.push(
         new builder.HeroCard(session)
           .title(person)
           // .subtitle('Subtitle')
           .text(text)
-          // .images([
-          //   builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
-          // ])
+          .images([
+            builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
+          ])
           .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
           .buttons([
             // builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`, 'Localisation'),
@@ -56,7 +62,7 @@ const getCardsAttachments = async (session) => {
   }
   // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
   console.log('I RETURNED !');
-  console.log(myCards);
+  // console.log(myCards);
   return myCards;
 };
 
