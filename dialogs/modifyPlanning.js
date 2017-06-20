@@ -77,7 +77,7 @@ const sendRequestToSlack = (payload) => {
     uri: 'https://slack.com/api/chat.postMessage',
     form: {
       token: process.env.SLACK_TOKEN,
-      channel: config.Slack.channels[payload.sector], // "G5QLJ49KL",
+      channel: config.Slack.channels[payload.sector],
       attachments: JSON.stringify([
         {
           callback_id: 'request_processed',
