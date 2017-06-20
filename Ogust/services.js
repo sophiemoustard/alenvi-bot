@@ -101,10 +101,10 @@ exports.getServicesByEmployeeIdInRange = (token, id, timeOption, pageOption) => 
       type: 'I',
       start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
       nbperpage: pageOption.nbPerPage,
-      pagenum: pageOption.pageNum,
+      pagenum: pageOption.pageNum
     },
     resolveWithFullResponse: true,
-    time: true,
+    time: true
   };
   return rp.post(option);
 };
