@@ -38,12 +38,6 @@ const getCardsAttachments = async (session) => {
       const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
       const person = await formatPerson(myRawCustomers[k]);
       const text = await formatText(myRawCustomers[k]);
-      console.log('ENCODED =');
-      console.log(encoded);
-      console.log('PERSON =');
-      console.log(person);
-      console.log('TEXT =');
-      console.log(text);
       myCards.push(
         new builder.HeroCard(session)
           .title(person)
