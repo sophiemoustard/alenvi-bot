@@ -1,5 +1,3 @@
-
-
 const path = require('path');
 // const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
@@ -58,7 +56,7 @@ bot.use({
   send(event, next) {
     logUserConversation(event);
     next();
-  },
+  }
 });
 
 app.post('/api/messages', connector.listen());
@@ -94,7 +92,7 @@ bot.on('conversationUpdate', (message) => {
   if (message.membersAdded) {
     message.membersAdded.forEach((identity) => {
       if (identity.id === message.address.bot.id) {
-        bot.beginDialog(message.address, '/hello_first');
+        bot.replaceDialog(message.address, '/hello_first');
       }
     });
   }
@@ -105,7 +103,7 @@ bot.on('conversationUpdate', (message) => {
 // =========================================================
 
 bot.dialog('/', new builder.IntentDialog()
-  .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, '/hello')
+  // .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, '/hello')
 
   // .matches(/^connexion/i, "/connection")
   // .matches(/Consulter planning/i, "/show_planning")
@@ -135,7 +133,7 @@ bot.dialog('/', new builder.IntentDialog()
             console.log(decoded);
             session.userData.alenvi = decoded;
             session.send(`Compte Facebook lié à Alenvi, merci ${session.userData.alenvi.firstname} :)`);
-            session.beginDialog('/hello');
+            session.replaceDialog('/hello');
           }
         });
       } else if (authorizationStatus === 'unlinked') {
@@ -145,7 +143,7 @@ bot.dialog('/', new builder.IntentDialog()
         session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');
       }
     } else {
-      session.beginDialog('/not_understand');
+      session.replaceDialog('/not_understand');
     }
   })
 );
