@@ -8,7 +8,7 @@ const config = require('../config');
 
 exports.login = (session) => {
   console.log('WENT IN LOGIN');
-  const uri = process.env.WEBSITE_HOSTNAME ? `${process.env.WEBSITE_HOSTNAME}/api/users/bot/facebook/account_linking` : config.WEBSITE_HOSTNAME ? `${config.WEBSITE_HOSTNAME}/api/users/bot/facebook/account_linking` : 'http://localhost:3000/api/users/bot/facebook/account_linking';
+  const uri = `${process.env.WEBSITE_HOSTNAME}/api/users/bot/facebook/account_linking`;
   const message = new builder.Message(session).sourceEvent({
     facebook: {
       attachment: {
