@@ -31,8 +31,9 @@ const formatText = async (customer) => {
 const getCardsAttachments = async (session) => {
   const myCards = [];
   const myRawCustomers = await planning.getCustomers(session);
-  console.log(myRawCustomers);
+  // console.log(myRawCustomers);
   for (const k in myRawCustomers) {
+    console.log('WENT IN FOR !');
     if (myRawCustomers[k].id_customer != '286871430') {
       const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
       const person = await formatPerson(myRawCustomers[k]);
@@ -54,6 +55,7 @@ const getCardsAttachments = async (session) => {
     }
   }
   // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
+  console.log('I RETURNED !');
   return myCards;
 };
 
