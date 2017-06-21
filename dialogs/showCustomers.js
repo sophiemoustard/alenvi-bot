@@ -33,29 +33,25 @@ const getCardsAttachments = async (session) => {
   const myRawCustomers = await planning.getCustomers(session);
   // console.log(myRawCustomers);
   for (const k in myRawCustomers) {
-    console.log('WENT IN FOR !');
     if (myRawCustomers[k].id_customer != '286871430') {
       const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
       const person = await formatPerson(myRawCustomers[k]);
       const text = await formatText(myRawCustomers[k]);
       myCards.push(
-        // new builder.HeroCard(session)
-        //   .title(person)
-        //   .text(text)
-        //   .images([
-        //     builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
-        //   ])
-        //   .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
-        //   .buttons([
-        //     builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
-        //   ])
-        person
+        new builder.HeroCard(session)
+          .title(person)
+          .text(text)
+          .images([
+            builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
+          ])
+          .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
+          .buttons([
+            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
+          ])
       );
     }
   }
   // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
-  console.log('I RETURNED !');
-  // console.log(myCards);
   return myCards;
 };
 
@@ -72,13 +68,10 @@ const showMyCustomers = async (session) => {
     session.sendTyping();
     await checkOgustToken(session);
     const cards = await getCardsAttachments(session);
-    console.log('Got the cards !');
-    console.log(cards);
-    // const message = new builder.Message(session)
-    //   .attachmentLayout(builder.AttachmentLayout.carousel)
-    //   .attachments(cards);
-    // session.endDialog(message);
-    session.endDialog('Test');
+    const message = new builder.Message(session)
+      .attachmentLayout(builder.AttachmentLayout.carousel)
+      .attachments(cards);
+    session.endDialog(message);
   } catch (err) {
     console.error(err);
     return session.endDialog("Oh non, je n'ai pas réussi à récupérer tes bénéficiaires :/ Si le problème persiste, essaie de contacter un administrateur !");
