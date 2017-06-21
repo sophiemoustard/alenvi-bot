@@ -39,9 +39,5 @@ jspm_packages
 # env
 .env
 
-<<<<<<< HEAD
 # log
-=======
-# Log file
->>>>>>> 133c0f98fc248a930647bef1495478da564564e4
 .logs.txt
