@@ -41,3 +41,4 @@ jspm_packages
 
 # log
 .logs.txt
+.logs_errors.txt
