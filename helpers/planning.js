@@ -212,7 +212,10 @@ exports.getCustomers = async (session) => {
       if (service.id_customer != 0 && service.id_customer != '271395715') { // Not Reunion Alenvi please
         return service;
       }
-    }).map(service => service.id_customer); // Put it in array of id_customer
+    }
+  ).map(service => service.id_customer); // Put it in array of id_customer
+  console.log('UNIQ CUSTOMERS =');
+  console.log(uniqCustomers);
   const myRawCustomers = [];
   for (let i = 0; i < uniqCustomers.length; i++) {
     const getCustomer = await customers.getCustomerByCustomerId(
