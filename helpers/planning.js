@@ -190,6 +190,8 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 exports.getCustomers = async (session) => {
   // First we get services from Ogust by employee Id in a specific range
   // 249180689 || session.userData.alenvi.employee_id
+  console.log('SESSION ALENVI =');
+  console.log(session.userData.alenvi);
   const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(
     session.userData.ogust.tokenConfig.token,
     session.userData.alenvi.employee_id,
