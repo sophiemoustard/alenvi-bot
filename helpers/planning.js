@@ -190,8 +190,6 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 exports.getCustomers = async (session) => {
   // First we get services from Ogust by employee Id in a specific range
   // 249180689 || session.userData.alenvi.employee_id
-  console.log('SESSION ALENVI =');
-  console.log(session.userData.alenvi);
   const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(
     session.userData.ogust.tokenConfig.token,
     session.userData.alenvi.employee_id,
@@ -216,8 +214,6 @@ exports.getCustomers = async (session) => {
       }
     }
   ).map(service => service.id_customer); // Put it in array of id_customer
-  console.log('UNIQ CUSTOMERS =');
-  console.log(uniqCustomers);
   const myRawCustomers = [];
   for (let i = 0; i < uniqCustomers.length; i++) {
     const getCustomer = await customers.getCustomerByCustomerId(
