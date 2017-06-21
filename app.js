@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 // const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
