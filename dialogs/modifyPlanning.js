@@ -1,6 +1,7 @@
+require('dotenv').config();
 const builder = require('botbuilder');
 const rp = require('request-promise');
-const moment = require('moment');
+const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const planning = require('../helpers/planning');
@@ -47,11 +48,7 @@ const whichCustomer = async (session) => {
     session.sendTyping();
     await checkOgustToken(session);
     const myRawCustomers = await planning.getCustomers(session);
-    console.log('RAW CUSTOMERS =');
-    console.log(myRawCustomers);
     const myCustomersToDisplay = await planning.formatPromptListPersons(session, myRawCustomers, 'id_customer');
-    console.log('CUSTOMERS TO DISPLAY =');
-    console.log(myCustomersToDisplay);
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomersToDisplay, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
@@ -81,7 +78,7 @@ const sendRequestToSlack = (payload) => {
     uri: 'https://slack.com/api/chat.postMessage',
     form: {
       token: process.env.SLACK_TOKEN,
-      channel: config.Slack.channels[payload.sector],
+      channel: process.env.NODE_ENV == 'development' ? config.Slack.channels['test'] : config.Slack.channels[payload.sector],
       attachments: JSON.stringify([
         {
           callback_id: 'request_processed',
@@ -140,7 +137,7 @@ const handleRequest = async (session, results) => {
         const options = {
           type: session.dialogData.selectedPerson ? 'Modif. Intervention' : 'Heures internes',
           author: `${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`,
-          dateRequest: moment().format('DD/MM/YYYY, HH:mm'),
+          dateRequest: moment().tz('Europe/Paris').format('DD/MM/YYYY, HH:mm'),
           textToSend: results.response,
           sector: session.userData.alenvi.sector,
           target: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
