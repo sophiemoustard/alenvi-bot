@@ -93,7 +93,7 @@ bot.on('conversationUpdate', (message) => {
   if (message.membersAdded) {
     message.membersAdded.forEach((identity) => {
       if (identity.id === message.address.bot.id) {
-        bot.replaceDialog(message.address, '/hello_first');
+        bot.beginDialog(message.address, '/hello_first');
       }
     });
   }
