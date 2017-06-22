@@ -133,7 +133,7 @@ bot.dialog('/', new builder.IntentDialog()
             console.log('DECODED !');
             console.log(decoded);
             session.userData.alenvi = decoded;
-            session.send(`Compte Facebook lié à Alenvi, merci ${session.userData.alenvi.firstname} :)`);
+            session.send(`Je t'ai bien reconnu, ${session.userData.alenvi.firstname}, merci de t'être connecté ! :)`);
             session.replaceDialog('/hello');
           }
         });

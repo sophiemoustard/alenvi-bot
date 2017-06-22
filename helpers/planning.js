@@ -1,4 +1,4 @@
-const moment = require('moment');
+const moment = require('moment-timezone');
 const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
@@ -31,8 +31,8 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
       throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
     }
     // Then push all the interventions well displayed (without carriage return yet)
-    const startDate = moment(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm').format('HH:mm');
-    const endDate = moment(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm').format('HH:mm');
+    const startDate = moment.tz(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
+    const endDate = moment.tz(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
     const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name.substring(0, 1)} ` : '';
     servicesToDisplay.push(`${getCustomer.body.customer.title}. ${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}  `);
   }
@@ -62,11 +62,7 @@ exports.getPlanningByChosenDay = async (session, results) => {
     }
     const sortedServicesByDate = await fillAndSortArrByStartDate(getServicesResult);
     const servicesToDisplay = await getServicesToDisplay(session, sortedServicesByDate);
-    session.send(`Interventions le ${results.response.entity}:
-    
-
-    
-    ${servicesToDisplay}`);
+    session.send(`Interventions le ${results.response.entity}:  \n${servicesToDisplay}`);
     return session.endDialog();
   } catch (err) {
     console.error(err);
@@ -142,8 +138,8 @@ const getWorkHoursByDay = async (session, dayChosen) => {
             workingHours[employeeId] = {};
           }
           workingHours[employeeId][j] = {};
-          workingHours[employeeId][j].start_date = moment(employeePlanningResult[j].start_date, 'YYYYMMDDHHmm').format('HH:mm');
-          workingHours[employeeId][j].end_date = moment(employeePlanningResult[j].end_date, 'YYYYMMDDHHmm').format('HH:mm');
+          workingHours[employeeId][j].start_date = moment.tz(employeePlanningResult[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
+          workingHours[employeeId][j].end_date = moment.tz(employeePlanningResult[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
           workingHours[employeeId].title = myTeam[i].title;
           workingHours[employeeId].first_name = myTeam[i].first_name;
           workingHours[employeeId].last_name = myTeam[i].last_name;
@@ -241,7 +237,7 @@ exports.getCustomers = async (session) => {
 */
 exports.getDaysByWeekOffset = (offset = 0) => {
   const days = {};
-  const currentDate = moment();
+  const currentDate = moment().tz('Europe/Paris');
   const weekStart = currentDate.clone().startOf('isoWeek');
   if (offset) {
     if (offset < 0) {

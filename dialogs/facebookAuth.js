@@ -16,7 +16,7 @@ exports.login = (session) => {
         payload: {
           template_type: 'generic',
           elements: [{
-            title: 'Bienvenue sur la liaison de compte',
+            title: 'Authentification avec identifiants Alenvi',
             image_url: 'http://www.welcometothejungle.co/uploads/company/logo/alenvi.png',
             buttons: [{
               type: 'account_link',

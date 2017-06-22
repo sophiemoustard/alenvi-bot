@@ -1,15 +1,15 @@
-const builder = require('botbuilder');
-
 // =========================================================
 // Hello when connected or not
 // =========================================================
+
+const builder = require('botbuilder');
 
 exports.hello_first = [
   (session) => {
     console.log('WENT IN HELLO_FIRST');
     session.sendTyping();
     session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
-    session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier chez Alenvi grâce à Facebook, pour que je puisse te reconnaître ?");
+    session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier grâce aux identifiants fournis par Alenvi, pour que je puisse te reconnaître ?");
     session.beginDialog('/login_facebook');
   }
 ];
