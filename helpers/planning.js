@@ -34,7 +34,7 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
     const startDate = moment(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm').format('HH:mm');
     const endDate = moment(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm').format('HH:mm');
     const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name.substring(0, 1)} ` : '';
-    servicesToDisplay.push(`${getCustomer.body.customer.title}. ${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}`);
+    servicesToDisplay.push(`${getCustomer.body.customer.title}. ${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}  `);
   }
   // Return all services to display the carriage return
   return servicesToDisplay.join('  \n');
@@ -53,16 +53,20 @@ exports.getPlanningByChosenDay = async (session, results) => {
         session.userData.alenvi.employee_id,
       dayChosen, { nbPerPage: 20, pageNum: 1 }
     );
-    const getServicesResult = getServices.body.array_service.result;
     if (getServices.body.status === 'KO') {
       throw new Error(`Error while getting services: ${getServices.body.message}`);
     }
+    const getServicesResult = getServices.body.array_service.result;
     if (Object.keys(getServicesResult).length === 0) {
       return session.endDialog('Aucune intervention ce jour-là ! :)');
     }
     const sortedServicesByDate = await fillAndSortArrByStartDate(getServicesResult);
     const servicesToDisplay = await getServicesToDisplay(session, sortedServicesByDate);
-    session.send(`Interventions le ${results.response.entity}:  \n${servicesToDisplay}`);
+    session.send(`Interventions le ${results.response.entity}:
+    
+
+    
+    ${servicesToDisplay}`);
     return session.endDialog();
   } catch (err) {
     console.error(err);
