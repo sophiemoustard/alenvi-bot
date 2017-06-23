@@ -68,6 +68,9 @@ exports.getPlanningByChosenDay = async (session, results) => {
         session.dialogData.myCoworkerChosen.employee_id,
         { nbPerPage: 1, pageNum: 1 }
       );
+      if (coWorker.body.status === 'KO') {
+        throw new Error(`Error while getting employee by id: ${coWorker.body.message}`);
+      }
       session.send(`📅 Interventions de ${coWorker.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
     } else {
     session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
@@ -156,6 +159,7 @@ const getWorkHoursByDay = async (session, dayChosen) => {
       }
     }
   }
+  console.log(workingHours);
   return workingHours;
 };
 
