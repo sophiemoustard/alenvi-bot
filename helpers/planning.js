@@ -33,8 +33,8 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
     // Then push all the interventions well displayed (without carriage return yet)
     const startDate = moment.tz(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
     const endDate = moment.tz(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
-    const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name.substring(0, 1)} ` : '';
-    servicesToDisplay.push(`${getCustomer.body.customer.title}. ${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}  `);
+    const firstName = getCustomer.body.customer.first_name ? `${getCustomer.body.customer.first_name.substring(0, 1)}. ` : '';
+    servicesToDisplay.push(`${firstName}${getCustomer.body.customer.last_name}: ${startDate} - ${endDate}  `); // ${getCustomer.body.customer.title}.
   }
   // Return all services to display the carriage return
   return servicesToDisplay.join('  \n');
@@ -62,7 +62,16 @@ exports.getPlanningByChosenDay = async (session, results) => {
     }
     const sortedServicesByDate = await fillAndSortArrByStartDate(getServicesResult);
     const servicesToDisplay = await getServicesToDisplay(session, sortedServicesByDate);
-    session.send(`Interventions le ${results.response.entity}:  \n${servicesToDisplay}`);
+    if (session.dialogData.myCoworkerChosen) {
+      const coWorker = await employee.getEmployeeById(
+        session.userData.ogust.tokenConfig.token,
+        session.dialogData.myCoworkerChosen.employee_id,
+        { nbPerPage: 1, pageNum: 1 }
+      );
+      session.send(`📅 Interventions de ${coWorker.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
+    } else {
+    session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
+    }
     return session.endDialog();
   } catch (err) {
     console.error(err);
@@ -175,7 +184,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
     }
     const workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
-    session.send(`Voici les créneaux horaires sur lesques tes collègues travaillent le ${results.response.entity}:  \n${workingHoursToDisplay}`);
+    session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
     return session.endDialog();
   } catch (err) {
     console.error(err);
