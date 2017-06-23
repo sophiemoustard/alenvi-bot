@@ -30,7 +30,7 @@ exports.getEmployees = (token, pageOption) => {
 ** - id: employee id
 ** Method: POST
 */
-exports.getEmployeeByEmployeeId = (token, id, pageOption) => {
+exports.getEmployeeById = (token, id, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}getEmployee`,
     json: true,

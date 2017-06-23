@@ -139,7 +139,7 @@ bot.dialog('/', new builder.IntentDialog()
         });
       } else if (authorizationStatus === 'unlinked') {
         delete session.userData.alenvi;
-        session.endDialog('Compte Facebook bien délié ! Reviens-vite :)');
+        session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
       } else {
         session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');
       }
