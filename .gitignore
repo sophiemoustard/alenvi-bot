@@ -40,5 +40,5 @@ jspm_packages
 .env
 
 # log
-.logs.txt
-.logs_errors.txt
+.logs.log
+.logs_errors.log
