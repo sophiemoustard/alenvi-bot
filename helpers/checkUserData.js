@@ -57,7 +57,5 @@ exports.checkUserData = async (session) => {
   session.userData.alenvi.lastname = userDataOgust.last_name;
   session.userData.alenvi.sector = userDataOgust.sector;
   session.userData.alenvi.role = userDataAlenvi.role;
-  console.log('USER DATA ALENVI =');
-  console.log(session.userData.alenvi);
   return session.userData.alenvi;
 };
