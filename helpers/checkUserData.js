@@ -16,6 +16,17 @@ const getAlenviUserById = (id) => {
 ** Method: POST
 */
 exports.checkUserData = async (session) => {
+  // Special update for Alenvi Guillaume / Clément / Thibault / Admin
+  if (session.userData.alenvi.employee_id == 1 || session.userData.alenvi.employee_id == 2 ||
+  session.userData.alenvi.employee_id == 3 || session.userData.alenvi.employee_id == 4) {
+    const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
+    const userDataAlenvi = userDataAlenviRaw.body.data.user;
+    session.userData.alenvi.firstname = userDataAlenvi.firstname;
+    session.userData.alenvi.lastname = userDataAlenvi.lastname;
+    session.userData.alenvi.sector = userDataAlenvi.sector;
+    session.userData.alenvi.role = userDataAlenvi.role;
+    return session.userData.alenvi;
+  }
   const userDataOgustRaw = await employee.getEmployeeById(
     session.userData.ogust.tokenConfig.token,
     session.userData.alenvi.employee_id,
@@ -46,5 +57,7 @@ exports.checkUserData = async (session) => {
   session.userData.alenvi.lastname = userDataOgust.last_name;
   session.userData.alenvi.sector = userDataOgust.sector;
   session.userData.alenvi.role = userDataAlenvi.role;
+  console.log('USER DATA ALENVI =');
+  console.log(session.userData.alenvi);
   return session.userData.alenvi;
 };
