@@ -16,7 +16,6 @@ const addTokenToSession = async (session) => {
 
 exports.checkToken = async (session) => {
   try {
-    // await checkUserData(session);
     session.userData.ogust = session.userData.ogust || {};
     session.userData.ogust.tokenConfig = session.userData.ogust.tokenConfig || {};
     session.userData.ogust.tokenConfig.token = session.userData.ogust.tokenConfig.token || '';
