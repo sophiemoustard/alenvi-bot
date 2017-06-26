@@ -110,11 +110,8 @@ bot.dialog('/', new builder.IntentDialog()
   // .matches(/Consulter planning/i, "/show_planning")
   // .matches(/^log in|login/i, "/login")
   .onDefault((session) => {
-    console.log('WENT IN .onDefault()');
     if (session.message.sourceEvent.account_linking) {
-      console.log('TOKEN =');
       const token = session.message.sourceEvent.account_linking.authorization_code;
-      console.log(token);
       const authorizationStatus = session.message.sourceEvent.account_linking.status;
       if (authorizationStatus === 'linked') {
         jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
@@ -140,7 +137,7 @@ bot.dialog('/', new builder.IntentDialog()
         delete session.userData.ogust;
         session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
       } else {
-        session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');
+        session.endDialog('Il y a eu un problème au moment de déconnecter ton compte Alenvi ! :/');
       }
     } else {
       session.replaceDialog('/not_understand');
