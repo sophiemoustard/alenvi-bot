@@ -110,8 +110,6 @@ bot.dialog('/', new builder.IntentDialog()
   // .matches(/Consulter planning/i, "/show_planning")
   // .matches(/^log in|login/i, "/login")
   .onDefault((session) => {
-    // Facebook account_linking
-    // if already linked
     console.log('WENT IN .onDefault()');
     if (session.message.sourceEvent.account_linking) {
       console.log('TOKEN =');
@@ -133,12 +131,13 @@ bot.dialog('/', new builder.IntentDialog()
             console.log('DECODED !');
             console.log(decoded);
             session.userData.alenvi = decoded;
-            session.send(`Je t'ai bien reconnu, ${session.userData.alenvi.firstname}, merci de t'être connecté ! :)`);
+            session.send(`Je t'ai bien reconnu ${session.userData.alenvi.firstname}, merci de t'être connecté(e) ! :)`);
             session.replaceDialog('/hello');
           }
         });
       } else if (authorizationStatus === 'unlinked') {
         delete session.userData.alenvi;
+        delete session.userData.ogust;
         session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
       } else {
         session.endDialog('Il y a eu un problème au moment de délier ton compte Facebook ! :/');

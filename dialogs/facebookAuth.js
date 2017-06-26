@@ -8,13 +8,14 @@ const config = require('../config');
 
 exports.login = (session) => {
   console.log('WENT IN LOGIN');
-  const uri = `${process.env.WEBSITE_HOSTNAME}/api/users/bot/facebook/account_linking`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/api/bot/facebook/account_linking`;
   const message = new builder.Message(session).sourceEvent({
     facebook: {
       attachment: {
         type: 'template',
         payload: {
           template_type: 'generic',
+          image_aspect_ratio: 'square',
           elements: [{
             title: 'Authentification avec identifiants Alenvi',
             image_url: 'http://www.welcometothejungle.co/uploads/company/logo/alenvi.png',
