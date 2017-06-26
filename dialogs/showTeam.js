@@ -27,7 +27,7 @@ const getCardsAttachments = async (session) => {
       const contact = `https://m.me/${myRawTeam[k].skype_id}`;
       const picture = myRawTeam[k].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
       myCards.push(
-        new builder.HeroCard(session)
+        new builder.ThumbnailCard(session)
           .title(person)
           .text(mobilePhone)
           .images([
