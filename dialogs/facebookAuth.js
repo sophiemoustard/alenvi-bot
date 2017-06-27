@@ -8,7 +8,7 @@ const config = require('../config');
 
 exports.login = (session) => {
   console.log('WENT IN LOGIN');
-  const uri = `${process.env.WEBSITE_HOSTNAME}/api/bot/facebook/account_linking`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/api/bot/facebook/account_linking`; //'https://867da8cd.ngrok.io/api/bot/facebook/account_linking';
   const message = new builder.Message(session).sourceEvent({
     facebook: {
       attachment: {
