@@ -18,7 +18,7 @@ exports.login = (session) => {
           image_aspect_ratio: 'square',
           elements: [{
             title: 'Authentification avec identifiants Alenvi',
-            image_url: 'http://www.welcometothejungle.co/uploads/company/logo/alenvi.png',
+            image_url: `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`,
             buttons: [{
               type: 'account_link',
               url: uri
