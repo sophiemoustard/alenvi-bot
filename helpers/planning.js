@@ -126,7 +126,7 @@ const getTeamBySector = exports.getTeamBySector = async (session) => {
   return getTeamResult;
 };
 
-const getWorkHoursByDay = async (session, dayChosen) => {
+const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
   const myTeam = await getTeamBySector(session);
   const lengthTeam = Object.keys(myTeam).length;
   const workingHours = {};
@@ -137,29 +137,39 @@ const getWorkHoursByDay = async (session, dayChosen) => {
     }
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
-      const getEmployeePlanningByDay = await services.getServicesByEmployeeIdAndDate(
+      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(
         session.userData.ogust.tokenConfig.token,
         employeeId, dayChosen, { nbPerPage: 20, pageNum: 1 });
-      if (getEmployeePlanningByDay.body.status === 'KO') {
-        throw new Error(`Error while getting employee planning by day: ${getEmployeePlanningByDay.body.message}`);
+      if (employeePlanningByDayRaw.body.status === 'KO') {
+        throw new Error(`Error while getting employee planning by day: ${employeePlanningByDayRaw.body.message}`);
       }
-      const employeePlanningResult = getEmployeePlanningByDay.body.array_service.result;
-      if (employeePlanningResult) {
-        for (const j in employeePlanningResult) {
-          if (!workingHours[employeeId]) {
-            workingHours[employeeId] = {};
+      const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
+      if (employeePlanningByDay) {
+        // for (const j in employeePlanningByDay) {
+        //   workingHours[employeeId] = workingHours[employeeId] || {};
+        //   workingHours[employeeId][j] = {};
+        //   workingHours[employeeId][j].start_date = moment.tz(employeePlanningByDay[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
+        //   workingHours[employeeId][j].end_date = moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
+        //   workingHours[employeeId].title = myTeam[i].title;
+        //   workingHours[employeeId].first_name = myTeam[i].first_name;
+        //   workingHours[employeeId].last_name = myTeam[i].last_name;
+        // }
+        workingHours[employeeId] = {};
+        workingHours[employeeId]['interventions'] = [];
+        workingHours[employeeId].title = myTeam[i].title;
+        workingHours[employeeId].first_name = myTeam[i].first_name;
+        workingHours[employeeId].last_name = myTeam[i].last_name;
+        for (const j in employeePlanningByDay) {
+          const interv = {
+            start_date: moment.tz(employeePlanningByDay[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm'),
+            end_date: moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm')
           }
-          workingHours[employeeId][j] = {};
-          workingHours[employeeId][j].start_date = moment.tz(employeePlanningResult[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
-          workingHours[employeeId][j].end_date = moment.tz(employeePlanningResult[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
-          workingHours[employeeId].title = myTeam[i].title;
-          workingHours[employeeId].first_name = myTeam[i].first_name;
-          workingHours[employeeId].last_name = myTeam[i].last_name;
+          workingHours[employeeId]['interventions'].push(interv);
         }
       }
     }
   }
-  console.log(workingHours);
+  // console.log(workingHours);
   return workingHours;
 };
 
@@ -168,9 +178,10 @@ const formatCommunityWorkingHours = async (workingHours) => {
   for (const k in workingHours) {
     const obj = workingHours[k];
     let planningToAdd = `${obj.first_name} ${obj.last_name}:  \n`;
-    for (const indexService in obj) {
-      if (obj[indexService].start_date && obj[indexService].end_date) {
-        planningToAdd += `${obj[indexService].start_date} - ${obj[indexService].end_date}  \n`;
+    for (let i = 0; i < obj.interventions.length; i++) {
+      console.log(obj.interventions[i]);
+      if (obj.interventions[i].start_date && obj.interventions[i].end_date) {
+        planningToAdd += `${obj.interventions[i].start_date} - ${obj.interventions[i].end_date}  \n`;
       }
     }
     planningToDisplay.push(planningToAdd);
@@ -178,15 +189,35 @@ const formatCommunityWorkingHours = async (workingHours) => {
   return planningToDisplay.join('  \n');
 };
 
+// const fillAndSortArrByStartDate = async (getServiceResult) => {
+//   const sortedServicesByDate = _.values(getServiceResult);
+//   await sortedServicesByDate.sort((service1, service2) => (
+//     service1.start_date - service2.start_date));
+//   return sortedServicesByDate;
+// };
+
+const sortWorkingHoursByStartDate = async (workingHoursRaw) => {
+  console.log('WORKING HOURS RAW =');
+  console.log(workingHoursRaw);
+  // for (const id in workingHoursRaw) {
+  //   for (const j in workingHoursRaw[id]) {
+  //     await workingHoursRaw[id].sort((service1, service2) => (
+  //       service1.start_date - service2.start_date));
+  //     return workingHoursRaw;
+  //   }
+  // }
+}
+
 exports.getCommunityPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
     const dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
-    const workingHoursRaw = await getWorkHoursByDay(session, dayChosen);
+    const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
     if (Object.keys(workingHoursRaw).length === 0) {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
     }
+    const workingHoursSorted = await sortWorkingHoursByStartDate(workingHoursRaw);
     const workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
     session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
     return session.endDialog();
