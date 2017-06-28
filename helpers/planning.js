@@ -165,6 +165,7 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
             end_date: moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm')
           }
           workingHours[employeeId]['interventions'].push(interv);
+          // workingHours[employeeId]['interventions'] = ._sortBy();
         }
       }
     }
@@ -188,13 +189,6 @@ const formatCommunityWorkingHours = async (workingHours) => {
   }
   return planningToDisplay.join('  \n');
 };
-
-// const fillAndSortArrByStartDate = async (getServiceResult) => {
-//   const sortedServicesByDate = _.values(getServiceResult);
-//   await sortedServicesByDate.sort((service1, service2) => (
-//     service1.start_date - service2.start_date));
-//   return sortedServicesByDate;
-// };
 
 const sortWorkingHoursByStartDate = async (workingHoursRaw) => {
   console.log('WORKING HOURS RAW =');
