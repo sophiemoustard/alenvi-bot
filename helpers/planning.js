@@ -163,14 +163,14 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
           const interv = {
             start_date: moment.tz(employeePlanningByDay[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm'),
             end_date: moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm')
-          }
+          };
           workingHours[employeeId]['interventions'].push(interv);
-          // workingHours[employeeId]['interventions'] = ._sortBy();
+          let sortedWorkingHours = _.sortBy(workingHours[employeeId]['interventions'], 'start_date');
+          workingHours[employeeId]['interventions'] = sortedWorkingHours;
         }
       }
     }
   }
-  // console.log(workingHours);
   return workingHours;
 };
 
