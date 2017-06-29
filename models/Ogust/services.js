@@ -1,4 +1,4 @@
-const Ogust = require('../config').Ogust;
+const Ogust = require('../../config').Ogust;
 const rp = require('request-promise');
 const moment = require('moment');
 

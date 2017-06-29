@@ -1,5 +1,5 @@
 const rp = require('request-promise');
-const employee = require('../Ogust/employees');
+const employee = require('../models/Ogust/employees');
 
 const getAlenviUserById = (id) => {
   const options = {

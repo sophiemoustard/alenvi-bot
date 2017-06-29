@@ -3,9 +3,9 @@ const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
-const employee = require('../Ogust/employees');
-const services = require('../Ogust/services');
-const customers = require('../Ogust/customers');
+const employee = require('../models/Ogust/employees');
+const services = require('../models/Ogust/services');
+const customers = require('../models/Ogust/customers');
 
 // =========================================================
 // Own planning + another auxiliary planning
@@ -171,6 +171,7 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
       }
     }
   }
+  console.log(workingHours['287607426']['interventions']);
   return workingHours;
 };
 

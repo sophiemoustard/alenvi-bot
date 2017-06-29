@@ -1,5 +1,5 @@
 const moment = require('moment-timezone');
-const token = require('../Ogust/token');
+const token = require('../models/Ogust/token');
 const {checkUserData} = require('./checkUserData');
 
 const addTokenToSession = async (session) => {

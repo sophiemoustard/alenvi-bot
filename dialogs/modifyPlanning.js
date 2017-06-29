@@ -1,11 +1,10 @@
 require('dotenv').config();
 const builder = require('botbuilder');
-const rp = require('request-promise');
 const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const planning = require('../helpers/planning');
-const config = require('../config');
+const slack = require('../models/Slack/planning');
 
 // const services = require('../Ogust/services');
 // const customers = require('../Ogust/customers');
@@ -73,56 +72,6 @@ const promptDescription = (session, args) => {
   }
 };
 
-const sendRequestToSlack = (payload) => {
-  const options = {
-    uri: 'https://slack.com/api/chat.postMessage',
-    form: {
-      token: process.env.SLACK_TOKEN,
-      channel: process.env.NODE_ENV == 'development' ? config.Slack.channels['test'] : config.Slack.channels[payload.sector],
-      attachments: JSON.stringify([
-        {
-          callback_id: 'request_processed',
-          title: 'Demande:',
-          text: payload.textToSend,
-          fields: [
-            {
-              title: 'Auteur:',
-              value: payload.author,
-              short: true,
-            },
-            {
-              title: 'Date requête:',
-              value: payload.dateRequest,
-              short: true,
-            },
-            {
-              title: 'Concerné(e):',
-              value: payload.target,
-              short: true,
-            },
-            {
-              title: 'Type:',
-              value: payload.type,
-              short: true,
-            },
-          ],
-          // "actions": [
-          //   {
-          //     "name": "is_processed",
-          //     "text": "Traité",
-          //     "type": "button",
-          //     "value": "done"
-          //   }
-          // ]
-        },
-      ]),
-    },
-    headers: {
-      'content-type': 'application/x-www-form-urlencoded',
-    },
-  };
-  return rp.post(options);
-};
 
 const handleRequest = async (session, results) => {
   try {
@@ -142,7 +91,7 @@ const handleRequest = async (session, results) => {
           sector: session.userData.alenvi.sector,
           target: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
         };
-        const sent = await sendRequestToSlack(options);
+        const sent = await slack.sendRequestToSlack(options);
         if (sent.ok === false) {
           throw new Error(sent);
         }
@@ -159,35 +108,3 @@ const handleRequest = async (session, results) => {
 
 exports.changeIntervention = [whichCustomer, promptDescription, handleRequest];
 exports.askForRequest = [promptDescription, handleRequest];
-
-// var message = new builder.Message(session).sourceEvent({
-//   slack: {
-//     "channel": config.Slack.channels[sector], // "G5QLJ49KL",
-//     "attachments": JSON.stringify([
-//       {
-//         "callback_id": "request_processed",
-//         "title": "Demande:",
-//         "text": textToSend,
-//         "fields": [
-//           {
-//             "title": "Name",
-//             "value": author,
-//             "short": true
-//           },
-//           {
-//             "title": "Date",
-//             "value": date,
-//             "short": true
-//           }
-//         ],
-//         "actions": [
-//           {
-//             "name": "is_processed",
-//             "text": "Traité",
-//             "type": "button",
-//             // "value": "done"
-//           }
-//         ]
-//       }
-//     ])
-//   }
