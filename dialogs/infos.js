@@ -6,7 +6,7 @@ const builder = require('botbuilder');
 
 const whichInfo = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quelle information souhaites-tu obtenir précisement ?', 'Feuilles de paie|Documents RH|Contacts Utiles', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quelle information souhaites-tu obtenir précisément ?', 'Feuilles de paie|Documents RH|Contacts Utiles', { maxRetries: 0 });
 };
 
 const redirectToInfoSelected = (session, results) => {
