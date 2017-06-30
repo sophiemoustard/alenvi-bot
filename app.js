@@ -178,6 +178,7 @@ bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
 
 bot.dialog('/select_infos', require('./dialogs/infos').select);
 bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
+bot.dialog('/usefull_contacts', require('./dialogs/usefull_contacts').showContacts);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 

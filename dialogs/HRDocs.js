@@ -6,32 +6,32 @@ const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 // HR documents dialog
 // =========================================================
 
-const getCardsAttachments = async (session) => {
+const getCardsAttachments = (session) => {
   return [
     new builder.HeroCard(session)
       .title(`Conditions de remboursement de mutuelle`)
       .buttons([
-        builder.CardAction.openUrl(session, 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing', 'Télécharger')
+        builder.CardAction.openUrl(session, 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing', 'Visionner')
       ]),
     new builder.HeroCard(session)
       .title(`Accord d'intéressement`)
       .buttons([
-        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeUxoN2RTVmlOUVk', 'Télécharger')
+        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeUxoN2RTVmlOUVk', 'Visionner')
       ]),
     new builder.HeroCard(session)
       .title('Plan d’épargne entreprise')
       .buttons([
-        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3CkiGZsxsSpQ0cwYjlMMk9KeWs', 'Télécharger')
+        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3CkiGZsxsSpQ0cwYjlMMk9KeWs', 'Visionner')
       ]),
     new builder.HeroCard(session)
       .title('Convention collective des services à la personne')
       .buttons([
-        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM', 'Télécharger')
+        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM', 'Visionner')
       ]),
     new builder.HeroCard(session)
       .title('Evaluation des risques professionnels')
       .buttons([
-        builder.CardAction.openUrl(session, 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE', 'Télécharger')
+        builder.CardAction.openUrl(session, 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE', 'Visionner')
       ])
   ]
 };
@@ -49,36 +49,6 @@ const showHRDocs = async (session) => {
     console.error(err);
     return session.endDialog("Arf, je n'ai pas réussi à récupérer les documents :/ Si le problème persiste, essaie de contacter un administrateur !");
   }
-  // session.endDialog(`[Conditions de remboursement de mutuelle](https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing)  \n
-  // [Accord d'intéressement](https://drive.google.com/open?id=0B3bqjy-Bj6OHeUxoN2RTVmlOUVk)  \n
-  // [Plan d’épargne entreprise](https://drive.google.com/open?id=0B3CkiGZsxsSpQ0cwYjlMMk9KeWs)  \n
-  // [Convention collective des services à la personne](https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM)  \n
-  // [Evaluation des risques professionnels](https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE)`);
-  // builder.Prompts.choice(session, 'Quelle information souhaites-tu obtenir précisement ?', 'Feuilles de paie|Documents RH|Contacts Utiles', { maxRetries: 0 });
 };
-
-// const redirectToInfoSelected = (session, results) => {
-//   if (results.response) {
-//     if (session.userData.alenvi) {
-//       switch (results.response.entity) {
-//         case 'Feuilles de paie':
-//           session.replaceDialog('/pay_sheets');
-//           break;
-//         case 'Documents RH':
-//           session.replaceDialog('/hr_docs');
-//           break;
-//         case 'Contacts utiles':
-//           session.replaceDialog('/usefull_contacts');
-//           break;
-//         default:
-//           break;
-//       }
-//     } else {
-//       session.endDialog('Vous devez vous connecter pour accéder à cette fonctionnalité ! :)');
-//     }
-//   } else {
-//     session.cancelDialog(0, '/not_understand');
-//   }
-// };
 
 exports.showHRDocs = [showHRDocs];
