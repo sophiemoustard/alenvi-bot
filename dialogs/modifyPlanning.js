@@ -3,6 +3,7 @@ const builder = require('botbuilder');
 const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
+const customers = require('../helpers/customers');
 const planning = require('../helpers/planning');
 const slack = require('../models/Slack/planning');
 
@@ -46,9 +47,9 @@ const whichCustomer = async (session) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const myRawCustomers = await planning.getCustomers(session);
-    const myCustomersToDisplay = await planning.formatPromptListPersons(session, myRawCustomers, 'id_customer');
-    builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomersToDisplay, { listStyle: builder.ListStyle.button, maxRetries: 0 });
+    const myCustomersRaw = await customers.getCustomers(session, session.userData.alenvi.employee_id);
+    const myCustomers = await planning.formatPromptListPersons(session, myCustomersRaw, 'id_customer');
+    builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomers, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
     return session.endDialog("Flûte, impossible de récupérer ta liste de bénéficiaires pour le moment :/ Réessaie, et si le problème persiste n'hésite pas à contacter l'équipe technique !");
