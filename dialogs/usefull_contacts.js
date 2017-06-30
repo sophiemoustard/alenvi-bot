@@ -4,7 +4,7 @@ const builder = require('botbuilder');
 // Usefull contacts dialog
 // =========================================================
 
-const showContacts = async (session) => {
+const showContacts = (session) => {
   return session.endDialog(`Médecine du travail:  \n
 🏠 CIAMT Centre Vaugirard  \n
 242 rue de Vaugirard 75015 Paris  \n
