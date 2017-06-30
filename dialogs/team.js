@@ -1,7 +1,7 @@
 const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const planning = require('../helpers/planning');
+const {getTeamBySector} = require('../helpers/team');
 
 const formatPerson = async (coworker) => {
   let person = {};
@@ -15,7 +15,7 @@ const formatPerson = async (coworker) => {
 
 const getCardsAttachments = async (session) => {
   const myCards = [];
-  const myRawTeam = await planning.getTeamBySector(session);
+  const myRawTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const lengthTeam = Object.keys(myRawTeam).length;
   for (const k in myRawTeam) {
     if (myRawTeam[k].id_employee == session.userData.alenvi.employee_id && lengthTeam === 1) {

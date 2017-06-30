@@ -8,7 +8,7 @@ const rp = require('request-promise');
 ** - id: customer id
 ** Method: POST
 */
-exports.getCustomerByCustomerId = (token, id, pageOption) => {
+exports.getCustomerByCustomerId = async (token, id, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}getCustomer`,
     json: true,
@@ -21,5 +21,9 @@ exports.getCustomerByCustomerId = (token, id, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting customer by id: ${res.body.message}`);
+  }
+  return res;
 };

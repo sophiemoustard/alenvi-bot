@@ -38,7 +38,7 @@ const getIntervalInRange = (timeOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesInRange = (token, timeOption, pageOption) => {
+exports.getServicesInRange = async (token, timeOption, pageOption) => {
   const interval = getIntervalInRange(timeOption);
   const options = {
     url: `${Ogust.API_LINK}searchService`,
@@ -54,11 +54,15 @@ exports.getServicesInRange = (token, timeOption, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services in range: ${res.body.message}`);
+  }
+  return res;
 };
 
-exports.getServicesByDate = (token, date, pageOption) => {
-  const option = {
+exports.getServicesByDate = async (token, date, pageOption) => {
+  const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
@@ -72,7 +76,11 @@ exports.getServicesByDate = (token, date, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(option);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services by date: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -89,9 +97,9 @@ exports.getServicesByDate = (token, date, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdInRange = (token, id, timeOption, pageOption) => {
+exports.getServicesByEmployeeIdInRange = async (token, id, timeOption, pageOption) => {
   const interval = getIntervalInRange(timeOption);
-  const option = {
+  const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
@@ -106,7 +114,11 @@ exports.getServicesByEmployeeIdInRange = (token, id, timeOption, pageOption) => 
     resolveWithFullResponse: true,
     time: true
   };
-  return rp.post(option);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services by employee id in range: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -120,8 +132,8 @@ exports.getServicesByEmployeeIdInRange = (token, id, timeOption, pageOption) => 
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
-  const option = {
+exports.getServicesByEmployeeIdAndDate = async (token, id, date, pageOption) => {
+  const options = {
     url: `${Ogust.API_LINK}searchService`,
     json: true,
     body: {
@@ -136,7 +148,11 @@ exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(option);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services by employee id and date: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -153,7 +169,7 @@ exports.getServicesByEmployeeIdAndDate = (token, id, date, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServicesByCustomerIdInRange = (token, id, timeOption, pageOption) => {
+exports.getServicesByCustomerIdInRange = async (token, id, timeOption, pageOption) => {
   const interval = getIntervalInRange(timeOption);
   const options = {
     url: `${Ogust.API_LINK}searchService`,
@@ -170,5 +186,9 @@ exports.getServicesByCustomerIdInRange = (token, id, timeOption, pageOption) => 
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services by customer id in range: ${res.body.message}`);
+  }
+  return res;
 };

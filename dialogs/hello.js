@@ -10,7 +10,7 @@ exports.hello_first = [
     session.sendTyping();
     session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
     session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier grâce aux identifiants fournis par Alenvi, pour que je puisse te reconnaître ?");
-    session.beginDialog('/login_facebook');
+    session.replaceDialog('/login_facebook');
   }
 ];
 
@@ -27,16 +27,16 @@ const redirectMenuResult = (session, results) => {
       console.log(results.response);
       switch (results.response.entity) {
         case 'Consulter planning':
-          session.beginDialog('/select_show_planning');
+          session.replaceDialog('/select_show_planning');
           break;
         case 'Modifier planning':
-          session.beginDialog('/select_modify_planning');
+          session.replaceDialog('/select_modify_planning');
           break;
         case 'Bénéficiaires':
-          session.beginDialog('/show_my_customers');
+          session.replaceDialog('/show_my_customers');
           break;
         case 'Equipe':
-          session.beginDialog('/show_team');
+          session.replaceDialog('/show_team');
           break;
       }
     }

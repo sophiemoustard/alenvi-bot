@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
+const {getTeamBySector} = require('../helpers/team');
 
 const employee = require('../models/Ogust/employees');
 const services = require('../models/Ogust/services');
@@ -27,9 +28,6 @@ const getServicesToDisplay = async (session, sortedServicesByDate) => {
       session.userData.ogust.tokenConfig.token,
       sortedServicesByDate[i].id_customer,
       { nbPerPage: 20, pageNum: 1 });
-    if (getCustomer.body.status === 'KO') {
-      throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
-    }
     // Then push all the interventions well displayed (without carriage return yet)
     const startDate = moment.tz(sortedServicesByDate[i].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
     const endDate = moment.tz(sortedServicesByDate[i].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
@@ -53,9 +51,6 @@ exports.getPlanningByChosenDay = async (session, results) => {
         session.userData.alenvi.employee_id,
       dayChosen, { nbPerPage: 20, pageNum: 1 }
     );
-    if (getServices.body.status === 'KO') {
-      throw new Error(`Error while getting services: ${getServices.body.message}`);
-    }
     const getServicesResult = getServices.body.array_service.result;
     if (Object.keys(getServicesResult).length === 0) {
       return session.endDialog('Aucune intervention ce jour-là ! :)');
@@ -68,9 +63,6 @@ exports.getPlanningByChosenDay = async (session, results) => {
         session.dialogData.myCoworkerChosen.employee_id,
         { nbPerPage: 1, pageNum: 1 }
       );
-      if (coWorker.body.status === 'KO') {
-        throw new Error(`Error while getting employee by id: ${coWorker.body.message}`);
-      }
       session.send(`📅 Interventions de ${coWorker.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
     } else {
     session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
@@ -112,48 +104,25 @@ exports.formatPromptListPersons = async (session, persons, field) => {
 // Community planning
 // =========================================================
 
-const getTeamBySector = exports.getTeamBySector = async (session) => {
-  const getTeam = await employee.getEmployeesBySector(
-    session.userData.ogust.tokenConfig.token,
-    session.userData.alenvi.sector, { nbPerPage: 20, pageNum: 1 });
-  if (getTeam.body.status === 'KO') {
-    throw new Error(`Error while getting employees by sector: ${getTeam.body.message}`);
-  }
-  const getTeamResult = getTeam.body.array_employee.result;
-  if (Object.keys(getTeamResult).length === 0) {
-    return session.endDialog('Il semble que tu sois le pillier de ta communauté ! :)');
-  }
-  return getTeamResult;
-};
-
 const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
-  const myTeam = await getTeamBySector(session);
+  const myTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const lengthTeam = Object.keys(myTeam).length;
   const workingHours = {};
   // For all people in my team, get their planning, then return it as an object well formated
   for (const i in myTeam) {
+    // Check errors in bot's session
     if (myTeam[i].id_employee == session.userData.alenvi.employee_id && lengthTeam === 1) {
       return session.endDialog('Il semble que tu sois le premier membre de ta communauté ! :)');
     }
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
+      // Get all interventions for an employee
       const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(
         session.userData.ogust.tokenConfig.token,
         employeeId, dayChosen, { nbPerPage: 20, pageNum: 1 });
-      if (employeePlanningByDayRaw.body.status === 'KO') {
-        throw new Error(`Error while getting employee planning by day: ${employeePlanningByDayRaw.body.message}`);
-      }
       const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
+      // Create the object to return
       if (employeePlanningByDay) {
-        // for (const j in employeePlanningByDay) {
-        //   workingHours[employeeId] = workingHours[employeeId] || {};
-        //   workingHours[employeeId][j] = {};
-        //   workingHours[employeeId][j].start_date = moment.tz(employeePlanningByDay[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
-        //   workingHours[employeeId][j].end_date = moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
-        //   workingHours[employeeId].title = myTeam[i].title;
-        //   workingHours[employeeId].first_name = myTeam[i].first_name;
-        //   workingHours[employeeId].last_name = myTeam[i].last_name;
-        // }
         workingHours[employeeId] = {};
         workingHours[employeeId]['interventions'] = [];
         workingHours[employeeId].title = myTeam[i].title;
@@ -165,13 +134,13 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
             end_date: moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm')
           };
           workingHours[employeeId]['interventions'].push(interv);
+          // Use Lodash sortBy() to sort easily
           let sortedWorkingHours = _.sortBy(workingHours[employeeId]['interventions'], 'start_date');
           workingHours[employeeId]['interventions'] = sortedWorkingHours;
         }
       }
     }
   }
-  console.log(workingHours['287607426']['interventions']);
   return workingHours;
 };
 
@@ -191,18 +160,6 @@ const formatCommunityWorkingHours = async (workingHours) => {
   return planningToDisplay.join('  \n');
 };
 
-const sortWorkingHoursByStartDate = async (workingHoursRaw) => {
-  console.log('WORKING HOURS RAW =');
-  console.log(workingHoursRaw);
-  // for (const id in workingHoursRaw) {
-  //   for (const j in workingHoursRaw[id]) {
-  //     await workingHoursRaw[id].sort((service1, service2) => (
-  //       service1.start_date - service2.start_date));
-  //     return workingHoursRaw;
-  //   }
-  // }
-}
-
 exports.getCommunityPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
@@ -212,7 +169,6 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
     if (Object.keys(workingHoursRaw).length === 0) {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
     }
-    const workingHoursSorted = await sortWorkingHoursByStartDate(workingHoursRaw);
     const workingHoursToDisplay = await formatCommunityWorkingHours(workingHoursRaw);
     session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
     return session.endDialog();
@@ -226,53 +182,10 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 // Generic helper for planning
 // =========================================================
 
-exports.getCustomers = async (session) => {
-  // First we get services from Ogust by employee Id in a specific range
-  // 249180689 || session.userData.alenvi.employee_id
-  const servicesInFourWeeks = await services.getServicesByEmployeeIdInRange(
-    session.userData.ogust.tokenConfig.token,
-    session.userData.alenvi.employee_id,
-    { slotToSub: 2, slotToAdd: 2, intervalType: 'week' },
-    { nbPerPage: 500, pageNum: 1 }
-  );
-  if (servicesInFourWeeks.body.status === 'KO') {
-    throw new Error(`Error while getting services in four weeks: ${servicesInFourWeeks.body.message}`);
-  }
-  // Put it in a variable so it's more readable
-  const servicesRawObj = servicesInFourWeeks.body.array_service.result;
-  if (Object.keys(servicesRawObj).length === 0) {
-    return session.endDialog("Il semble que tu n'aies aucune intervention de prévue d'ici 2 semaines !");
-  }
-  // Transform this services object into an array, then pop all duplicates by id_customer
-  const servicesUniqCustomers = _.uniqBy(_.values(servicesRawObj), 'id_customer');
-  // Get only id_customer properties (without '0' id_customer)
-  const uniqCustomers = servicesUniqCustomers.filter(
-    (service) => {
-      if (service.id_customer != 0 && service.id_customer != '271395715'
-      && service.id_customer != '244566438' && service.id_customer != '286871430') {
-        // Not Reunion Alenvi please
-        return service;
-      }
-    }
-  ).map(service => service.id_customer); // Put it in array of id_customer
-  const myRawCustomers = [];
-  for (let i = 0; i < uniqCustomers.length; i++) {
-    const getCustomer = await customers.getCustomerByCustomerId(
-      session.userData.ogust.tokenConfig.token,
-      uniqCustomers[i],
-      { nbPerPage: 20, pageNum: 1 });
-    if (getCustomer.body.status === 'KO') {
-      throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
-    }
-    myRawCustomers.push(getCustomer.body.customer);
-  }
-  return myRawCustomers;
-};
-
 /*
-** getDaysByWeekOffset(-X); : -X = all days from -X week before current one, assuming current = 0
-** getDaysByWeekOffset([0]); : no param or 0, get current week, assuming current = 0
-** getDaysByWeekOffset(X); : X = get all days from +X week after current one, assuming current = 0
+** offset no param or 0 = get current week, assuming current = 0
+** offset -X = all days from -X week before current one, assuming current = 0
+** offset  X = get all days from +X week after current one, assuming current = 0
 */
 exports.getDaysByWeekOffset = (offset = 0) => {
   const days = {};

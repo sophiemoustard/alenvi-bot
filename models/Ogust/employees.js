@@ -7,7 +7,7 @@ const rp = require('request-promise');
 ** - token: token after login
 ** Method: POST
 */
-exports.getEmployees = (token, pageOption) => {
+exports.getEmployees = async (token, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
@@ -20,7 +20,11 @@ exports.getEmployees = (token, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting employees: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -30,7 +34,7 @@ exports.getEmployees = (token, pageOption) => {
 ** - id: employee id
 ** Method: POST
 */
-exports.getEmployeeById = (token, id, pageOption) => {
+exports.getEmployeeById = async (token, id, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}getEmployee`,
     json: true,
@@ -44,7 +48,11 @@ exports.getEmployeeById = (token, id, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting employee by id: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -57,7 +65,7 @@ exports.getEmployeeById = (token, id, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getEmployeesBySector = (token, sector, pageOption) => {
+exports.getEmployeesBySector = async (token, sector, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}searchEmployee`,
     json: true,
@@ -72,5 +80,9 @@ exports.getEmployeesBySector = (token, sector, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting employees by sector: ${res.body.message}`);
+  }
+  return res;
 };
