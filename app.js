@@ -175,6 +175,10 @@ bot.dialog('/my_customers_more_details', require('./dialogs/customers').moreDeta
 
 // bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
 bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
+
+bot.dialog('/select_infos', require('./dialogs/infos').select);
+bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
+
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================

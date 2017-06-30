@@ -1,7 +1,5 @@
 const builder = require('botbuilder');
 
-const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-
 // =========================================================
 // Root 'Infos' dialog
 // =========================================================
