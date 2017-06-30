@@ -13,7 +13,7 @@ const rp = require('request-promise');
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getSalariesByEmployeeId = (token, id, pageOption) => {
+exports.getSalariesByEmployeeId = async (token, id, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}searchSalary`,
     json: true,
@@ -26,7 +26,11 @@ exports.getSalariesByEmployeeId = (token, id, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting salaries by employee id: ${res.body.message}`);
+  }
+  return res;
 };
 
 /*
@@ -38,7 +42,7 @@ exports.getSalariesByEmployeeId = (token, id, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getSalaries = (token, pageOption) => {
+exports.getSalaries = async (token, pageOption) => {
   const options = {
     url: `${Ogust.API_LINK}searchSalary`,
     json: true,
@@ -50,5 +54,9 @@ exports.getSalaries = (token, pageOption) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  rp.post(options);
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting salaries: ${res.body.message}`);
+  }
+  return res;
 };

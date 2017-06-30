@@ -9,7 +9,7 @@ const moment = require('moment-timezone');
 ** Get token from Ogust base
 ** Method: POST
 */
-exports.getToken = () => {
+exports.getToken = async () => {
   const payload = {
     key: process.env.OGUST_PUBLIC_KEY,
     request: 'GET_TOKEN',
@@ -18,11 +18,15 @@ exports.getToken = () => {
   const joinPayload = `${payload.key}+${payload.request}+${payload.time}`;
   const hash = crypto.createHmac('sha1', process.env.OGUST_PRIVATE_KEY).update(joinPayload).digest('hex');
   payload.api_signature = hash.toUpperCase();
-  return rp.post({
+  const res = await rp.post({
     uri: `${Ogust.API_LINK}getToken`,
     body: payload,
     json: true,
     resolveWithFullResponse: true,
     time: true,
   });
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting new token from Ogust: ${res.body.message}`);
+  }
+  return res;
 };

@@ -26,10 +26,10 @@ const redirectToDeclarationSelected = (session, results) => {
       console.log(results.response);
       switch (results.response.entity) {
         case 'Heures internes':
-          session.beginDialog('/ask_for_request');
+          session.replaceDialog('/ask_for_request');
           break;
         case 'Modif. intervention':
-          session.beginDialog('/change_intervention');
+          session.replaceDialog('/change_intervention');
           break;
       }
     } else {
@@ -91,10 +91,7 @@ const handleRequest = async (session, results) => {
           sector: session.userData.alenvi.sector,
           target: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
         };
-        const sent = await slack.sendRequestToSlack(options);
-        if (sent.ok === false) {
-          throw new Error(sent);
-        }
+        await slack.sendRequestToSlack(options);
         session.endDialog('Ta demande a bien été envoyée, merci :)');
       }
     } else {

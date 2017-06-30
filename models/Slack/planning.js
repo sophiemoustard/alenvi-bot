@@ -2,7 +2,7 @@ require('dotenv').config();
 const rp = require('request-promise');
 const config = require('../../config');
 
-exports.sendRequestToSlack = (payload) => {
+exports.sendRequestToSlack = async (payload) => {
   const options = {
     uri: 'https://slack.com/api/chat.postMessage',
     form: {
@@ -50,7 +50,11 @@ exports.sendRequestToSlack = (payload) => {
       'content-type': 'application/x-www-form-urlencoded',
     },
   };
-  return rp.post(options);
+  const res = await rp.post(options);
+  if (res.ok === false) {
+    throw new Error(res);
+  }
+  return res;
 };
 
 // var message = new builder.Message(session).sourceEvent({

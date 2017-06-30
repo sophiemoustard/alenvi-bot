@@ -1,14 +1,18 @@
 const rp = require('request-promise');
 const employee = require('../models/Ogust/employees');
 
-const getAlenviUserById = (id) => {
+const getAlenviUserById = async (id) => {
   const options = {
     url: `${process.env.WEBSITE_HOSTNAME}/api/bot/user/${id}`,
     json: true,
     resolveWithFullResponse: true,
     time: true,
   };
-  return rp.get(options);
+  const res = await rp.post(options);
+  if (res.body.success == false) {
+    throw new Error(`Error while refreshing infos from Alenvi: ${res.body.msg}`);
+  }
+  return res;
 };
 
 /*

@@ -1,7 +1,7 @@
 const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const planning = require('../helpers/planning');
+const customers = require('../helpers/customers');
 
 const formatPerson = async (customer) => {
   let person = {};
@@ -30,7 +30,7 @@ const formatText = async (customer) => {
 
 const getCardsAttachments = async (session) => {
   const myCards = [];
-  const myRawCustomers = await planning.getCustomers(session);
+  const myRawCustomers = await customers.getCustomers(session, session.userData.alenvi.employee_id);
   // console.log(myRawCustomers);
   for (const k in myRawCustomers) {
     if (myRawCustomers[k].id_customer != '286871430') {

@@ -15,16 +15,15 @@ const whichPlanning = (session) => {
 const redirectToDaySelected = (session, results) => {
   if (results.response) {
     if (session.userData.alenvi) {
-      console.log(results.response);
       switch (results.response.entity) {
         case 'Le mien':
-          session.beginDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
+          session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
           break;
         case 'Un(e) auxiliaire':
-          session.beginDialog('/show_another_auxiliary_planning');
+          session.replaceDialog('/show_another_auxiliary_planning');
           break;
         case 'Ma communauté':
-          session.beginDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: true });
+          session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: true });
           break;
         default:
           break;
@@ -87,14 +86,14 @@ const handleWeeksOrGetPlanningSelected = (session, results) => {
         myCoworkerChosen: session.dialogData.myCoworkerChosen,
         isCommunity: session.dialogData.isCommunity,
       };
-      return session.beginDialog('/show_planning', params);
+      return session.replaceDialog('/show_planning', params);
     } else if (results.response.entity === 'Suivant') {
       params = {
         weekSelected: ++session.dialogData.weekSelected,
         myCoworkerChosen: session.dialogData.myCoworkerChosen,
         isCommunity: session.dialogData.isCommunity,
       };
-      return session.beginDialog('/show_planning', params);
+      return session.replaceDialog('/show_planning', params);
     }
 
     if (session.dialogData.days[results.response.entity]) {
@@ -140,7 +139,7 @@ const redirectToShowPlanning = (session, results) => {
         myCoworkerChosen: session.dialogData.myCoworkers[results.response.entity],
         isCommunity: false,
       };
-      return session.beginDialog('/show_planning', params);
+      return session.replaceDialog('/show_planning', params);
     }
   } else {
     session.cancelDialog(0, '/not_understand');

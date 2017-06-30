@@ -5,9 +5,6 @@ const {checkUserData} = require('./checkUserData');
 const addTokenToSession = async (session) => {
   console.log('Get a new token...');
   const getToken = await token.getToken();
-  if (getToken.body.status === 'KO') {
-    throw new Error(`Error while getting token: ${getToken.body.message}`);
-  }
   const currentDate = moment().tz('Europe/Paris');
   session.userData.ogust.tokenConfig.token = getToken.body.token;
   // Add an expiration time of 9 minuts (Ogust token validity = 10 min)
