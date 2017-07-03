@@ -17,7 +17,7 @@ const redirectToInfoSelected = (session, results) => {
           if (process.env.NODE_ENV == 'production') {
             session.endDialog('Je suis en train de construire cette partie, reviens plus tard ! :)');
           } else {
-            session.replaceDialog('/pay_sheets');
+            session.replaceDialog('/select_pay_sheets');
           }
           break;
         case 'Documents RH':
