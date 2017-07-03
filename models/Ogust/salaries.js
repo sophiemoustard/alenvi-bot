@@ -1,8 +1,6 @@
 const Ogust = require('../../config').Ogust;
 const rp = require('request-promise');
 
-/** ******** SALARIES **********/
-
 /*
 ** Get salaries by employee id
 ** PARAMS:
