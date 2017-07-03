@@ -14,11 +14,7 @@ const redirectToInfoSelected = (session, results) => {
     if (session.userData.alenvi) {
       switch (results.response.entity) {
         case 'Feuilles de paie':
-          if (process.env.NODE_ENV == 'production') {
-            session.endDialog('Je suis en train de construire cette partie, reviens plus tard ! :)');
-          } else {
-            session.replaceDialog('/select_pay_sheets');
-          }
+          session.replaceDialog('/select_pay_sheets');
           break;
         case 'Documents RH':
           session.replaceDialog('/hr_docs');
