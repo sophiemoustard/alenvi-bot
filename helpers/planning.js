@@ -2,7 +2,7 @@ const moment = require('moment-timezone');
 const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const {getTeamBySector} = require('../helpers/team');
+const { getTeamBySector } = require('../helpers/team');
 
 const employee = require('../models/Ogust/employees');
 const services = require('../models/Ogust/services');
@@ -65,7 +65,7 @@ exports.getPlanningByChosenDay = async (session, results) => {
       );
       session.send(`📅 Interventions de ${coWorker.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
     } else {
-    session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
+      session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
     }
     return session.endDialog();
   } catch (err) {
@@ -124,7 +124,7 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
       // Create the object to return
       if (employeePlanningByDay) {
         workingHours[employeeId] = {};
-        workingHours[employeeId]['interventions'] = [];
+        workingHours[employeeId].interventions = [];
         workingHours[employeeId].title = myTeam[i].title;
         workingHours[employeeId].first_name = myTeam[i].first_name;
         workingHours[employeeId].last_name = myTeam[i].last_name;
@@ -133,10 +133,10 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
             start_date: moment.tz(employeePlanningByDay[j].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm'),
             end_date: moment.tz(employeePlanningByDay[j].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm')
           };
-          workingHours[employeeId]['interventions'].push(interv);
+          workingHours[employeeId].interventions.push(interv);
           // Use Lodash sortBy() to sort easily
-          let sortedWorkingHours = _.sortBy(workingHours[employeeId]['interventions'], 'start_date');
-          workingHours[employeeId]['interventions'] = sortedWorkingHours;
+          const sortedWorkingHours = _.sortBy(workingHours[employeeId].interventions, 'start_date');
+          workingHours[employeeId].interventions = sortedWorkingHours;
         }
       }
     }
@@ -198,7 +198,7 @@ const formatDays = (weekStart) => {
   // add a 'Suivant' result to the object so it appears in last
   days.Suivant = {};
   return days;
-}
+};
 
 // const formatWeeks = (weekStart) => {
 //   const weeks = {};
@@ -218,7 +218,7 @@ const formatDays = (weekStart) => {
 //   return days;
 // }
 
-// const formatDays = (weekStart) => {
+// const formatMonths = (weekStart) => {
 //   const days = {};
 //   // Add a 'Précédent' result to the object so it appears in first
 //   days['Précédent'] = {};
@@ -263,7 +263,6 @@ exports.getPeriodByOffset = (offset = 0, type = 'days') => {
     return formatDays(periodStart);
   } else if (type == 'weeks') {
     return formatDays(periodStart);
-  } else {
-    return formatMonths(periodStart);
   }
+  return formatMonths(periodStart);
 };
