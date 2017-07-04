@@ -53,11 +53,11 @@ const whichDay = async (session, args) => {
     session.dialogData.myCoworkerChosen = args.myCoworkerChosen;
     session.dialogData.isCommunity = args.isCommunity;
     if (args.weekSelected != 0) {
-      days = planning.getDaysByWeekOffset(args.weekSelected);
+      days = planning.getPeriodByOffset(args.weekSelected, 'weeks');
       // We have to use session.dialogData to save the week selected in waterfall
       session.dialogData.weekSelected = args.weekSelected;
     } else { // If user didn't click on 'Précédent' or 'Suivant', just get current week's days
-      days = planning.getDaysByWeekOffset();
+      days = planning.getPeriodByOffset(0, 'weeks');
       session.dialogData.weekSelected = 0;
     }
     session.dialogData.days = days;
