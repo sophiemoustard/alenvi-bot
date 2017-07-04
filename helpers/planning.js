@@ -182,23 +182,8 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 // Generic helper for planning
 // =========================================================
 
-/*
-** offset no param or 0 = get current week, assuming current = 0
-** offset -X = all days from -X week before current one, assuming current = 0
-** offset  X = get all days from +X week after current one, assuming current = 0
-*/
-exports.getDaysByWeekOffset = (offset = 0) => {
+const formatDays = (weekStart) => {
   const days = {};
-  const currentDate = moment().tz('Europe/Paris');
-  const weekStart = currentDate.clone().startOf('isoWeek');
-  if (offset) {
-    if (offset < 0) {
-      weekStart.subtract(Math.abs(offset), 'week');
-    }
-    if (offset > 0) {
-      weekStart.add(Math.abs(offset), 'week');
-    }
-  }
   // Add a 'Précédent' result to the object so it appears in first
   days['Précédent'] = {};
   // Add all days from a week, to then display it with the good format
@@ -213,4 +198,72 @@ exports.getDaysByWeekOffset = (offset = 0) => {
   // add a 'Suivant' result to the object so it appears in last
   days.Suivant = {};
   return days;
+}
+
+// const formatWeeks = (weekStart) => {
+//   const weeks = {};
+//   // Add a 'Précédent' result to the object so it appears in first
+//   weeks['Précédent'] = {};
+//   // Add all days from a week, to then display it with the good format
+//   // Prompt understandable object
+//   for (let i = 0; i <= 6; i++) {
+//     // Add user format to prompt
+//     const weekUserFormat = moment(weekStart).add(i, 'days');
+//     days[dayUserFormat.format('DD/MM')] = {};
+//     // Add ogust format
+//     days[dayUserFormat.format('DD/MM')].dayOgustFormat = dayUserFormat.format('YYYYMMDD');
+//   }
+//   // add a 'Suivant' result to the object so it appears in last
+//   days.Suivant = {};
+//   return days;
+// }
+
+// const formatDays = (weekStart) => {
+//   const days = {};
+//   // Add a 'Précédent' result to the object so it appears in first
+//   days['Précédent'] = {};
+//   // Add all days from a week, to then display it with the good format
+//   // Prompt understandable object
+//   for (let i = 0; i <= 6; i++) {
+//     // Add user format to prompt
+//     const dayUserFormat = moment(weekStart).add(i, 'days');
+//     days[dayUserFormat.format('DD/MM')] = {};
+//     // Add ogust format
+//     days[dayUserFormat.format('DD/MM')].dayOgustFormat = dayUserFormat.format('YYYYMMDD');
+//   }
+//   // add a 'Suivant' result to the object so it appears in last
+//   days.Suivant = {};
+//   return days;
+// }
+
+/*
+** offset no param or 0 = get current period, assuming current = 0
+** offset -X = all days from -X period before current one, assuming current = 0
+** offset  X = get all days from +X week after current one, assuming current = 0
+** interval = 'weeks', 'months' or 'days'
+*/
+exports.getPeriodByOffset = (offset = 0, type = 'days') => {
+  const currentDate = moment().tz('Europe/Paris');
+  let periodStart = {};
+  if (type == 'weeks') {
+    periodStart = currentDate.clone().startOf('isoWeek');
+    console.log('meh');
+  } else {
+    periodStart = currentDate.clone().startOf(type);
+  }
+  if (offset) {
+    if (offset < 0) {
+      periodStart.subtract(Math.abs(offset), type);
+    }
+    if (offset > 0) {
+      periodStart.add(Math.abs(offset), type);
+    }
+  }
+  if (!type || type == 'days') {
+    return formatDays(periodStart);
+  } else if (type == 'weeks') {
+    return formatDays(periodStart);
+  } else {
+    return formatMonths(periodStart);
+  }
 };

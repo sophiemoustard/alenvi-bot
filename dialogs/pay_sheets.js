@@ -21,7 +21,7 @@ const getCardsAttachments = async (session) => {
   for (const k in mySalaries) {
   cards.push(
     new builder.HeroCard(session)
-      .title(`Bulletin ${moment.tz(mySalaries[k].period_end, 'YYYYMMDDHHmm', 'Europe/Paris').format('MMM YYYY')}`)
+      .title(`Bulletin ${moment.tz(mySalaries[k].period_start, 'YYYYMMDDHHmm', 'Europe/Paris').format('MMM YYYY')}`)
       .buttons([
         builder.CardAction.openUrl(session, mySalaries[k].print_url, 'Visionner')
       ])
