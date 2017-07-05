@@ -1,7 +1,9 @@
 const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const planning = require('../helpers/planning');
+const planning = require('../helpers/planning/treatment.js');
+const { getTeamBySector } = require('../helpers/team');
+const { formatPromptListPersons } = require('../helpers/planning/format');
 const { getCustomers } = require('./../helpers/customers');
 
 // =========================================================
