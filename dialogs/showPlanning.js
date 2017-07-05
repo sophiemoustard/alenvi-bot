@@ -137,8 +137,6 @@ const whichPerson = async (session, args) => {
     session.sendTyping();
     session.dialogData.isBeneficiary = args.isBeneficiary;
     if (session.dialogData.isBeneficiary) {
-  } catch (err) {
-
   }
 }
 
