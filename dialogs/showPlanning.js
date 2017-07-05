@@ -131,6 +131,17 @@ const whichAuxiliary = async (session) => {
   }
 };
 
+const whichPerson = async (session, args) => {
+  try {
+    await checkOgustToken(session);
+    session.sendTyping();
+    session.dialogData.isBeneficiary = args.isBeneficiary;
+    if (session.dialogData.isBeneficiary) {
+  } catch (err) {
+
+  }
+}
+
 const redirectToShowPlanning = (session, results) => {
   if (results.response) {
     if (session.dialogData.myCoworkers[results.response.entity]) {
