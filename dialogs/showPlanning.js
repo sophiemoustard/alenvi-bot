@@ -1,7 +1,9 @@
 const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const planning = require('../helpers/planning');
+const planning = require('../helpers/planning/treatment.js');
+const { getTeamBySector } = require('../helpers/team');
+const { formatPromptListPersons } = require('../helpers/planning/format');
 
 // =========================================================
 // Root 'Select show planning' dialog
@@ -120,8 +122,8 @@ const whichAuxiliary = async (session) => {
     await checkOgustToken(session);
     session.sendTyping();
     // Get list of coworkers
-    const myRawCoworkers = await planning.getTeamBySector(session);
-    const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
+    const myRawCoworkers = await getTeamBySector(session, session.userData.alenvi.sector);
+    const myCoworkers = await formatPromptListPersons(session, myRawCoworkers, 'id_employee');
     // Put the list in dialogData so we can compare it in next function
     session.dialogData.myCoworkers = myCoworkers;
     builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
