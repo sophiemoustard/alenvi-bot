@@ -137,8 +137,13 @@ const whichPerson = async (session, args) => {
     session.sendTyping();
     session.dialogData.isBeneficiary = args.isBeneficiary;
     if (session.dialogData.isBeneficiary) {
+      // blablablabal
+    }
+  } catch (err) {
+    console.error(err);
+    return session.endDialog("Mince, je n'ai pas réussi à récupérer les personnes correspondantes :/ Si le problème persiste, essaye de contacter l'équipe technique !");
   }
-}
+};
 
 const redirectToShowPlanning = (session, results) => {
   if (results.response) {
