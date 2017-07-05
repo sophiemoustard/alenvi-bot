@@ -23,10 +23,10 @@ const redirectToDaySelected = (session, results) => {
           session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
           break;
         case 'Un(e) auxiliaire':
-          session.replaceDialog('/show_person_planning', { isBeneficiary: false });
+          session.replaceDialog('/show_person_planning', { isCustomer: false });
           break;
         case '1 de mes bénéficiaires':
-          session.replaceDialog('/show_person_planning', { isBeneficiary: true });
+          session.replaceDialog('/show_person_planning', { isCustomer: true });
           break;
         case 'Ma communauté':
           session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: true });
@@ -141,8 +141,8 @@ const whichPerson = async (session, args) => {
   try {
     await checkOgustToken(session);
     session.sendTyping();
-    session.dialogData.isBeneficiary = args.isBeneficiary;
-    if (session.dialogData.isBeneficiary) {
+    session.dialogData.isCustomer = args.isCustomer;
+    if (session.dialogData.isCustomer) {
       const myRawCustomers = await getCustomers(session, session.userData.alenvi.employee_id);
       console.log(myRawCustomers);
     } else {
