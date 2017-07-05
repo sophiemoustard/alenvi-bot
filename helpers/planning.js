@@ -242,12 +242,11 @@ const formatDays = (weekStart) => {
 ** offset  X = get all days from +X week after current one, assuming current = 0
 ** interval = 'weeks', 'months' or 'days'
 */
-exports.getPeriodByOffset = (offset = 0, type = 'days') => {
+exports.getPeriodByOffset = (offset = 0, type = 'weeks') => {
   const currentDate = moment().tz('Europe/Paris');
   let periodStart = {};
   if (type == 'weeks') {
     periodStart = currentDate.clone().startOf('isoWeek');
-    console.log('meh');
   } else {
     periodStart = currentDate.clone().startOf(type);
   }
