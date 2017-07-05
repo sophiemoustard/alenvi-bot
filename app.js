@@ -167,7 +167,7 @@ bot.dialog('/hello', require('./dialogs/hello').hello);
 
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
 bot.dialog('/show_planning', require('./dialogs/showPlanning').showPlanning);
-bot.dialog('/show_another_auxiliary_planning', require('./dialogs/showPlanning').showAnotherAuxiliaryPlanning);
+bot.dialog('/show_person_planning', require('./dialogs/showPlanning').showPersonPlanning);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
