@@ -51,6 +51,6 @@ exports.logout = async (session) => {
     }
   } catch (err) {
     console.log(err);
-    return session.endDialog('Il y a eu un problème au moment de te déconnecter :(');
+    return session.endDialog('Il y a eu un problème au moment de te déconnecter');
   }
 };
