@@ -146,8 +146,8 @@ const whichPerson = async (session, args) => {
       const myRawCustomers = await getCustomers(session, session.userData.alenvi.employee_id);
       console.log(myRawCustomers);
     } else {
-      const myRawCoworkers = await planning.getTeamBySector(session);
-      const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
+      const myRawCoworkers = await getTeamBySector(session);
+      const myCoworkers = await formatPromptListPersons(session, myRawCoworkers, 'id_employee');
       session.dialogData.myCoworkers = myCoworkers;
       builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
     }
