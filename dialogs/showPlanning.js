@@ -2,6 +2,7 @@ const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const planning = require('../helpers/planning');
+const { getCustomers } = require('./../helpers/customers');
 
 // =========================================================
 // Root 'Select show planning' dialog
@@ -9,7 +10,7 @@ const planning = require('../helpers/planning');
 
 const whichPlanning = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Ma communauté', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|1 de mes bénéficiaires|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const redirectToDaySelected = (session, results) => {
@@ -20,7 +21,10 @@ const redirectToDaySelected = (session, results) => {
           session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
           break;
         case 'Un(e) auxiliaire':
-          session.replaceDialog('/show_another_auxiliary_planning');
+          session.replaceDialog('/show_person_planning', { isBeneficiary: false });
+          break;
+        case '1 de mes bénéficiaires':
+          session.replaceDialog('/show_person_planning', { isBeneficiary: true });
           break;
         case 'Ma communauté':
           session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: true });
@@ -115,21 +119,21 @@ exports.showPlanning = [whichDay, handleWeeksOrGetPlanningSelected];
 // Show another auxiliary planning
 // =========================================================
 
-const whichAuxiliary = async (session) => {
-  try {
-    await checkOgustToken(session);
-    session.sendTyping();
-    // Get list of coworkers
-    const myRawCoworkers = await planning.getTeamBySector(session);
-    const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
-    // Put the list in dialogData so we can compare it in next function
-    session.dialogData.myCoworkers = myCoworkers;
-    builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
-  } catch (err) {
-    console.error(err);
-    return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter l'équipe technique !");
-  }
-};
+// const whichAuxiliary = async (session) => {
+//   try {
+//     await checkOgustToken(session);
+//     session.sendTyping();
+//     // Get list of coworkers
+//     const myRawCoworkers = await planning.getTeamBySector(session);
+//     const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
+//     // Put the list in dialogData so we can compare it in next function
+//     session.dialogData.myCoworkers = myCoworkers;
+//     builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
+//   } catch (err) {
+//     console.error(err);
+//     return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter l'équipe technique !");
+//   }
+// };
 
 const whichPerson = async (session, args) => {
   try {
@@ -137,7 +141,13 @@ const whichPerson = async (session, args) => {
     session.sendTyping();
     session.dialogData.isBeneficiary = args.isBeneficiary;
     if (session.dialogData.isBeneficiary) {
-      // blablablabal
+      const myRawCustomers = await getCustomers(session, session.userData.alenvi.employee_id);
+      console.log(myRawCustomers);
+    } else {
+      const myRawCoworkers = await planning.getTeamBySector(session);
+      const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
+      session.dialogData.myCoworkers = myCoworkers;
+      builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
     }
   } catch (err) {
     console.error(err);
@@ -160,4 +170,4 @@ const redirectToShowPlanning = (session, results) => {
   }
 };
 
-exports.showAnotherAuxiliaryPlanning = [whichAuxiliary, redirectToShowPlanning];
+exports.showPersonPlanning = [whichPerson, redirectToShowPlanning];
