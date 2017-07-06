@@ -166,17 +166,18 @@ bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
 
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
-bot.dialog('/show_planning', require('./dialogs/showPlanning').showPlanning);
-bot.dialog('/show_person_planning', require('./dialogs/showPlanning').showPersonPlanning);
+bot.dialog('/which_person', require('./dialogs/showPlanning').whichPerson);
+bot.dialog('/which_day', require('./dialogs/showPlanning').whichDay);
+bot.dialog('/show_planning', require('./dialogs/showPlanning').showResult);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
 bot.dialog('/show_my_customers', require('./dialogs/customers').showCustomers);
+bot.dialog('/my_customers_more_details', require('./dialogs/customers').moreDetails);
 
 bot.dialog('/show_team', require('./dialogs/team').showTeam);
-bot.dialog('/my_customers_more_details', require('./dialogs/customers').moreDetails);
 
 // bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
 bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
