@@ -12,7 +12,7 @@ const { getCustomers } = require('./../helpers/customers');
 
 const whichPlanning = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|1 de mes bénéficiaires|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Mes bénéficiaires|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const redirectToDaySelected = (session, results) => {
@@ -25,7 +25,7 @@ const redirectToDaySelected = (session, results) => {
         case 'Un(e) auxiliaire':
           session.replaceDialog('/show_person_planning', { isCustomer: false });
           break;
-        case '1 de mes bénéficiaires':
+        case 'Mes bénéficiaires':
           session.replaceDialog('/show_person_planning', { isCustomer: true });
           break;
         case 'Ma communauté':
@@ -142,15 +142,12 @@ const whichPerson = async (session, args) => {
     await checkOgustToken(session);
     session.sendTyping();
     session.dialogData.isCustomer = args.isCustomer;
-    if (session.dialogData.isCustomer) {
-      const myRawCustomers = await getCustomers(session, session.userData.alenvi.employee_id);
-      console.log(myRawCustomers);
-    } else {
-      const myRawCoworkers = await getTeamBySector(session);
-      const myCoworkers = await formatPromptListPersons(session, myRawCoworkers, 'id_employee');
-      session.dialogData.myCoworkers = myCoworkers;
-      builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
-    }
+    const myRawPersons = session.dialogData.isCustomer ? await getCustomers(session, session.userData.alenvi.employee_id) : await getTeamBySector(session);
+    const personType = session.dialogData.isCustomer ? 'id_customer' : 'id_employee';
+    const personPromptMsg = session.dialogData.isCustomer ? 'Quel(le) bénéficiaire précisément ?' : 'Quel(le) auxiliaire précisément ?';
+    const myPersons = await formatPromptListPersons(session, myRawPersons, personType);
+    session.dialogData.myPersons = myPersons;
+    builder.Prompts.choice(session, personPromptMsg, myPersons, { maxRetries: 0 });
   } catch (err) {
     console.error(err);
     return session.endDialog("Mince, je n'ai pas réussi à récupérer les personnes correspondantes :/ Si le problème persiste, essaye de contacter l'équipe technique !");
