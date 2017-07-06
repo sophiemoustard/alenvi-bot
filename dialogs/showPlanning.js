@@ -12,7 +12,7 @@ const { getCustomers } = require('./../helpers/customers');
 
 const whichPlanning = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Mes bénéficiaires|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Un(e) bénéficiaire|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const redirectToDaySelected = (session, results) => {
@@ -20,16 +20,16 @@ const redirectToDaySelected = (session, results) => {
     if (session.userData.alenvi) {
       switch (results.response.entity) {
         case 'Le mien':
-          session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: false });
+          session.replaceDialog('/which_person', { personType: 'Self' });
           break;
         case 'Un(e) auxiliaire':
-          session.replaceDialog('/show_person_planning', { isCustomer: false });
+          session.replaceDialog('/which_person', { personType: 'Auxiliary' });
           break;
-        case 'Mes bénéficiaires':
-          session.replaceDialog('/show_person_planning', { isCustomer: true });
+        case 'Un(e) bénéficiaire':
+          session.replaceDialog('/which_person', { personType: 'Customer' });
           break;
         case 'Ma communauté':
-          session.replaceDialog('/show_planning', { weekSelected: 0, myCoworkerChosen: '', isCommunity: true });
+          session.replaceDialog('/which_person', { personType: 'Community' });
           break;
         default:
           break;
@@ -50,30 +50,53 @@ exports.select = [whichPlanning, redirectToDaySelected];
 // Generic function shared by my own planning and another auxiliary planning
 // =========================================================
 
-const whichDay = async (session, args) => {
+// const checkPerson = async (session, args) => {
+//   let targetPlanning = '';
+//   await checkOgustToken(session);
+//   session.sendTyping();
+//   // Because we can recall this dialog with different weeks select, we need to check it
+//   session.dialogData.personChosen = args.personChosen;
+//   session.dialogData.personType = args.personType;
+//
+//   switch (session.dialogData.personChosen) {
+//     case 'Self':
+//       session.replaceDialog();
+//       break;
+//     case 'Auxiliary':
+//     case 'Customer':
+//       targetPlanning = 'son planning';
+//       break;
+//     case 'Community':
+//       targetPlanning = 'le planning de ta communauté';
+//       break;
+//   }
+// }
+
+const whichDay = async (session) => {
   let days = {};
   try {
     await checkOgustToken(session);
     session.sendTyping();
     // Because we can recall this dialog with different weeks select, we need to check it
-    session.dialogData.myCoworkerChosen = args.myCoworkerChosen;
-    session.dialogData.isCommunity = args.isCommunity;
-    if (args.weekSelected != 0) {
-      days = planning.getPeriodByOffset(args.weekSelected, 'weeks');
-      // We have to use session.dialogData to save the week selected in waterfall
-      session.dialogData.weekSelected = args.weekSelected;
+    if (session.dialogData.weekSelected != 0) {
+      days = planning.getPeriodByOffset(session.dialogData.offset, 'weeks');
     } else { // If user didn't click on 'Précédent' or 'Suivant', just get current week's days
       days = planning.getPeriodByOffset(0, 'weeks');
-      session.dialogData.weekSelected = 0;
+      session.dialogData.offset = 0;
     }
     session.dialogData.days = days;
     let targetPlanning = '';
-    if (args.myCoworkerChosen) {
-      targetPlanning = 'son planning';
-    } else if (args.isCommunity) {
-      targetPlanning = 'le planning de ta communauté';
-    } else {
-      targetPlanning = 'ton planning';
+    switch (session.dialogData.personChosen) {
+      case 'Self':
+        targetPlanning = 'ton planning';
+        break;
+      case 'Auxiliary':
+      case 'Customer':
+        targetPlanning = 'son planning';
+        break;
+      case 'Community':
+        targetPlanning = 'le planning de ta communauté';
+        break;
     }
     builder.Prompts.choice(session, `Pour quel jour souhaites-tu consulter ${targetPlanning} ?`, days, { maxRetries: 0 });
   } catch (err) {
@@ -83,39 +106,34 @@ const whichDay = async (session, args) => {
 };
 
 const handleWeeksOrGetPlanningSelected = (session, results) => {
-  let params = {};
+  const params = {};
   if (results.response) {
     // Use args to save week's offset in the new dialog => dialogData is unset in each new one
+    params.personChosen = session.dialogData.personChosen;
+    params.personType = session.dialogData.personType;
     if (results.response.entity === 'Précédent') {
-      params = {
-        weekSelected: --session.dialogData.weekSelected,
-        myCoworkerChosen: session.dialogData.myCoworkerChosen,
-        isCommunity: session.dialogData.isCommunity,
-      };
+      params.offset = --session.dialogData.offset;
       return session.replaceDialog('/show_planning', params);
     } else if (results.response.entity === 'Suivant') {
-      params = {
-        weekSelected: ++session.dialogData.weekSelected,
-        myCoworkerChosen: session.dialogData.myCoworkerChosen,
-        isCommunity: session.dialogData.isCommunity,
-      };
+      params.offset = ++session.dialogData.offset;
       return session.replaceDialog('/show_planning', params);
     }
-
     if (session.dialogData.days[results.response.entity]) {
-      // My community planning
-      if (session.dialogData.isCommunity) {
-        return planning.getCommunityPlanningByChosenDay(session, results);
+      switch (session.dialogData.personType) {
+        case 'Self':
+        case 'Auxiliary':
+        case 'Customer':
+          return planning.getPlanningByChosenDay(session, results);
+        case 'Community':
+          return planning.getCommunityPlanningByChosenDay(session, results);
       }
-      // My planning or another auxiliary planning
-      return planning.getPlanningByChosenDay(session, results);
     }
   } else {
     return session.cancelDialog(0, '/not_understand');
   }
 };
 
-exports.showPlanning = [whichDay, handleWeeksOrGetPlanningSelected];
+exports.showPlanning = [whichPerson, whichDay, handleWeeksOrGetPlanningSelected];
 
 // =========================================================
 // Show another auxiliary planning
@@ -139,34 +157,52 @@ exports.showPlanning = [whichDay, handleWeeksOrGetPlanningSelected];
 
 const whichPerson = async (session, args) => {
   try {
+    let myRawPersons;
+    let personType;
+    let personPromptMsg;
+    session.dialogData.personType = args.personType || '';
     await checkOgustToken(session);
     session.sendTyping();
-    session.dialogData.isCustomer = args.isCustomer;
-    const myRawPersons = session.dialogData.isCustomer ? await getCustomers(session, session.userData.alenvi.employee_id) : await getTeamBySector(session);
-    const personType = session.dialogData.isCustomer ? 'id_customer' : 'id_employee';
-    const personPromptMsg = session.dialogData.isCustomer ? 'Quel(le) bénéficiaire précisément ?' : 'Quel(le) auxiliaire précisément ?';
-    const myPersons = await formatPromptListPersons(session, myRawPersons, personType);
-    session.dialogData.myPersons = myPersons;
-    builder.Prompts.choice(session, personPromptMsg, myPersons, { maxRetries: 0 });
+    switch (args.personType) {
+      case 'Customer':
+        myRawPersons = await getCustomers(session, session.userData.alenvi.employee_id);
+        personType = 'id_customer';
+        personPromptMsg = 'Quel(le) bénéficiaire précisément ?';
+        break;
+      case 'Auxiliary':
+        myRawPersons = await getTeamBySector(session);
+        personType = 'id_employee';
+        personPromptMsg = 'Quel(le) auxiliaire précisément ?';
+        break;
+      case 'Self':
+      case 'Community':
+        return session.replaceDialog('/which_day', { offset: '0', personChosen: '', personType: session.dialogData.personType });
+      case '':
+        throw new Error('personType is empty');
+      default:
+        break;
+    }
+    session.dialogData.myPersons = await formatPromptListPersons(session, myRawPersons, personType);
+    builder.Prompts.choice(session, personPromptMsg, session.dialogData.myPersons, { maxRetries: 0 });
   } catch (err) {
     console.error(err);
     return session.endDialog("Mince, je n'ai pas réussi à récupérer les personnes correspondantes :/ Si le problème persiste, essaye de contacter l'équipe technique !");
   }
 };
 
-const redirectToShowPlanning = (session, results) => {
+const redirectToWhichDay = (session, results) => {
   if (results.response) {
-    if (session.dialogData.myCoworkers[results.response.entity]) {
+    if (session.dialogData.myPersons[results.response.entity]) {
       const params = {
-        weekSelected: 0,
-        myCoworkerChosen: session.dialogData.myCoworkers[results.response.entity],
-        isCommunity: false,
+        offset: 0,
+        personChosen: session.dialogData.myPersons[results.response.entity],
+        personType: session.dialogData.personType
       };
-      return session.replaceDialog('/show_planning', params);
+      return session.replaceDialog('/which_day', params);
     }
   } else {
     session.cancelDialog(0, '/not_understand');
   }
 };
 
-exports.showPersonPlanning = [whichPerson, redirectToShowPlanning];
+exports.showPersonPlanning = [whichPerson, redirectToWhichDay];
