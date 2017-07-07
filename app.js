@@ -99,11 +99,6 @@ bot.on('conversationUpdate', (message) => {
   }
 });
 
-bot.on('error', (e) => {
-  console.error(e);
-  throw new Error(`Error in the bot: ${e}`);
-})
-
 // =========================================================
 // Root Dialog
 // =========================================================
@@ -185,6 +180,9 @@ bot.dialog('/select_infos', require('./dialogs/infos').select);
 bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
 bot.dialog('/usefull_contacts', require('./dialogs/usefull_contacts').showContacts);
 bot.dialog('/select_pay_sheets', require('./dialogs/pay_sheets').select);
+
+bot.dialog('/training', require('./dialogs/training').training);
+
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
