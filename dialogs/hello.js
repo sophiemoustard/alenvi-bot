@@ -41,9 +41,9 @@ const redirectMenuResult = (session, results) => {
         case 'Infos':
           session.replaceDialog('/select_infos');
           break;
-      case 'Formation':
-        session.replaceDialog('/training');
-        break;
+        case 'Formation':
+          session.replaceDialog('/training');
+          break;
       }
     }
     // session.endDialog();
