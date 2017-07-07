@@ -22,13 +22,13 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
 exports.getPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
-    const dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
+    const dayChosen = session.dialogData.period[results.response.entity].dayOgustFormat;
     // Get all services of an employee by day the user chose from prompt
     // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
     const getServices = await services.getServicesByEmployeeIdAndDate(
       session.userData.ogust.tokenConfig.token,
-      session.dialogData.myCoworkerChosen ?
-        session.dialogData.myCoworkerChosen.employee_id :
+      session.dialogData.personChosen ?
+        session.dialogData.personChosen.employee_id :
         session.userData.alenvi.employee_id,
       dayChosen, { nbPerPage: 20, pageNum: 1 }
     );
@@ -103,7 +103,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const dayChosen = session.dialogData.days[results.response.entity].dayOgustFormat;
+    const dayChosen = session.dialogData.period[results.response.entity].dayOgustFormat;
     const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
     if (Object.keys(workingHoursRaw).length === 0) {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
