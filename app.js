@@ -99,10 +99,10 @@ bot.on('conversationUpdate', (message) => {
   }
 });
 
-bot.on('error', (e) => {
-  console.error(e);
-  throw new Error(`Error in the bot: ${e}`);
-})
+// bot.on('error', (e) => {
+//   console.error(e);
+//   throw new Error(`Error in the bot: ${e}`);
+// })
 
 // =========================================================
 // Root Dialog
@@ -166,9 +166,8 @@ bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
 
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
-bot.dialog('/which_person', require('./dialogs/showPlanning').whichPerson);
-bot.dialog('/which_day', require('./dialogs/showPlanning').whichDay);
-bot.dialog('/show_planning', require('./dialogs/showPlanning').showResult);
+bot.dialog('/which_person', require('./dialogs/whichPerson').whichPerson);
+bot.dialog('/which_period', require('./dialogs/whichPeriod').whichPeriod);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
@@ -186,7 +185,11 @@ bot.dialog('/select_infos', require('./dialogs/infos').select);
 bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
 bot.dialog('/usefull_contacts', require('./dialogs/usefull_contacts').showContacts);
 bot.dialog('/select_pay_sheets', require('./dialogs/pay_sheets').select);
+<<<<<<< HEAD
 bot.dialog('/training', require('./dialogs/training').showTrainingVideoCards);
+=======
+
+>>>>>>> eb56ef871d005f860d74708fabfbf7c317193a50
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
