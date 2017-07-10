@@ -44,7 +44,6 @@ const redirectToWhichPeriod = (session, results) => {
   if (results.response) {
     if (session.dialogData.myPersons[results.response.entity]) {
       const params = {
-        offset: 0,
         personChosen: session.dialogData.myPersons[results.response.entity],
         personType: session.dialogData.personType
       };

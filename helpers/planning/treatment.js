@@ -22,7 +22,11 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
 exports.getPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
-    const dayChosen = session.dialogData.period[results.response.entity].dayOgustFormat;
+    console.log('RESULTS =');
+    console.log(results);
+    console.log('DIALOG DATA =');
+    console.log(session.dialogData);
+    const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
     // Get all services of an employee by day the user chose from prompt
     // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
     const getServices = await services.getServicesByEmployeeIdAndDate(
@@ -103,7 +107,7 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const dayChosen = session.dialogData.period[results.response.entity].dayOgustFormat;
+    const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
     const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
     if (Object.keys(workingHoursRaw).length === 0) {
       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
@@ -123,25 +127,25 @@ exports.getCommunityPlanningByChosenDay = async (session, results) => {
 ** offset  X = get all days from +X week after current one, assuming current = 0
 ** type = 'weeks', 'months' or 'days'
 */
-exports.getPeriodByOffset = (offset = 0, type = 'weeks') => {
+exports.getPeriodByOffset = (offset = 0, periodChosen) => {
   const currentDate = moment().tz('Europe/Paris');
   let periodStart = {};
-  if (type == 'weeks') {
+  if (periodChosen.type == 'weeks') {
     periodStart = currentDate.clone().startOf('isoWeek');
   } else {
-    periodStart = currentDate.clone().startOf(type);
+    periodStart = currentDate.clone().startOf(periodChosen.type);
   }
   if (offset) {
     if (offset < 0) {
-      periodStart.subtract(Math.abs(offset), type);
+      periodStart.subtract(Math.abs(offset), periodChosen.type);
     }
     if (offset > 0) {
-      periodStart.add(Math.abs(offset), type);
+      periodStart.add(Math.abs(offset), periodChosen.type);
     }
   }
-  if (!type || type == 'days') {
+  if (!periodChosen.type || periodChosen.type == 'days') {
     return format.formatDays(periodStart);
-  } else if (type == 'weeks') {
+  } else if (periodChosen.type == 'weeks') {
     return format.formatDays(periodStart);
   }
   return format.formatMonths(periodStart);
