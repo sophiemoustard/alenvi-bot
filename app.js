@@ -168,6 +168,7 @@ bot.dialog('/hello', require('./dialogs/hello').hello);
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
 bot.dialog('/which_person', require('./dialogs/whichPerson').whichPerson);
 bot.dialog('/which_period', require('./dialogs/whichPeriod').whichPeriod);
+bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPeriodUnit);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
