@@ -41,8 +41,8 @@ exports.formatPromptListPersons = async (session, persons, field) => {
         personsToDisplay[`${persons[k].last_name}`].customer_id = persons[k].id_customer;
       }
     }
-    personsToDisplay.Autre = {};
-    personsToDisplay.Autre.customer_id = 0;
+    // personsToDisplay.Autre = {};
+    // personsToDisplay.Autre.customer_id = 0;
   }
   return personsToDisplay;
 };

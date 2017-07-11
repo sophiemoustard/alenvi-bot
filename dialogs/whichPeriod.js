@@ -4,24 +4,17 @@ const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
 const whichPeriod = async (session, args) => {
   try {
-    let targetPlanning = '';
+    const targetPlanning = {
+      Self: 'ton planning',
+      Auxiliary: 'son planning',
+      Customer: 'son planning',
+      Community: 'le planning de ta communauté'
+    };
     await checkOgustToken(session);
     session.sendTyping();
     session.dialogData.personChosen = args.personChosen || '';
     session.dialogData.personType = args.personType || '';
-    switch (session.dialogData.personType) {
-      case 'Self':
-        targetPlanning = 'ton planning';
-        break;
-      case 'Auxiliary':
-      case 'Customer':
-        targetPlanning = 'son planning';
-        break;
-      case 'Community':
-        targetPlanning = 'le planning de ta communauté';
-        break;
-    }
-    builder.Prompts.choice(session, `Pour quelle période souhaites-tu consulter ${targetPlanning} ?`, 'A la journée|A la semaine|Au mois', { maxRetries: 0 });
+    builder.Prompts.choice(session, `Pour quelle période souhaites-tu consulter ${targetPlanning[session.dialogData.personType]} ?`, 'A la journée|A la semaine|Au mois', { maxRetries: 0 });
   } catch (err) {
     console.error(err);
     return session.endDialog("Mince, j'ai eu un problème lors de la récupération des différentes périodes disponibles :/ Si le problème persiste, essaie de contacter l'équipe technique !");

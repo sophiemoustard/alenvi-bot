@@ -3,6 +3,7 @@ const _ = require('lodash');
 
 const employee = require('../../models/Ogust/employees');
 const services = require('../../models/Ogust/services');
+const customers = require('../../models/Ogust/customers');
 
 const { getTeamBySector } = require('../team');
 const checkOgustToken = require('../checkOgustToken').checkToken;
@@ -19,50 +20,6 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
 // Own planning + another auxiliary planning
 // =========================================================
 
-exports.getPlanningByChosenDay = async (session, results) => {
-  try {
-    session.sendTyping();
-    console.log('RESULTS =');
-    console.log(results);
-    console.log('DIALOG DATA =');
-    console.log(session.dialogData);
-    const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
-    // Get all services of an employee by day the user chose from prompt
-    // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
-    const getServices = await services.getServicesByEmployeeIdAndDate(
-      session.userData.ogust.tokenConfig.token,
-      session.dialogData.personChosen ?
-        session.dialogData.personChosen.employee_id :
-        session.userData.alenvi.employee_id,
-      dayChosen, { nbPerPage: 20, pageNum: 1 }
-    );
-    const getServicesResult = getServices.body.array_service.result;
-    if (Object.keys(getServicesResult).length === 0) {
-      return session.endDialog('Aucune intervention ce jour-là ! :)');
-    }
-    const sortedServicesByDate = await fillAndSortArrByStartDate(getServicesResult);
-    const servicesToDisplay = await format.getServicesToDisplay(session, sortedServicesByDate);
-    if (session.dialogData.myCoworkerChosen) {
-      const coWorker = await employee.getEmployeeById(
-        session.userData.ogust.tokenConfig.token,
-        session.dialogData.myCoworkerChosen.employee_id,
-        { nbPerPage: 1, pageNum: 1 }
-      );
-      session.send(`📅 Interventions de ${coWorker.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
-    } else {
-      session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
-    }
-    return session.endDialog();
-  } catch (err) {
-    console.error(err);
-    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaie de contacter l'équipe technique !");
-  }
-};
-
-// =========================================================
-// Community auxiliary planning
-// =========================================================
-
 const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
   const myTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const lengthTeam = Object.keys(myTeam).length;
@@ -76,9 +33,7 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
       // Get all interventions for an employee
-      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(
-        session.userData.ogust.tokenConfig.token,
-        employeeId, dayChosen, { nbPerPage: 20, pageNum: 1 });
+      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, employeeId, dayChosen, { nbPerPage: 20, pageNum: 1 });
       const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
       // Create the object to return
       if (employeePlanningByDay) {
@@ -103,23 +58,77 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
   return workingHours;
 };
 
-exports.getCommunityPlanningByChosenDay = async (session, results) => {
+exports.getPlanningByChosenDay = async (session, results) => {
   try {
+    let servicesRaw = {};
+    let servicesToDisplay = {};
+    let communityWorkingHoursRaw = {};
     session.sendTyping();
     await checkOgustToken(session);
     const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
-    const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
-    if (Object.keys(workingHoursRaw).length === 0) {
-      return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
+    // Get all services of an employee by day the user chose from prompt
+    // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
+    if (session.dialogData.personType == 'Customer') {
+      servicesRaw = await services.getServicesByCustomerIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+    } else if (session.dialogData.personType == 'Self') {
+      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+    } else if (session.dialogData.personType == 'Auxiliary') {
+      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+    } else if (session.dialogData.personType == 'Community') {
+      communityWorkingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
+      if (Object.keys(communityWorkingHoursRaw) === 0) {
+        return session.endDialog('Aucune intervention ce jour-là ! :)');
+      }
     }
-    const workingHoursToDisplay = await format.formatCommunityWorkingHours(workingHoursRaw);
-    session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
+    if (session.dialogData.personType == 'Self' || session.dialogData.personType == 'Auxiliary' || session.dialogData.personType == 'Customer') {
+      const servicesUnsorted = servicesRaw.body.array_service.result;
+      if (Object.keys(servicesUnsorted).length === 0) {
+        return session.endDialog('Aucune intervention ce jour-là ! :)');
+      }
+      const servicesSorted = await fillAndSortArrByStartDate(servicesUnsorted);
+      servicesToDisplay = await format.getServicesToDisplay(session, servicesSorted);
+    }
+    if (session.dialogData.personType == 'Self') {
+      session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
+    } else if (session.dialogData.personType == 'Customer') {
+      const person = await customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, { nbPerPage: 1, pageNum: 1 });
+      session.send(`📅 Interventions chez ${person.body.customer.last_name} le ${results.response.entity}  \n${servicesToDisplay}`);
+    } else if (session.dialogData.personType == 'Auxiliary') {
+      const person = await employee.getEmployeeById(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, { nbPerPage: 1, pageNum: 1 });
+      session.send(`📅 Interventions de ${person.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
+    } else if (session.dialogData.personType == 'Community') {
+      const workingHoursToDisplay = await format.formatCommunityWorkingHours(communityWorkingHoursRaw);
+      session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
+    }
     return session.endDialog();
   } catch (err) {
     console.error(err);
-    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter l'équipe technique !");
+    return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning :/ Si le problème persiste, essaie de contacter l'équipe technique !");
   }
 };
+
+// =========================================================
+// Community auxiliary planning
+// =========================================================
+
+
+// exports.getCommunityPlanningByChosenDay = async (session, results) => {
+//   try {
+//     session.sendTyping();
+//     await checkOgustToken(session);
+//     const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
+//     const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
+//     if (Object.keys(workingHoursRaw).length === 0) {
+//       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
+//     }
+//     const workingHoursToDisplay = await format.formatCommunityWorkingHours(workingHoursRaw);
+//     session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
+//     return session.endDialog();
+//   } catch (err) {
+//     console.error(err);
+//     return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter l'équipe technique !");
+//   }
+// };
 
 /*
 ** offset no param or 0 = get current period, assuming current = 0

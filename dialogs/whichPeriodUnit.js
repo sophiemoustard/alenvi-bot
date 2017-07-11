@@ -33,16 +33,17 @@ const handlePeriodUnit = (session, results) => {
       params.offset = ++session.dialogData.offset;
       return session.replaceDialog('/which_period_unit', params);
     }
-    if (session.dialogData.periodUnit[results.response.entity]) {
-      switch (session.dialogData.personType) {
-        case 'Self':
-        case 'Auxiliary':
-        case 'Customer':
-          return planning.getPlanningByChosenDay(session, results);
-        case 'Community':
-          return planning.getCommunityPlanningByChosenDay(session, results);
-      }
-    }
+    return planning.getPlanningByChosenDay(session, results);
+    // if (session.dialogData.periodUnit[results.response.entity]) {
+    //   switch (session.dialogData.personType) {
+    //     case 'Self':
+    //     case 'Auxiliary':
+    //     case 'Customer':
+    //       return planning.getPlanningByChosenDay(session, results);
+    //     case 'Community':
+    //       return planning.getCommunityPlanningByChosenDay(session, results);
+    //   }
+    // }
   }
   return session.cancelDialog(0, '/not_understand');
 };
