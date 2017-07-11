@@ -192,3 +192,26 @@ exports.getServicesByCustomerIdInRange = async (token, id, timeOption, pageOptio
   }
   return res;
 };
+
+exports.getServicesByCustomerIdAndDate = async (token, id, date, pageOption) => {
+  const options = {
+    url: `${Ogust.API_LINK}searchService`,
+    json: true,
+    body: {
+      token,
+      id_customer: id,
+      status: '@!=|N',
+      type: 'I', // Intervention
+      start_date: `${'@between|'}${date}0000|${date}2359`,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
+    },
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting services by customer id and date: ${res.body.message}`);
+  }
+  return res;
+};
