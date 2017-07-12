@@ -33,7 +33,7 @@ const handlePeriodUnit = (session, results) => {
       params.offset = ++session.dialogData.offset;
       return session.replaceDialog('/which_period_unit', params);
     }
-    return planning.getPlanningByChosenDay(session, results);
+    return planning.getPlanningByPeriodChosen(session, results);
     // if (session.dialogData.periodUnit[results.response.entity]) {
     //   switch (session.dialogData.personType) {
     //     case 'Self':

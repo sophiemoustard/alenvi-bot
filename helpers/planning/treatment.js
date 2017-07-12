@@ -16,7 +16,7 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
   return sortedServicesByDate;
 };
 
-const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
+const getCommunityWorkingHoursByDay = async (session, dateOgust) => {
   const myTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const lengthTeam = Object.keys(myTeam).length;
   const workingHours = {};
@@ -29,7 +29,7 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
       // Get all interventions for an employee
-      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, employeeId, dayChosen, { nbPerPage: 20, pageNum: 1 });
+      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, employeeId, dateOgust, { nbPerPage: 20, pageNum: 1 });
       const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
       // Create the object to return
       if (employeePlanningByDay) {
@@ -57,24 +57,26 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
 // =========================================================
 // Generic get planning
 // =========================================================
-exports.getPlanningByChosenDay = async (session, results) => {
+exports.getPlanningByPeriodChosen = async (session, results) => {
   try {
     let servicesRaw = {};
     let servicesToDisplay = {};
     let communityWorkingHoursRaw = {};
     session.sendTyping();
     await checkOgustToken(session);
-    const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
+    const dateOgust = {};
+    dateOgust.periodStart = session.dialogData.periodUnit[results.response.entity].dayOgustStartFormat;
+    dateOgust.periodEnd = session.dialogData.periodUnit[results.response.entity].dayOgustEndFormat;
     // Get all services of an employee by day the user chose from prompt
     // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
     if (session.dialogData.personType == 'Customer') {
-      servicesRaw = await services.getServicesByCustomerIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+      servicesRaw = await services.getServicesByCustomerIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
     } else if (session.dialogData.personType == 'Self') {
-      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
     } else if (session.dialogData.personType == 'Auxiliary') {
-      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, dayChosen, { nbPerPage: 20, pageNum: 1 });
+      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
     } else if (session.dialogData.personType == 'Community') {
-      communityWorkingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
+      communityWorkingHoursRaw = await getCommunityWorkingHoursByDay(session, dateOgust);
       if (Object.keys(communityWorkingHoursRaw) === 0) {
         return session.endDialog('Aucune intervention ce jour-là ! :)');
       }
