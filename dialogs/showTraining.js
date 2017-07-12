@@ -54,12 +54,13 @@ const displayTrainingCards = async (session, results) => {
       if (cards[i].questionnaire_link) {
         buttonList.push(builder.CardAction.openUrl(session, cards[i].questionnaire_link, 'Questionnaire'));
       }
+      const image = cards[i].image_link || `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`;
       const card = new builder.HeroCard(session)
-        .title(`${cards[i].number} - ${cards[i].title}`)
+        .title(`${cards[i].number}.${cards[i].title}`)
         .images([
           builder.CardImage.create(
             session,
-            `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`
+            image
           )])
         .buttons(buttonList);
       trainingCards.push(card);
