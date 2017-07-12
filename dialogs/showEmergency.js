@@ -13,7 +13,7 @@ const showEmergency = async (session) => {
         new builder.HeroCard(session)
           .title("Situations d'urgence")
           .buttons([
-            builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHN1hzUkh4Zy1WNUk', 'Accéder au PDF')
+            builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHN1hzUkh4Zy1WNUk', 'Visionner')
           ])
       ]);
     session.endDialog(msg);
