@@ -115,7 +115,8 @@ exports.formatPeriodPrompt = (periodStart, periodChosen) => {
     for (let i = 0; i <= 6; i++) {
       const dayFormat = moment(periodStart).add(i, 'days');
       period[dayFormat.format('DD/MM')] = {};
-      period[dayFormat.format('DD/MM')].dayOgustFormat = dayFormat.format('YYYYMMDD');
+      period[dayFormat.format('DD/MM')].dayOgustStartFormat = dayFormat.format('YYYYMMDD');
+      period[dayFormat.format('DD/MM')].dayOgustEndFormat = dayFormat.endOf('day').format('YYYYMMDD');
     }
   } else if (periodChosen.name == 'PerWeek') {
     for (let i = 0; i <= 6; i++) {
@@ -123,7 +124,8 @@ exports.formatPeriodPrompt = (periodStart, periodChosen) => {
       const weekFormat = moment(periodStart).add(i, 'weeks');
       period[`Semaine du ${weekFormat.format('DD/MM')}`] = {};
       // Add ogust format
-      period[`Semaine du ${weekFormat.format('DD/MM')}`].dayOgustFormat = weekFormat.format('YYYYMMDD');
+      period[`Semaine du ${weekFormat.format('DD/MM')}`].dayOgustStartFormat = weekFormat.format('YYYYMMDD');
+      period[`Semaine du ${weekFormat.format('DD/MM')}`].dayOgustEndFormat = weekFormat.endOf('week').format('YYYYMMDD');
     }
   } else {
     for (let i = 0; i <= 6; i++) {
@@ -131,10 +133,12 @@ exports.formatPeriodPrompt = (periodStart, periodChosen) => {
       const monthFormat = moment(periodStart).add(i, 'months');
       period[monthFormat.format('MMM YYYY')] = {};
       // Add ogust format
-      period[monthFormat.format('MMM YYYY')].dayOgustFormat = monthFormat.format('YYYYMMDD');
+      period[monthFormat.format('MMM YYYY')].dayOgustStartFormat = monthFormat.format('YYYYMMDD');
+      period[monthFormat.format('MMM YYYY')].dayOgustEndFormat = monthFormat.endOf('month').format('YYYYMMDD');
     }
   }
   // add a 'Suivant' result to the object so it appears in last
   period.Suivant = {};
+  console.log(period);
   return period;
 };

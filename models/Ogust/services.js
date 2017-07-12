@@ -141,7 +141,7 @@ exports.getServicesByEmployeeIdAndDate = async (token, id, date, pageOption) => 
       id_employee: id,
       status: '@!=|N',
       type: 'I', // Intervention
-      start_date: `${'@between|'}${date}0000|${date}2359`,
+      start_date: `${'@between|'}${date.periodStart}0000|${date.periodEnd}2359`,
       nbperpage: pageOption.nbPerPage,
       pagenum: pageOption.pageNum,
     },
@@ -202,7 +202,7 @@ exports.getServicesByCustomerIdAndDate = async (token, id, date, pageOption) => 
       id_customer: id,
       status: '@!=|N',
       type: 'I', // Intervention
-      start_date: `${'@between|'}${date}0000|${date}2359`,
+      start_date: `${'@between|'}${date.periodStart}0000|${date.periodEnd}2359`,
       nbperpage: pageOption.nbPerPage,
       pagenum: pageOption.pageNum,
     },
