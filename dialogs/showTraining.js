@@ -45,8 +45,10 @@ const displayTrainingCards = async (session, results) => {
     }
     for (let i = 0, l = cards.length; i < l; i++) {
       const buttonList = [];
+      let showLink;
       if (cards[i].show_link) {
-        buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
+      //   buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
+        showLink = cards[i].show_link;
       }
       if (cards[i].script_link) {
         buttonList.push(builder.CardAction.openUrl(session, cards[i].script_link, 'Script'));
@@ -62,6 +64,7 @@ const displayTrainingCards = async (session, results) => {
             session,
             image
           )])
+        .tap(builder.CardAction.openUrl(session, showLink))
         .buttons(buttonList);
       trainingCards.push(card);
     }
