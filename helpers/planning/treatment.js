@@ -16,10 +16,6 @@ const fillAndSortArrByStartDate = async (getServiceResult) => {
   return sortedServicesByDate;
 };
 
-// =========================================================
-// Own planning + another auxiliary planning
-// =========================================================
-
 const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
   const myTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const lengthTeam = Object.keys(myTeam).length;
@@ -58,6 +54,9 @@ const getCommunityWorkingHoursByDay = async (session, dayChosen) => {
   return workingHours;
 };
 
+// =========================================================
+// Generic get planning
+// =========================================================
 exports.getPlanningByChosenDay = async (session, results) => {
   try {
     let servicesRaw = {};
@@ -107,39 +106,17 @@ exports.getPlanningByChosenDay = async (session, results) => {
   }
 };
 
-// =========================================================
-// Community auxiliary planning
-// =========================================================
-
-
-// exports.getCommunityPlanningByChosenDay = async (session, results) => {
-//   try {
-//     session.sendTyping();
-//     await checkOgustToken(session);
-//     const dayChosen = session.dialogData.periodUnit[results.response.entity].dayOgustFormat;
-//     const workingHoursRaw = await getCommunityWorkingHoursByDay(session, dayChosen);
-//     if (Object.keys(workingHoursRaw).length === 0) {
-//       return session.endDialog('Aucune intervention de prévue ce jour-là ! :)');
-//     }
-//     const workingHoursToDisplay = await format.formatCommunityWorkingHours(workingHoursRaw);
-//     session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
-//     return session.endDialog();
-//   } catch (err) {
-//     console.error(err);
-//     return session.endDialog("Zut, je n'ai pas réussi à récupérer le planning  de la communauté :/ Si le problème persiste, essaie de contacter l'équipe technique !");
-//   }
-// };
-
 /*
 ** offset no param or 0 = get current period, assuming current = 0
 ** offset -X = all days from -X period before current one, assuming current = 0
 ** offset  X = get all days from +X week after current one, assuming current = 0
-** type = 'weeks', 'months' or 'days'
+** periodChosen.name = 'PerDay', 'PerWeek', 'PerMonth'
+** periodChosen.type = 'weeks', 'months' or 'days'
 */
 exports.getPeriodByOffset = (offset = 0, periodChosen) => {
   const currentDate = moment().tz('Europe/Paris');
   let periodStart = {};
-  if (periodChosen.type == 'weeks') {
+  if (periodChosen.name == 'PerDay') {
     periodStart = currentDate.clone().startOf('isoWeek');
   } else {
     periodStart = currentDate.clone().startOf(periodChosen.type);
@@ -152,10 +129,5 @@ exports.getPeriodByOffset = (offset = 0, periodChosen) => {
       periodStart.add(Math.abs(offset), periodChosen.type);
     }
   }
-  if (!periodChosen.type || periodChosen.type == 'days') {
-    return format.formatDays(periodStart);
-  } else if (periodChosen.type == 'weeks') {
-    return format.formatDays(periodStart);
-  }
-  return format.formatMonths(periodStart);
+  return format.formatPeriodPrompt(periodStart, periodChosen);
 };

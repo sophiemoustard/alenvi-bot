@@ -8,10 +8,10 @@ const whichPeriodUnit = async (session, args) => {
     await checkOgustToken(session);
     session.sendTyping();
     session.dialogData.offset = args.offset || 0;
+    session.dialogData.periodChosen = args.periodChosen || '';
     session.dialogData.personChosen = args.personChosen || '';
     session.dialogData.personType = args.personType || '';
-    session.dialogData.periodChosen = args.periodChosen || '';
-    console.log(args);
+    console.log(session.dialogData);
     session.dialogData.periodUnit = planning.getPeriodByOffset(session.dialogData.offset, session.dialogData.periodChosen);
     builder.Prompts.choice(session, 'Quand exactement ?', session.dialogData.periodUnit, { maxRetries: 0 });
   } catch (err) {

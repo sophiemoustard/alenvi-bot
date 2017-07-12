@@ -37,29 +37,3 @@ const redirectToDaySelected = (session, results) => {
 };
 
 exports.select = [whichPlanning, redirectToDaySelected];
-
-
-// =========================================================
-// Show a planning, user connected one by default
-// Generic function shared by my own planning and another auxiliary planning
-// =========================================================
-
-// =========================================================
-// Show another auxiliary planning
-// =========================================================
-
-// const whichAuxiliary = async (session) => {
-//   try {
-//     await checkOgustToken(session);
-//     session.sendTyping();
-//     // Get list of coworkers
-//     const myRawCoworkers = await planning.getTeamBySector(session);
-//     const myCoworkers = await planning.formatPromptListPersons(session, myRawCoworkers, 'id_employee');
-//     // Put the list in dialogData so we can compare it in next function
-//     session.dialogData.myCoworkers = myCoworkers;
-//     builder.Prompts.choice(session, 'Quel(le) auxiliaire précisément ?', myCoworkers, { maxRetries: 0 });
-//   } catch (err) {
-//     console.error(err);
-//     return session.endDialog("Mince, je n'ai pas réussi à récupérer tes collègues :/ Si le problème persiste, essaye de contacter l'équipe technique !");
-//   }
-// };

@@ -19,12 +19,12 @@ const getCardsAttachments = async (session) => {
   const cards = [];
   moment.locale('fr');
   for (const k in mySalaries) {
-  cards.push(
-    new builder.HeroCard(session)
-      .title(`Bulletin ${moment.tz(mySalaries[k].period_start, 'YYYYMMDDHHmm', 'Europe/Paris').format('MMM YYYY')}`)
-      .buttons([
-        builder.CardAction.openUrl(session, mySalaries[k].print_url, 'Visionner')
-      ])
+    cards.push(
+      new builder.HeroCard(session)
+        .title(`Bulletin ${moment.tz(mySalaries[k].period_start, 'YYYYMMDDHHmm', 'Europe/Paris').format('MMM YYYY')}`)
+        .buttons([
+          builder.CardAction.openUrl(session, mySalaries[k].print_url, 'Visionner')
+        ])
     );
   }
   return cards;
