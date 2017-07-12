@@ -25,8 +25,9 @@ const whichPerson = async (session, args) => {
         promptMsg = 'Quel(le) auxiliaire précisément ?';
         break;
       case 'Self':
-      case 'Community':
         return session.replaceDialog('/which_period', { offset: '0', personChosen: '', personType: session.dialogData.personType });
+      case 'Community':
+        return session.replaceDialog('/which_period_unit', { offset: '0', personChosen: '', personType: session.dialogData.personType, periodChosen: { name: 'PerDay', type: 'weeks' } });
       case '':
         throw new Error('personType argument is empty');
       default:
