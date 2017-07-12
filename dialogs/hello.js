@@ -17,7 +17,7 @@ exports.hello_first = [
 const rootGreetingMenu = (session) => {
   console.log('WENT IN HELLO > MENU');
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
-  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE', { maxRetries: 0 });
 };
 
 const redirectMenuResult = (session, results) => {
@@ -43,6 +43,9 @@ const redirectMenuResult = (session, results) => {
           break;
         case 'Formation':
           session.replaceDialog('/training_choice');
+          break;
+        case 'URGENCE':
+          session.replaceDialog('/show_emergency');
           break;
       }
     }

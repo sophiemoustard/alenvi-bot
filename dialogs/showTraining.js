@@ -45,8 +45,10 @@ const displayTrainingCards = async (session, results) => {
     }
     for (let i = 0, l = cards.length; i < l; i++) {
       const buttonList = [];
+      let showLink;
       if (cards[i].show_link) {
-        buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
+      //   buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
+        showLink = cards[i].show_link;
       }
       if (cards[i].script_link) {
         buttonList.push(builder.CardAction.openUrl(session, cards[i].script_link, 'Script'));
@@ -54,13 +56,15 @@ const displayTrainingCards = async (session, results) => {
       if (cards[i].questionnaire_link) {
         buttonList.push(builder.CardAction.openUrl(session, cards[i].questionnaire_link, 'Questionnaire'));
       }
+      const image = cards[i].image_link || `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`;
       const card = new builder.HeroCard(session)
-        .title(`${cards[i].number} - ${cards[i].title}`)
+        .title(`${cards[i].number}.${cards[i].title}`)
         .images([
           builder.CardImage.create(
             session,
-            `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`
+            image
           )])
+        .tap(builder.CardAction.openUrl(session, showLink))
         .buttons(buttonList);
       trainingCards.push(card);
     }
