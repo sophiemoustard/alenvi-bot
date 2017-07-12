@@ -190,6 +190,8 @@ bot.dialog('/select_pay_sheets', require('./dialogs/pay_sheets').select);
 bot.dialog('/training_choice', require('./dialogs/trainingChoice').trainingChoice);
 bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
+bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
+
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
