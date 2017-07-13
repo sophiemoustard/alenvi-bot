@@ -23,7 +23,7 @@ exports.memVideosList = [
   }, {
     number: 4,
     title: 'Les fonctions instrumentales',
-    image_link: `${process.env.WEBSITE_HOSTNAME}/images/bot/formation/images_memoires/video4_les_fonctions_instrumentales.png`,
+    image_link: `${process.env.WEBSITE_HOSTNAME}/images/bot/formation/images_memoires/test/video4_les_fonctions_instrumentales.png`,
     show_link: 'https://vimeo.com/222328774/4f611bf120',
     script_link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHMC03QjJnaXBfWEU',
     questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSfBUaeevc7cz0nff10YADPrPzyT0hZLIdq4MmcQO4ROsaiMlw/viewform'
