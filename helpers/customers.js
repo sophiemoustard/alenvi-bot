@@ -11,9 +11,6 @@ exports.getCustomers = async (session, id) => {
     { slotToSub: 2, slotToAdd: 2, intervalType: 'week' },
     { nbPerPage: 500, pageNum: 1 }
   );
-  if (servicesInFourWeeks.body.status === 'KO') {
-    throw new Error(`Error while getting services in four weeks: ${servicesInFourWeeks.body.message}`);
-  }
   // Put it in a variable so it's more readable
   const servicesRawObj = servicesInFourWeeks.body.array_service.result;
   if (Object.keys(servicesRawObj).length === 0) {
@@ -37,9 +34,6 @@ exports.getCustomers = async (session, id) => {
       session.userData.ogust.tokenConfig.token,
       uniqCustomers[i],
       { nbPerPage: 20, pageNum: 1 });
-    if (getCustomer.body.status === 'KO') {
-      throw new Error(`Error while getting customers: ${getCustomer.body.message}`);
-    }
     myRawCustomers.push(getCustomer.body.customer);
   }
   return myRawCustomers;
