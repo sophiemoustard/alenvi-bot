@@ -105,7 +105,7 @@ exports.getServicesByEmployeeIdInRange = async (token, id, timeOption, pageOptio
     body: {
       token,
       id_employee: id,
-      status: 'R', // Récurrent
+      status: '@!=|N', // 'R' for 'Récurrent'
       type: 'I',
       start_date: `${'@between|'}${interval.intervalBwd}|${interval.intervalFwd}`,
       nbperpage: pageOption.nbPerPage,
