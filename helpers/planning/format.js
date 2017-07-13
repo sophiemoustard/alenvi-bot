@@ -93,42 +93,6 @@ exports.formatCommunityWorkingHours = async (workingHours) => {
   return planningToDisplay.join('  \n');
 };
 
-// exports.formatWeeks = (weekStart) => {
-//   const weeks = {};
-//   // Add a 'Précédent' result to the object so it appears in first
-//   weeks['Précédent'] = {};
-//   // Add all days from a week, to then display it with the good format
-//   // Prompt understandable object
-//   for (let i = 0; i <= 6; i++) {
-//     // Add user format to prompt
-//     const weekUserFormat = moment(weekStart).add(i, 'days');
-//     days[dayUserFormat.format('DD/MM')] = {};
-//     // Add ogust format
-//     days[dayUserFormat.format('DD/MM')].dayOgustFormat = dayUserFormat.format('YYYYMMDD');
-//   }
-//   // add a 'Suivant' result to the object so it appears in last
-//   days.Suivant = {};
-//   return days;
-// }
-
-// exports.formatMonths = (weekStart) => {
-//   const days = {};
-//   // Add a 'Précédent' result to the object so it appears in first
-//   days['Précédent'] = {};
-//   // Add all days from a week, to then display it with the good format
-//   // Prompt understandable object
-//   for (let i = 0; i <= 6; i++) {
-//     // Add user format to prompt
-//     const dayUserFormat = moment(weekStart).add(i, 'days');
-//     days[dayUserFormat.format('DD/MM')] = {};
-//     // Add ogust format
-//     days[dayUserFormat.format('DD/MM')].dayOgustFormat = dayUserFormat.format('YYYYMMDD');
-//   }
-//   // add a 'Suivant' result to the object so it appears in last
-//   days.Suivant = {};
-//   return days;
-// }
-
 exports.formatPeriodPrompt = (periodStart, periodChosen) => {
   const period = {};
   // Add a 'Précédent' result to the object so it appears in first
