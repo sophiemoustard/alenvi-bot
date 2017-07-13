@@ -87,7 +87,7 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
         return session.endDialog('Aucune intervention ce jour-là ! :)');
       }
       const servicesSorted = await fillAndSortArrByStartDate(servicesUnsorted);
-      servicesToDisplay = await format.getServicesToDisplay(session, servicesSorted);
+      servicesToDisplay = await format.formatServicesPerPeriod(session, servicesSorted);
     }
     if (session.dialogData.personType == 'Self') {
       session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
