@@ -1,9 +1,13 @@
 const builder = require('botbuilder');
 const _ = require('lodash');
+const cloudinary = require('cloudinary');
 
 const checkOgustToken = require('./../helpers/checkOgustToken').checkToken;
 const { comVideosList } = require('./../models/Alenvi/Training/communication');
 const { memVideosList } = require('./../models/Alenvi/Training/memory');
+const cloudinaryConfig = require('../config').Cloudinary;
+
+cloudinary.config(cloudinaryConfig);
 
 const whichTrainingType = async (session, args, next) => {
   try {
@@ -56,7 +60,7 @@ const displayTrainingCards = async (session, results) => {
       if (cards[i].questionnaire_link) {
         buttonList.push(builder.CardAction.openUrl(session, cards[i].questionnaire_link, 'Questionnaire'));
       }
-      const image = cards[i].image_link || `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`;
+      const image = cards[i].image_link || cloudinary.url('images/bot/Pigi.png');
       const card = new builder.HeroCard(session)
         .title(`${cards[i].number}.${cards[i].title}`)
         .images([
