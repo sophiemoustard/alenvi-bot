@@ -24,7 +24,7 @@ const whichTrainingType = async (session, args, next) => {
       case 'com': {
         session.dialogData.trainingTypeData = comVideosList;
         // const comVideosListCategories = Object.keys(comVideosList.categories);
-        builder.Prompts.choice(session, 'Quelle partie souhaites-tu consulter ?', 'Ecoute active');
+        builder.Prompts.choice(session, 'Quelle partie souhaites-tu consulter ?', 'Ecoute active', { maxRetries: 0 });
         break;
       }
 
@@ -42,40 +42,44 @@ const displayTrainingCards = async (session, results) => {
     session.sendTyping();
     let cards;
     const trainingCards = [];
-    if (results.response && session.dialogData.trainingType === 'com') {
-      cards = session.dialogData.trainingTypeData.categories[_.snakeCase(results.response.entity)];
+    if (results.response || session.dialogData.trainingType === 'memory') {
+      if (session.dialogData.trainingType === 'com') {
+        cards = session.dialogData.trainingTypeData.categories[_.snakeCase(results.response.entity)];
+      } else {
+        cards = session.dialogData.trainingTypeData;
+      }
+      for (let i = 0, l = cards.length; i < l; i++) {
+        const buttonList = [];
+        let showLink;
+        if (cards[i].show_link) {
+          //   buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
+          showLink = cards[i].show_link;
+        }
+        if (cards[i].script_link) {
+          buttonList.push(builder.CardAction.openUrl(session, cards[i].script_link, 'Script'));
+        }
+        if (cards[i].questionnaire_link) {
+          buttonList.push(builder.CardAction.openUrl(session, cards[i].questionnaire_link, 'Questionnaire'));
+        }
+        const image = cards[i].image_link || cloudinary.url('images/bot/Pigi.png');
+        const card = new builder.HeroCard(session)
+          .title(`${cards[i].number}.${cards[i].title}`)
+          .images([
+            builder.CardImage.create(
+              session,
+              image
+            )])
+          .tap(builder.CardAction.openUrl(session, showLink))
+          .buttons(buttonList);
+        trainingCards.push(card);
+      }
+      const message = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(trainingCards);
+      session.endDialog(message);
     } else {
-      cards = session.dialogData.trainingTypeData;
+      session.cancelDialog(0, '/not_understand');
     }
-    for (let i = 0, l = cards.length; i < l; i++) {
-      const buttonList = [];
-      let showLink;
-      if (cards[i].show_link) {
-      //   buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
-        showLink = cards[i].show_link;
-      }
-      if (cards[i].script_link) {
-        buttonList.push(builder.CardAction.openUrl(session, cards[i].script_link, 'Script'));
-      }
-      if (cards[i].questionnaire_link) {
-        buttonList.push(builder.CardAction.openUrl(session, cards[i].questionnaire_link, 'Questionnaire'));
-      }
-      const image = cards[i].image_link || cloudinary.url('images/bot/Pigi.png');
-      const card = new builder.HeroCard(session)
-        .title(`${cards[i].number}.${cards[i].title}`)
-        .images([
-          builder.CardImage.create(
-            session,
-            image
-          )])
-        .tap(builder.CardAction.openUrl(session, showLink))
-        .buttons(buttonList);
-      trainingCards.push(card);
-    }
-    const message = new builder.Message(session)
-      .attachmentLayout(builder.AttachmentLayout.carousel)
-      .attachments(trainingCards);
-    session.endDialog(message);
   } catch (err) {
     console.error(err);
     return session.endDialog("Arf, je n'ai pas réussi à récupérer les documents :/ Si le problème persiste, essaie de contacter un administrateur !");
