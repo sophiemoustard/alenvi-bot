@@ -38,6 +38,6 @@ exports.memVideosList = [
     image_link: cloudinary.url('images/bot/formation/memoires/movie_5.png'),
     show_link: 'https://vimeo.com/223966961/a1e7a13ba6',
     script_link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHT0dQYm9uSHdGcVE',
-    questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSehlb_89ZxiiRettko1kwLS2088Ovoo2eIarZN83-K30pQ/SNQ/viewform'
+    questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSehlb_89ZxiiRettko1kwLS2088Ovoo2eIarZN83-K30pQSNQ/viewform'
   }
 ];
