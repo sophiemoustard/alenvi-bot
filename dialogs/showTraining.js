@@ -62,7 +62,7 @@ const displayTrainingCards = async (session, results) => {
         }
         const image = cards[i].image_link || cloudinary.url('images/bot/Pigi.png');
         const card = new builder.HeroCard(session)
-          .title(`${cards[i].number}.${cards[i].title}`)
+          .title(`${cards[i].number}. ${cards[i].title}`)
           .images([
             builder.CardImage.create(
               session,
