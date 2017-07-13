@@ -59,11 +59,11 @@ const getCommunityWorkingHoursByDay = async (session, dateOgust) => {
 // =========================================================
 exports.getPlanningByPeriodChosen = async (session, results) => {
   try {
+    session.sendTyping();
+    await checkOgustToken(session);
     let servicesRaw = {};
     let servicesToDisplay = {};
     let communityWorkingHoursRaw = {};
-    session.sendTyping();
-    await checkOgustToken(session);
     const dateOgust = {};
     dateOgust.periodStart = session.dialogData.periodUnit[results.response.entity].dayOgustStartFormat;
     dateOgust.periodEnd = session.dialogData.periodUnit[results.response.entity].dayOgustEndFormat;
@@ -93,10 +93,10 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
       session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Customer') {
       const person = await customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, { nbPerPage: 1, pageNum: 1 });
-      session.send(`📅 Interventions chez ${person.body.customer.last_name} le ${results.response.entity}  \n${servicesToDisplay}`);
+      session.send(`📅 Interventions chez ${person.body.customer.title} ${person.body.customer.last_name} - ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Auxiliary') {
       const person = await employee.getEmployeeById(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, { nbPerPage: 1, pageNum: 1 });
-      session.send(`📅 Interventions de ${person.body.employee.first_name} le ${results.response.entity}  \n${servicesToDisplay}`);
+      session.send(`📅 Interventions de ${person.body.employee.first_name} - ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Community') {
       const workingHoursToDisplay = await format.formatCommunityWorkingHours(communityWorkingHoursRaw);
       session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);
