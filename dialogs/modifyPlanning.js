@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const customers = require('../helpers/customers');
-const planning = require('../helpers/planning/treatment');
+const planning = require('../helpers/planning/format');
 const slack = require('../models/Slack/planning');
 
 // const services = require('../Ogust/services');
