@@ -1,7 +1,7 @@
 const builder = require('botbuilder');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const {getTeamBySector} = require('../helpers/team');
+const { getTeamBySector } = require('../helpers/team');
 
 const formatPerson = async (coworker) => {
   let person = {};
