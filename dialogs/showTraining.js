@@ -16,7 +16,6 @@ const whichTrainingType = async (session, args, next) => {
     session.dialogData.trainingType = args.trainingType || '';
     switch (session.dialogData.trainingType) {
       case 'memory':
-        console.log(memVideosList);
         session.dialogData.trainingTypeData = memVideosList;
         next();
         break;
