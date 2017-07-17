@@ -16,8 +16,13 @@ const formatPerson = async (customer) => {
 const formatText = async (customer) => {
   const text = [];
   let textToDisplay = '';
-  text.push(customer.main_address.line);
-  text.push(`${customer.main_address.zip} ${customer.main_address.city}`);
+  // text.push(`${customer.main_address.line} ${customer.main_address.zip} ${customer.main_address.city}`);
+  if (customer.landline) {
+    text.push(`📞 ${customer.landline}`);
+  }
+  if (customer.mobile_phone) {
+    text.push(`📱 ${customer.mobile_phone}`);
+  }
   if (customer.door_code) {
     text.push(`Code Porte: ${customer.door_code}`);
   }
@@ -39,6 +44,7 @@ const getCardsAttachments = async (session) => {
       myCards.push(
         new builder.HeroCard(session)
           .title(person)
+          // .subtitle(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip} ${myRawCustomers[k].main_address.city}`)
           .text(text)
           .images([
             builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
