@@ -27,3 +27,24 @@ exports.getCustomerByCustomerId = async (token, id, pageOption) => {
   }
   return res;
 };
+
+exports.getThirdPartyInformationsByCustomerId = async (token, id, pageOption) => {
+  const options = {
+    url: `${Ogust.API_LINK}getThirdPartyInformations`,
+    json: true,
+    body: {
+      token,
+      nbperpage: pageOption.nbPerPage,
+      pagenum: pageOption.pageNum,
+      third_party: 'C',
+      third_party_id: id,
+    },
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while getting third party info by customer by id: ${res.body.message}`);
+  }
+  return res;
+};
