@@ -199,8 +199,6 @@ bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
 bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 
-bot.dialog('/modify_customer_infos', require('./dialogs/modifyCustomerInfos').modifyCustomerInfos);
-
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
