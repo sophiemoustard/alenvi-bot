@@ -117,7 +117,7 @@ exports.moreDetails = async (session, args) => {
           new builder.HeroCard(session)
             .title('Modification fiche')
             .buttons([
-              builder.CardAction.openUrl(session, `${process.env.WEBSITE_HOSTNAME}/login.html`, 'Modification...')
+              builder.CardAction.openUrl(session, `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${encodeURIComponent(customerById.id_customer)}`, 'Modification...')
             ])
         ]);
       session.endDialog(msg);
