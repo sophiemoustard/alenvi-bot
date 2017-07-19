@@ -74,7 +74,6 @@ exports.moreDetails = async (session, args) => {
         miscComments: 'Autres'
       };
       const customerComments = customerById.comment || '';
-      console.log(customerComments);
       if (customerById.landline) {
         customerContactDetails.push(customerById.landline);
       }
@@ -89,13 +88,10 @@ exports.moreDetails = async (session, args) => {
       const customerDetails = {};
       customerDetails.customerContactDetails = customerContactDetails;
       customerDetails.customerComments = customerComments;
-      customerDetails.pathology = thirdPartyInfo.NIVEAU;
+      customerDetails.pathology = thirdPartyInfo.NIVEAU === '-' ? customerDetails.pathology : '';
       customerDetails.pathologyComment = thirdPartyInfo.COMMNIV || '';
       customerDetails.interventionDetails = thirdPartyInfo.DETAILEVE || '';
       customerDetails.miscComments = thirdPartyInfo.AUTRESCOMM || '';
-      if (customerDetails.pathology === '-') {
-        customerDetails.pathology = '';
-      }
       let title = '';
       let text = '';
       for (const k in customerDetails) {
