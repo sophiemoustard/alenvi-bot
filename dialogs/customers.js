@@ -61,6 +61,7 @@ const getCardsAttachments = async (session) => {
 exports.moreDetails = async (session, args) => {
   try {
     session.sendTyping();
+    await checkOgustToken(session);
     if (args.data) {
       const myRawCustomers = await customersHelper.getCustomers(session, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers, customer => customer.id_customer === args.data);
@@ -109,7 +110,17 @@ exports.moreDetails = async (session, args) => {
       if (title === '' && text === '') {
         session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
-      session.replaceDialog('/modify_customer_infos');
+      const msg = new builder.Message(session);
+      msg
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments([
+          new builder.HeroCard(session)
+            .title('Modification fiche')
+            .buttons([
+              builder.CardAction.openUrl(session, `${process.env.WEBSITE_HOSTNAME}/login.html`, 'Modification...')
+            ])
+        ]);
+      session.endDialog(msg);
     } else {
       throw new Error('id_customer empty');
     }
