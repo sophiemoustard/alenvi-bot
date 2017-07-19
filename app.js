@@ -5,6 +5,11 @@ const jwt = require('jsonwebtoken');
 // const _ = require('lodash');
 
 const builder = require('botbuilder');
+
+const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
+  botId: process.env.BOTMETRICS_BOT_ID,
+  apiKey: process.env.BOTMETRICS_API_KEY
+});
 // const botauth = require('botauth');
 
 // const passport = require('passport');
@@ -49,6 +54,7 @@ const logUserConversation = (event) => {
 bot.use({
   receive(event, next) {
     logUserConversation(event);
+    BotmetricsMiddleware.receive();
     next();
   },
   // botbuilder: (session, next) => {
@@ -56,6 +62,7 @@ bot.use({
   // },
   send(event, next) {
     logUserConversation(event);
+    BotmetricsMiddleware.send();
     next();
   }
 });

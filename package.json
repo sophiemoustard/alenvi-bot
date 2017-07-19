@@ -16,6 +16,8 @@
     "body-parser": "^1.17.1",
     "botauth": "^0.2.12",
     "botbuilder": "^3.8.3",
+    "botmetrics": "0.0.10",
+    "botmetrics-botframework-middleware": "0.0.1",
     "cloudinary": "^1.9.0",
     "dotenv": "^4.0.0",
     "express": "^4.15.2",
