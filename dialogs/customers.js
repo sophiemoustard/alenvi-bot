@@ -84,7 +84,7 @@ exports.moreDetails = async (session, args) => {
       if (!customerContactDetails.length) {
         customerContactDetails = '';
       }
-      const thirdPartyInfoRaw = await customers.getThirdPartyInformationsByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, { nbPerPage: 30, pageNum: 1 });
+      const thirdPartyInfoRaw = await customers.getThirdPartyInformationsByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, { nbPerPage: 10, pageNum: 1 });
       const thirdPartyInfo = thirdPartyInfoRaw.body.thirdPartyInformations.array_values || {};
       const customerDetails = {};
       customerDetails.customerContactDetails = customerContactDetails;
@@ -99,11 +99,11 @@ exports.moreDetails = async (session, args) => {
       let title = '';
       let text = '';
       for (const k in customerDetails) {
-        session.sendTyping();
         if (customerDetails[k] && customerDetails[k] !== '') {
+          session.sendTyping();
           title = `## ${customerDetailsTitles[k]}`;
           if (k === 'customerContactDetails') {
-            text = customerDetails[k].join(' \n\n');
+            text = customerDetails[k].join('  \n');
           } else {
             text = customerDetails[k];
           }
@@ -111,10 +111,9 @@ exports.moreDetails = async (session, args) => {
         }
       }
       if (title === '' && text === '') {
-        session.endDialog('Le bénéficiaire ne possède pas plus de détails.');
-      } else {
-        session.endDialog();
+        session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
+      session.replaceDialog('/modify_customer_infos');
     } else {
       throw new Error('id_customer empty');
     }
