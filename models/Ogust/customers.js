@@ -48,3 +48,23 @@ exports.getThirdPartyInformationsByCustomerId = async (token, id, pageOption) =>
   }
   return res;
 };
+
+exports.editThirdPartyInformationsByCustomerId = async (token, id, arrayValues) => {
+  const options = {
+    url: `${Ogust.API_LINK}setThirdPartyInformations`,
+    json: true,
+    body: {
+      token,
+      third_party: 'C',
+      third_party_id: id,
+      array_values: arrayValues
+    },
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.post(options);
+  if (res.body.status == 'KO') {
+    throw new Error(`Error while editing third party info by customer by id: ${res.body.message}`);
+  }
+  return res;
+};
