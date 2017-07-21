@@ -32,6 +32,6 @@ exports.checkToken = async (session) => {
     }
   } catch (err) {
     console.error(err);
-    return session.endDialogs(`Oups ! Il y a eu une erreur au moment de rafraichir tes informations personnelles :/ Si ce problème persiste, n'hésite pas à contacter l'équipe technique !`);
+    return session.endDialog('Oups ! Il y a eu une erreur au moment de rafraichir tes informations personnelles :/ Si ce problème persiste, n'hésite pas à contacter l'équipe technique !');
   }
 };
