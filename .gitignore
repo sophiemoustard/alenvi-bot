@@ -44,3 +44,6 @@ jspm_packages
 .logs_errors.log
 errors
 logs
+
+# ds_store
+.DS_Store
