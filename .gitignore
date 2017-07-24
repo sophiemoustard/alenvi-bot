@@ -47,3 +47,6 @@ logs
 
 # ds_store
 .DS_Store
+
+# google api json
+client_secret.json
