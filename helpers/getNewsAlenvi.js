@@ -13,7 +13,7 @@ exports.getNewsAlenvi = () => {
     // authenticate request
     jwtClient.authorize((err) => {
       if (err) {
-        return console.log(err);
+        reject(err);
       }
       console.log('Successfully connected to Google Drive API !');
     });
