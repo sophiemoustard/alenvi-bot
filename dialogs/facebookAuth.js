@@ -18,7 +18,7 @@ exports.login = (session) => {
           image_aspect_ratio: 'square',
           elements: [{
             title: 'Authentification avec identifiants Alenvi',
-            image_url: `${process.env.WEBSITE_HOSTNAME}/images/Pigi.png`,
+            image_url: 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png',
             buttons: [{
               type: 'account_link',
               url: uri
