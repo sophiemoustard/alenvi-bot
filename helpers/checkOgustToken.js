@@ -1,12 +1,18 @@
 const moment = require('moment-timezone');
+const jwt = require('jsonwebtoken');
 const token = require('../models/Ogust/token');
-const {checkUserData} = require('./checkUserData');
+const { checkUserData } = require('./checkUserData');
+const { tokenConfig } = require('./../config/config');
 
 const addTokenToSession = async (session) => {
   console.log('Get a new token...');
-  const getToken = await token.getToken();
+  const payload = {
+    _id: session.userData.alenvi._id
+  };
+  const getToken = await token.getToken(jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn }));
+  console.log(getToken.body.data.token);
   const currentDate = moment().tz('Europe/Paris');
-  session.userData.ogust.tokenConfig.token = getToken.body.token;
+  session.userData.ogust.tokenConfig.token = getToken.body.data.token;
   // Add an expiration time of 9 minuts (Ogust token validity = 10 min)
   session.userData.ogust.tokenConfig.expireDate = currentDate.add(9, 'm');
 };
