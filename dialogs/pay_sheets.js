@@ -5,17 +5,20 @@ const moment = require('moment-timezone');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
-const salaries = require('../models/Ogust/salaries');
+const employees = require('../models/Ogust/employees');
 
 // =========================================================
 // Pay sheets dialog
 // =========================================================
 
 const getCardsAttachments = async (session) => {
-  const mySalariesRaw = await salaries.getSalariesByEmployeeId(
+  const mySalariesRaw = await employees.getSalaries(
     session.userData.ogust.tokenConfig.token,
     session.userData.alenvi.employee_id, { nbPerPage: 24, pageNum: 1 });
-  const mySalaries = mySalariesRaw.body.array_salary.result;
+  const mySalaries = mySalariesRaw.body.data.salaries.array_salary.result;
+  if (Object.keys(mySalaries).length == 0) {
+    session.endDialog(`Tu n'as pour le moment aucun bulletin de salaire !`);
+  }
   const cards = [];
   moment.locale('fr');
   for (const k in mySalaries) {
