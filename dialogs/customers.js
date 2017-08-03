@@ -2,8 +2,8 @@ const builder = require('botbuilder');
 const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const customersHelper = require('../helpers/customers');
 const customers = require('./../models/Ogust/customers');
+const employees = require('./../models/Ogust/employees');
 
 const formatPerson = async (customer) => {
   let person = {};
@@ -32,24 +32,25 @@ const formatText = async (customer) => {
 
 const getCardsAttachments = async (session) => {
   const myCards = [];
-  const myRawCustomers = await customersHelper.getCustomers(session, session.userData.alenvi.employee_id);
-  for (const k in myRawCustomers) {
-    if (myRawCustomers[k].id_customer != '286871430') {
-      const encoded = encodeURI(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip}`);
-      const person = await formatPerson(myRawCustomers[k]);
-      const text = await formatText(myRawCustomers[k]);
+  const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
+  const myCustomers = myRawCustomers.body.data.customers;
+  for (const k in myCustomers) {
+    if (myCustomers[k].id_customer != '286871430') {
+      const encoded = encodeURI(`${myCustomers[k].main_address.line} ${myCustomers[k].main_address.zip}`);
+      const person = await formatPerson(myCustomers[k]);
+      const text = await formatText(myCustomers[k]);
       myCards.push(
         new builder.HeroCard(session)
           .title(person)
-          // .subtitle(`${myRawCustomers[k].main_address.line} ${myRawCustomers[k].main_address.zip} ${myRawCustomers[k].main_address.city}`)
+          // .subtitle(`${myCustomers[k].main_address.line} ${myCustomers[k].main_address.zip} ${myCustomers[k].main_address.city}`)
           .text(text)
           .images([
             builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
           ])
           .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
           .buttons([
-            // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].comment, 'Plus de détails...')
-            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myRawCustomers[k].id_customer, 'Plus de détails...')
+            // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].comment, 'Plus de détails...')
+            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].id_customer, 'Plus de détails...')
           ])
       );
     }
@@ -63,8 +64,8 @@ exports.moreDetails = async (session, args) => {
     session.sendTyping();
     await checkOgustToken(session);
     if (args.data) {
-      const myRawCustomers = await customersHelper.getCustomers(session, session.userData.alenvi.employee_id);
-      const customerById = _.find(myRawCustomers, customer => customer.id_customer === args.data);
+      const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
+      const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
       let customerContactDetails = [];
       const customerDetailsTitles = {
         customerContactDetails: 'Coordonnées bénéficiaire',
@@ -84,8 +85,8 @@ exports.moreDetails = async (session, args) => {
       if (!customerContactDetails.length) {
         customerContactDetails = '';
       }
-      const thirdPartyInfoRaw = await customers.getThirdPartyInformationsByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, { nbPerPage: 10, pageNum: 1 });
-      const thirdPartyInfo = thirdPartyInfoRaw.body.thirdPartyInformations.array_values || {};
+      const thirdPartyInfoRaw = await customers.getThirdPartyInformationByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, 'C', { nbPerPage: 10, pageNum: 1 });
+      const thirdPartyInfo = thirdPartyInfoRaw.body.data.info.thirdPartyInformations.array_values || {};
       const customerDetails = {};
       customerDetails.customerContactDetails = customerContactDetails;
       customerDetails.customerComments = customerComments;

@@ -3,7 +3,7 @@ const builder = require('botbuilder');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const { getTeamBySector } = require('../helpers/team');
 const { formatPromptListPersons } = require('../helpers/planning/format');
-const { getCustomers } = require('./../helpers/customers');
+const { getCustomers } = require('./../models/Ogust/employees');
 
 const whichPerson = async (session, args) => {
   try {
@@ -15,7 +15,11 @@ const whichPerson = async (session, args) => {
     session.sendTyping();
     switch (args.personType) {
       case 'Customer':
-        myRawPersons = await getCustomers(session, session.userData.alenvi.employee_id);
+        myRawPersons = await getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
+        myRawPersons = myRawPersons.body.data.customers;
+        if (myRawPersons.length == 0) {
+          return session.endDialog(`Il semble que tu n'aies pas encore de bénéficiaire !`);
+        }
         personTypeId = 'id_customer';
         promptMsg = 'Quel(le) bénéficiaire précisément ?';
         break;
