@@ -110,16 +110,45 @@ exports.moreDetails = async (session, args) => {
       if (title === '' && text === '') {
         session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
-      const msg = new builder.Message(session);
-      msg
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments([
-          new builder.HeroCard(session)
-            .title('Modification fiche')
-            .buttons([
-              builder.CardAction.openUrl(session, `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${encodeURIComponent(customerById.id_customer)}`, 'Modification...')
-            ])
-        ]);
+      // const msg = new builder.Message(session);
+      // msg
+      //   .attachmentLayout(builder.AttachmentLayout.carousel)
+      //   .attachments([
+      //     new builder.HeroCard(session)
+      //       .title('Modification fiche')
+      //       .buttons([
+      //         // builder.CardAction.openUrl(session, `http://localhost:3000/api/ogust/customers/${customerById.id_customer}/moreInfo?_id=${session.userData.alenvi._id}`, 'Modification...')
+      //         builder.CardAction.openUrl(session, `http://localhost:3000/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}`, 'Modification...')
+      //       ])
+      //   ]);
+      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}`;
+      const msg = new builder.Message(session).sourceEvent({
+        facebook: {
+          attachment: {
+            type: 'template',
+            payload: {
+              template_type: 'generic',
+              image_aspect_ratio: 'square',
+              elements: [{
+                title: 'Modification fiche',
+                default_action: {
+                  type: 'web_url',
+                  url: uri,
+                  messenger_extensions: true,
+                  webview_height_ratio: 'tall',
+                },
+                buttons: [{
+                  type: 'web_url',
+                  url: uri,
+                  title: 'Modification...',
+                  webview_height_ratio: 'full',
+                  messenger_extensions: true,
+                }],
+              }]
+            }
+          }
+        }
+      });
       session.endDialog(msg);
     } else {
       throw new Error('id_customer empty');
