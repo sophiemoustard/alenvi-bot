@@ -3,7 +3,7 @@ const builder = require('botbuilder');
 const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-const customers = require('../helpers/customers');
+const employees = require('../models/Ogust/employees');
 const planning = require('../helpers/planning/format');
 const slack = require('../models/Slack/planning');
 
@@ -47,8 +47,8 @@ const whichCustomer = async (session) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const myCustomersRaw = await customers.getCustomers(session, session.userData.alenvi.employee_id);
-    const myCustomers = await planning.formatPromptListPersons(session, myCustomersRaw, 'id_customer');
+    const myCustomersRaw = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
+    const myCustomers = await planning.formatPromptListPersons(session, myCustomersRaw.body.data.customers, 'id_customer');
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomers, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
