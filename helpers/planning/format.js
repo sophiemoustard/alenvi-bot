@@ -19,15 +19,15 @@ exports.formatServicesPerPeriod = async (session, sortedServicesByDate) => {
         session.userData.ogust.tokenConfig.token,
         sortedServicesByDate[i].id_employee,
         { nbPerPage: 1, pageNum: 1 });
-      firstName = personRaw.body.employee.first_name ? `${personRaw.body.employee.first_name} ` : '';
-      lastName = `${personRaw.body.employee.last_name.substring(0, 1)}. `;
+      firstName = personRaw.body.data.user.employee.first_name ? `${personRaw.body.data.user.employee.first_name} ` : '';
+      lastName = `${personRaw.body.data.user.employee.last_name.substring(0, 1)}. `;
     } else {
       personRaw = await customers.getCustomerByCustomerId(
         session.userData.ogust.tokenConfig.token,
         sortedServicesByDate[i].id_customer,
         { nbPerPage: 1, pageNum: 1 });
-      firstName = personRaw.body.customer.first_name ? `${personRaw.body.customer.first_name.substring(0, 1)}. ` : '';
-      lastName = personRaw.body.customer.last_name;
+      firstName = personRaw.body.data.user.customer.first_name ? `${personRaw.body.data.user.customer.first_name.substring(0, 1)}. ` : '';
+      lastName = personRaw.body.data.user.customer.last_name;
     }
     // Then push all the interventions well displayed (without carriage return yet)
     if (session.dialogData.periodChosen.name == 'PerWeek' || session.dialogData.periodChosen.name == 'PerMonth') {

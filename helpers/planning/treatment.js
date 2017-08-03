@@ -1,8 +1,7 @@
 const moment = require('moment-timezone');
 const _ = require('lodash');
 
-const employee = require('../../models/Ogust/employees');
-const services = require('../../models/Ogust/services');
+const employees = require('../../models/Ogust/employees');
 const customers = require('../../models/Ogust/customers');
 
 const { getTeamBySector } = require('../team');
@@ -29,7 +28,14 @@ const getCommunityWorkingHoursByDay = async (session, dateOgust) => {
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
       // Get all interventions for an employee
-      const employeePlanningByDayRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, employeeId, dateOgust, { nbPerPage: 20, pageNum: 1 });
+      const employeePlanningByDayRaw = await employees.getServices(
+        session.userData.ogust.tokenConfig.token,
+        employeeId,
+        'false', 'true', '', '', '',
+        `${dateOgust.periodStart}0000`, `${dateOgust.periodEnd}2359`,
+        '', '',
+        { nbPerPage: 20, pageNum: 1 }
+      );
       const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
       // Create the object to return
       if (employeePlanningByDay) {
@@ -70,11 +76,32 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
     // Get all services of an employee by day the user chose from prompt
     // employee_id = 249180689 for testing (Aurélie) or session.userData.alenvi.employee_id in prod
     if (session.dialogData.personType == 'Customer') {
-      servicesRaw = await services.getServicesByCustomerIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
+      servicesRaw = await customers.getServices(
+        session.userData.ogust.tokenConfig.token,
+        session.dialogData.personChosen.customer_id,
+        'false', 'true', '', '', '',
+        `${dateOgust.periodStart}0000`, `${dateOgust.periodEnd}2359`,
+        '', '',
+        { nbPerPage: 100, pageNum: 1 }
+      );
     } else if (session.dialogData.personType == 'Self') {
-      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
+      servicesRaw = await employees.getServices(
+        session.userData.ogust.tokenConfig.token,
+        session.userData.alenvi.employee_id,
+        'false', 'true', '', '', '',
+        `${dateOgust.periodStart}0000`, `${dateOgust.periodEnd}2359`,
+        '', '',
+        { nbPerPage: 100, pageNum: 1 }
+      );
     } else if (session.dialogData.personType == 'Auxiliary') {
-      servicesRaw = await services.getServicesByEmployeeIdAndDate(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, dateOgust, { nbPerPage: 100, pageNum: 1 });
+      servicesRaw = await employees.getServices(
+        session.userData.ogust.tokenConfig.token,
+        session.dialogData.personChosen.employee_id,
+        'false', 'true', '', '', '',
+        `${dateOgust.periodStart}0000`, `${dateOgust.periodEnd}2359`,
+        '', '',
+        { nbPerPage: 100, pageNum: 1 }
+      );
     } else if (session.dialogData.personType == 'Community') {
       communityWorkingHoursRaw = await getCommunityWorkingHoursByDay(session, dateOgust);
       if (Object.keys(communityWorkingHoursRaw) === 0) {
@@ -82,7 +109,8 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
       }
     }
     if (session.dialogData.personType == 'Self' || session.dialogData.personType == 'Auxiliary' || session.dialogData.personType == 'Customer') {
-      const servicesUnsorted = servicesRaw.body.array_service.result;
+      console.log(servicesRaw.body.data);
+      const servicesUnsorted = servicesRaw.body.data.servicesRaw.array_service.result;
       if (Object.keys(servicesUnsorted).length === 0) {
         return session.endDialog('Aucune intervention ce jour-là ! :)');
       }
@@ -93,10 +121,10 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
       session.send(`📅 Interventions le ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Customer') {
       const person = await customers.getCustomerByCustomerId(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.customer_id, { nbPerPage: 1, pageNum: 1 });
-      session.send(`📅 Interventions chez ${person.body.customer.title} ${person.body.customer.last_name} - ${results.response.entity}  \n${servicesToDisplay}`);
+      session.send(`📅 Interventions chez ${person.body.data.user.customer.title} ${person.body.data.user.customer.last_name} - ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Auxiliary') {
-      const person = await employee.getEmployeeById(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, { nbPerPage: 1, pageNum: 1 });
-      session.send(`📅 Interventions de ${person.body.employee.first_name} - ${results.response.entity}  \n${servicesToDisplay}`);
+      const person = await employees.getEmployeeById(session.userData.ogust.tokenConfig.token, session.dialogData.personChosen.employee_id, { nbPerPage: 1, pageNum: 1 });
+      session.send(`📅 Interventions de ${person.body.data.user.employee.first_name} - ${results.response.entity}  \n${servicesToDisplay}`);
     } else if (session.dialogData.personType == 'Community') {
       const workingHoursToDisplay = await format.formatCommunityWorkingHours(communityWorkingHoursRaw);
       session.send(`📅 Voici les créneaux horaires sur lesquels tes collègues travaillent le ${results.response.entity}  \n${workingHoursToDisplay}`);

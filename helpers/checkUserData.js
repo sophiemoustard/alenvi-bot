@@ -36,11 +36,8 @@ exports.checkUserData = async (session) => {
     session.userData.alenvi.employee_id,
     { nbPerPage: 1, pageNum: 1 }
   );
-  if (userDataOgustRaw.body.status === 'KO') {
-    throw new Error(`Error while checking user data: ${userDataOgustRaw.body.message}`);
-  }
   // console.log(userDataRaw);
-  const userDataOgust = userDataOgustRaw.body.employee;
+  const userDataOgust = userDataOgustRaw.body.data.user.employee;
   if (Object.keys(userDataOgust).length === 0) {
     session.send(`Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)`);
     delete session.userData.alenvi;

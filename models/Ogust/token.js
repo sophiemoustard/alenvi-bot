@@ -16,8 +16,8 @@ exports.getToken = async (token) => {
     resolveWithFullResponse: true,
     time: true,
   });
-  if (res.body.status == 'KO') {
-    throw new Error(`Error while getting employees: ${res.body.message}`);
+  if (res.body.success == false) {
+    throw new Error(`Error while getting token: ${res.body.message}`);
   }
   return res;
 };
