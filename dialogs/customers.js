@@ -21,10 +21,10 @@ const formatText = async (customer) => {
   text.push(`${customer.main_address.line}`);
   text.push(`${customer.main_address.zip} ${customer.main_address.city}`);
   if (customer.door_code) {
-    text.push(`Code Porte: ${customer.door_code}`);
+    text.push(`Porte: ${customer.door_code}`);
   }
   if (customer.intercom_code) {
-    text.push(`Code Interphone: ${customer.intercom_code}`);
+    text.push(`Interphone: ${customer.intercom_code}`);
   }
   textToDisplay = text.join('  \n');
   return textToDisplay;

@@ -8,9 +8,9 @@ const getAlenviUserById = async (id) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  const res = await rp.post(options);
+  const res = await rp.get(options);
   if (res.body.success == false) {
-    throw new Error(`Error while refreshing infos from Alenvi: ${res.body.msg}`);
+    throw new Error(`Error while refreshing infos from Alenvi: ${res.body.message}`);
   }
   return res;
 };
@@ -44,7 +44,9 @@ exports.checkUserData = async (session) => {
     delete session.userData.ogust;
     session.replaceDialog('/logout_facebook');
   }
+  console.log('TEST');
   const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
+  console.log('TEST2');
   const userDataAlenvi = userDataAlenviRaw.body;
   if (userDataOgust.id_customer) {
     session.userData.alenvi.customer_id = userDataOgust.id_customer;
