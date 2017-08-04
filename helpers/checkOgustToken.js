@@ -10,7 +10,6 @@ const addTokenToSession = async (session) => {
     _id: session.userData.alenvi._id
   };
   const getToken = await token.getToken(jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn }));
-  console.log(getToken.body.data.token);
   const currentDate = moment().tz('Europe/Paris');
   session.userData.ogust.tokenConfig.token = getToken.body.data.token;
   // Add an expiration time of 9 minuts (Ogust token validity = 10 min)
