@@ -122,7 +122,7 @@ exports.moreDetails = async (session, args) => {
       //         builder.CardAction.openUrl(session, `http://localhost:3000/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}`, 'Modification...')
       //       ])
       //   ]);
-      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&address=${encodeURI(JSON.stringify(session.message.address))}`;
+      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=286871430&_id=${session.userData.alenvi._id}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       console.log(uri);
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
@@ -138,13 +138,15 @@ exports.moreDetails = async (session, args) => {
                   url: uri,
                   messenger_extensions: true,
                   webview_height_ratio: 'tall',
+                  webview_share_button: 'hide'
                 },
                 buttons: [{
                   type: 'web_url',
                   url: uri,
                   title: 'Modification...',
                   webview_height_ratio: 'full',
-                  messenger_extensions: true,
+                  webview_share_button: 'hide',
+                  messenger_extensions: true
                 }],
               }]
             }
