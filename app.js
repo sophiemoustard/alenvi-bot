@@ -67,7 +67,19 @@ bot.use({
   }
 });
 
+const resume = (encodedAddress) => {
+  const stringAddress = decodeURIComponent(encodedAddress);
+  const address = JSON.parse(stringAddress);
+  const msg = new builder.Message().address(address).text('Modification effectué');
+  bot.send(msg.toMessage());
+};
+
 app.post('/api/messages', connector.listen());
+app.get('/editCustomerDone', (req, res) => {
+  console.log('Customer edit done.');
+  resume(req.query.address);
+  res.end('<html><body>Modification OK. La fenêtre va se fermer.</body></html>');
+});
 
 // const facebookConfig = {
 //   clientID: process.env.FACEBOOK_APP_ID || '977382919031323',
