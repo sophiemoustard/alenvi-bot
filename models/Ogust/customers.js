@@ -29,7 +29,6 @@ exports.getCustomerByCustomerId = async (token, id, pageOption) => {
 };
 
 exports.getThirdPartyInformationByCustomerId = async (token, id, thirdParty, pageOption) => {
-  console.log('I WENT IN CUSTOMER MORE INFO BITCH');
   const options = {
     url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/customers/${id}/moreInfo`,
     json: true,

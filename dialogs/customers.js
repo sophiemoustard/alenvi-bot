@@ -69,13 +69,11 @@ exports.moreDetails = async (session, args) => {
       let customerContactDetails = [];
       const customerDetailsTitles = {
         customerContactDetails: 'Coordonnées bénéficiaire',
-        customerComments: 'Commentaires bénéficiaire',
         pathology: 'Pathologie',
         pathologyComment: 'Commentaires',
         interventionDetails: 'Détails intervention',
         miscComments: 'Autres'
       };
-      const customerComments = customerById.comment || '';
       if (customerById.landline) {
         customerContactDetails.push(customerById.landline);
       }
@@ -89,8 +87,7 @@ exports.moreDetails = async (session, args) => {
       const thirdPartyInfo = thirdPartyInfoRaw.body.data.info.thirdPartyInformations.array_values || {};
       const customerDetails = {};
       customerDetails.customerContactDetails = customerContactDetails;
-      customerDetails.customerComments = customerComments;
-      customerDetails.pathology = thirdPartyInfo.NIVEAU === '-' ? customerDetails.pathology : '';
+      customerDetails.pathology = thirdPartyInfo.NIVEAU;
       customerDetails.pathologyComment = thirdPartyInfo.COMMNIV || '';
       customerDetails.interventionDetails = thirdPartyInfo.DETAILEVE || '';
       customerDetails.miscComments = thirdPartyInfo.AUTRESCOMM || '';
@@ -111,19 +108,7 @@ exports.moreDetails = async (session, args) => {
       if (title === '' && text === '') {
         session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
-      // const msg = new builder.Message(session);
-      // msg
-      //   .attachmentLayout(builder.AttachmentLayout.carousel)
-      //   .attachments([
-      //     new builder.HeroCard(session)
-      //       .title('Modification fiche')
-      //       .buttons([
-      //         // builder.CardAction.openUrl(session, `http://localhost:3000/api/ogust/customers/${customerById.id_customer}/moreInfo?_id=${session.userData.alenvi._id}`, 'Modification...')
-      //         builder.CardAction.openUrl(session, `http://localhost:3000/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}`, 'Modification...')
-      //       ])
-      //   ]);
       const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
-      console.log(uri);
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
           attachment: {
