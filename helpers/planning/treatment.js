@@ -109,7 +109,6 @@ exports.getPlanningByPeriodChosen = async (session, results) => {
       }
     }
     if (session.dialogData.personType == 'Self' || session.dialogData.personType == 'Auxiliary' || session.dialogData.personType == 'Customer') {
-      console.log(servicesRaw.body.data);
       const servicesUnsorted = servicesRaw.body.data.servicesRaw.array_service.result;
       if (Object.keys(servicesUnsorted).length === 0) {
         return session.endDialog('Aucune intervention ce jour-là ! :)');

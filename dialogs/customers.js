@@ -68,7 +68,6 @@ exports.moreDetails = async (session, args) => {
     if (args.data) {
       const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
-      console.log(customerById);
       let customerContactDetails = [];
       const customerDetailsTitles = {
         customerContactDetails: 'Coordonnées bénéficiaire',
@@ -132,7 +131,7 @@ exports.moreDetails = async (session, args) => {
                 buttons: [{
                   type: 'web_url',
                   url: uri,
-                  title: '📝 Modification',
+                  title: '📝  Modification',
                   webview_height_ratio: 'full',
                   webview_share_button: 'hide',
                   messenger_extensions: true

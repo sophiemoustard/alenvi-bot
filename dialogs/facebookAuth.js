@@ -7,7 +7,6 @@ const rp = require('request-promise');
 const config = require('../config');
 
 exports.login = (session) => {
-  console.log('WENT IN LOGIN');
   const uri = `${process.env.WEBSITE_HOSTNAME}/api/bot/facebook/account_linking`;// 'https://f388f055.ngrok.io/api/bot/facebook/account_linking';
   const message = new builder.Message(session).sourceEvent({
     facebook: {
@@ -32,7 +31,6 @@ exports.login = (session) => {
 };
 
 exports.logout = async (session) => {
-  console.log('WENT IN LOGOUT');
   try {
     const options = {
       url: 'https://graph.facebook.com/v2.6/me/unlink_accounts',
