@@ -1,5 +1,7 @@
 const builder = require('botbuilder');
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
+const { tokenConfig } = require('./../config/config');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const customers = require('./../models/Ogust/customers');
@@ -109,7 +111,8 @@ exports.moreDetails = async (session, args) => {
       if (title === '' && text === '') {
         session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
-      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
+      const accessToken = jwt.sign(session.userData.alenvi._id, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&access-token=${accessToken}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
           attachment: {
