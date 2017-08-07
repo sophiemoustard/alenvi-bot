@@ -22,9 +22,7 @@ const whichDeclaration = async (session) => {
 
 const redirectToDeclarationSelected = (session, results) => {
   if (results.response) {
-    console.log(results.response);
     if (session.userData.alenvi) {
-      console.log(results.response);
       switch (results.response.entity) {
         case 'Heures internes':
           session.replaceDialog('/ask_for_request');

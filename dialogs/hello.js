@@ -6,7 +6,6 @@ const builder = require('botbuilder');
 
 exports.hello_first = [
   (session) => {
-    console.log('WENT IN HELLO_FIRST');
     session.sendTyping();
     session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
     session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier grâce aux identifiants fournis par Alenvi, pour que je puisse te reconnaître ?");
@@ -15,16 +14,13 @@ exports.hello_first = [
 ];
 
 const rootGreetingMenu = (session) => {
-  console.log('WENT IN HELLO > MENU');
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE', { maxRetries: 0 });
 };
 
 const redirectMenuResult = (session, results) => {
-  console.log('WENT IN HELLO > REDIRECTMENURESULT');
   if (results.response) {
     if (session.userData.alenvi) {
-      console.log(results.response);
       switch (results.response.entity) {
         case 'Consulter planning':
           session.replaceDialog('/select_show_planning');

@@ -66,7 +66,6 @@ exports.moreDetails = async (session, args) => {
     if (args.data) {
       const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
-      console.log(customerById);
       let customerContactDetails = [];
       const customerDetailsTitles = {
         customerContactDetails: 'Coordonnées bénéficiaire',
