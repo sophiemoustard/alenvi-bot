@@ -83,7 +83,6 @@ exports.formatCommunityWorkingHours = async (workingHours) => {
     const obj = workingHours[k];
     let planningToAdd = `${obj.first_name} ${obj.last_name}:  \n`;
     for (let i = 0; i < obj.interventions.length; i++) {
-      console.log(obj.interventions[i]);
       if (obj.interventions[i].start_date && obj.interventions[i].end_date) {
         planningToAdd += `${obj.interventions[i].start_date} - ${obj.interventions[i].end_date}  \n`;
       }
