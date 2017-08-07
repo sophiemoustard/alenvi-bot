@@ -128,7 +128,7 @@ exports.moreDetails = async (session, args) => {
                 buttons: [{
                   type: 'web_url',
                   url: uri,
-                  title: '📝 Modification',
+                  title: '📝  Modification',
                   webview_height_ratio: 'full',
                   webview_share_button: 'hide',
                   messenger_extensions: true
