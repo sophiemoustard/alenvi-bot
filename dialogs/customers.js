@@ -110,7 +110,10 @@ exports.moreDetails = async (session, args) => {
       if (title === '' && text === '') {
         session.send('Le bénéficiaire ne possède pas plus de détails.');
       }
-      const accessToken = jwt.sign(session.userData.alenvi._id, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
+      const payload = {
+        _id: session.userData.alenvi._id
+      };
+      const accessToken = jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
       const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomer.html?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&access-token=${accessToken}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
