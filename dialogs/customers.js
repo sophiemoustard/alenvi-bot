@@ -118,13 +118,13 @@ exports.moreDetails = async (session, args) => {
               image_aspect_ratio: 'square',
               elements: [{
                 title: 'Modification fiche',
-                default_action: {
-                  type: 'web_url',
-                  url: uri,
-                  messenger_extensions: true,
-                  webview_height_ratio: 'tall',
-                  webview_share_button: 'hide'
-                },
+                // default_action: {
+                //   type: 'web_url',
+                //   url: uri,
+                //   messenger_extensions: true,
+                //   webview_height_ratio: 'tall',
+                //   webview_share_button: 'hide'
+                // },
                 buttons: [{
                   type: 'web_url',
                   url: uri,
