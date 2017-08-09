@@ -79,6 +79,7 @@ app.post('/api/messages', connector.listen());
 app.get('/editCustomerDone', (req, res) => {
   console.log('Customer edit done.');
   resume(req.query.address);
+  res.status(200).send('Customer edit done');
 });
 
 // const facebookConfig = {
