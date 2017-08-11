@@ -36,7 +36,7 @@ const getCommunityWorkingHoursByDay = async (session, dateOgust) => {
         '', '',
         { nbPerPage: 20, pageNum: 1 }
       );
-      const employeePlanningByDay = employeePlanningByDayRaw.body.array_service.result;
+      const employeePlanningByDay = employeePlanningByDayRaw.body.data.servicesRaw.array_service.result;
       // Create the object to return
       if (employeePlanningByDay) {
         workingHours[employeeId] = {};
