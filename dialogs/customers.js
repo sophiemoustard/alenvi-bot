@@ -165,6 +165,9 @@ const showMyCustomers = async (session) => {
     session.endDialog(message);
   } catch (err) {
     console.error(err);
+    if (err.statusCode === 404) {
+      return session.endDialog("Il semble que tu n'aies aucune intervention de prévues d'ici 2 semaines !");
+    }
     return session.endDialog("Oh non, je n'ai pas réussi à récupérer tes bénéficiaires :/ Si le problème persiste, essaie de contacter un administrateur !");
   }
 };
