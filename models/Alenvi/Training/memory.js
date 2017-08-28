@@ -44,6 +44,7 @@ exports.memVideosList = [
     title: "La maladie d'Alzheimer et sa prise en charge",
     image_link: cloudinary.url('images/bot/formation/memoires/movie_6.png'),
     show_link: 'https://vimeo.com/224495770/03cf53a02c',
+    script_link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHd3pxcElWOUdpZVk',
     questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSe6U8HazD3KqPTduIvUxWnkoyfuyqNGJVNtuzcSyS6jxzpQlQ/viewform'
   }
 ];
