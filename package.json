@@ -31,7 +31,8 @@
     "path": "^0.12.7",
     "request": "^2.81.0",
     "request-promise": "^4.2.0",
-    "restify": "^4.3.0"
+    "restify": "^4.3.0",
+    "twilio": "^3.6.4"
   },
   "devDependencies": {
     "eslint": "^4.0.0",

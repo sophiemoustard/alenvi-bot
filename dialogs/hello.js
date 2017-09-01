@@ -15,7 +15,11 @@ exports.hello_first = [
 
 const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
-  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE', { maxRetries: 0 });
+  if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
+  } else {
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE', { maxRetries: 0 });
+  }
 };
 
 const redirectMenuResult = (session, results) => {
@@ -42,6 +46,9 @@ const redirectMenuResult = (session, results) => {
           break;
         case 'URGENCE':
           session.replaceDialog('/show_emergency');
+          break;
+        case 'Accueil aux.':
+          session.replaceDialog('/ask_phone_nbr');
           break;
       }
     }
