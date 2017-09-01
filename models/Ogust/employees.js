@@ -6,17 +6,19 @@ const rp = require('request-promise');
 ** - token: token after login
 ** Method: GET
 */
-exports.getEmployees = async (token, pageOption) => {
+exports.getEmployees = async (params) => {
+  console.log(params);
   const options = {
     url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees`,
     json: true,
     headers: {
-      'x-ogust-token': token
+      'x-ogust-token': params.token
     },
     qs: {
-      nbperpage: pageOption.nbPerPage,
-      pagenum: pageOption.pageNum,
-      status: 'A'
+      nbperpage: params.nbPerPage,
+      pagenum: params.pageNum,
+      status: params.status || 'A',
+      mobile_phone: params.mobile_phone
     },
     resolveWithFullResponse: true,
     time: true,

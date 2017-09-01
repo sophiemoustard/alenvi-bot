@@ -213,6 +213,8 @@ bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
 bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 
+bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
+
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // =========================================================
