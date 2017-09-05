@@ -3,7 +3,7 @@ const employee = require('../models/Ogust/employees');
 
 const getAlenviUserById = async (id) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/bot/user/${id}`,
+    url: `${process.env.API_HOSTNAME}/bot/user/${id}`,
     json: true,
     resolveWithFullResponse: true,
     time: true,
