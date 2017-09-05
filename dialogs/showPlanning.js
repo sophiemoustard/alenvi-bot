@@ -14,7 +14,8 @@ const redirectToDaySelected = (session, results) => {
     if (session.userData.alenvi) {
       switch (results.response.entity) {
         case 'Le mien':
-          session.replaceDialog('/which_person', { personType: 'Self' });
+          // session.replaceDialog('/which_person', { personType: 'Self' });
+          session.replaceDialog('/display_calendar');
           break;
         case 'Un(e) auxiliaire':
           session.replaceDialog('/which_person', { personType: 'Auxiliary' });
