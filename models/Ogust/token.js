@@ -8,7 +8,7 @@ const rp = require('request-promise');
 */
 exports.getToken = async (token) => {
   const res = await rp.get({
-    uri: `${process.env.WEBSITE_HOSTNAME}/api/ogust/token`,
+    uri: `${process.env.API_HOSTNAME}/ogust/token`,
     headers: {
       'x-access-token': token
     },

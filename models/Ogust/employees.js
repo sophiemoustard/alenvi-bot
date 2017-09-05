@@ -9,7 +9,7 @@ const rp = require('request-promise');
 exports.getEmployees = async (params) => {
   console.log(params);
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees`,
     json: true,
     headers: {
       'x-ogust-token': params.token
@@ -39,7 +39,7 @@ exports.getEmployees = async (params) => {
 */
 exports.getEmployeeById = async (token, id, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees/${id}`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -71,7 +71,7 @@ exports.getEmployeeById = async (token, id, pageOption) => {
 */
 exports.getEmployeesBySector = async (token, sector, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees/sector/${sector}`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/sector/${sector}`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -94,7 +94,7 @@ exports.getEmployeesBySector = async (token, sector, pageOption) => {
 
 exports.getCustomers = async (token, id) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees/${id}/customers`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/customers`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -122,7 +122,7 @@ exports.getCustomers = async (token, id) => {
 */
 exports.getSalaries = async (token, id, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees/${id}/salaries`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/salaries`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -163,7 +163,7 @@ exports.getSalaries = async (token, id, pageOption) => {
 */
 exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/employees/${id}/services/`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/services/`,
     json: true,
     headers: {
       'x-ogust-token': token
