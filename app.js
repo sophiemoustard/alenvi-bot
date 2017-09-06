@@ -79,7 +79,7 @@ app.post('/api/messages', connector.listen());
 app.get('/editCustomerDone', (req, res) => {
   console.log('Customer edit done.');
   resume(req.query.address);
-  res.json('Modification effectuée. La fenêtre va se fermer');
+  res.status(200).send('Customer edit done');
 });
 
 // const facebookConfig = {
@@ -189,6 +189,7 @@ bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
 bot.dialog('/which_person', require('./dialogs/whichPerson').whichPerson);
 bot.dialog('/which_period', require('./dialogs/whichPeriod').whichPeriod);
 bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPeriodUnit);
+bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCalendar);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
@@ -212,6 +213,8 @@ bot.dialog('/training_choice', require('./dialogs/trainingChoice').trainingChoic
 bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
 bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
+
+bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
