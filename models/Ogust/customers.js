@@ -9,7 +9,7 @@ const rp = require('request-promise');
 */
 exports.getCustomerByCustomerId = async (token, id, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/customers/${id}`,
+    url: `${process.env.API_HOSTNAME}/ogust/customers/${id}`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -30,7 +30,7 @@ exports.getCustomerByCustomerId = async (token, id, pageOption) => {
 
 exports.getThirdPartyInformationByCustomerId = async (token, id, thirdParty, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/customers/${id}/moreInfo`,
+    url: `${process.env.API_HOSTNAME}/ogust/customers/${id}/moreInfo`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -52,7 +52,7 @@ exports.getThirdPartyInformationByCustomerId = async (token, id, thirdParty, pag
 
 exports.editThirdPartyInformationByCustomerId = async (token, id, thirdParty, arrayValues) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/customers/${id}/moreInfo`,
+    url: `${process.env.API_HOSTNAME}/ogust/customers/${id}/moreInfo`,
     json: true,
     headers: {
       'x-ogust-token': token
@@ -94,7 +94,7 @@ exports.editThirdPartyInformationByCustomerId = async (token, id, thirdParty, ar
 */
 exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, pageOption) => {
   const options = {
-    url: `${process.env.WEBSITE_HOSTNAME}/api/ogust/customers/${id}/services/`,
+    url: `${process.env.API_HOSTNAME}/ogust/customers/${id}/services/`,
     json: true,
     headers: {
       'x-ogust-token': token
