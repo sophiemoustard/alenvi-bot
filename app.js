@@ -1,6 +1,5 @@
 require('dotenv').config();
 const path = require('path');
-const cors = require('cors');
 // const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
 // const _ = require('lodash');
@@ -25,7 +24,7 @@ const restify = require('restify');
 const app = restify.createServer();
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
-app.use(cors());
+
 // =========================================================
 // Bot Setup
 // =========================================================
