@@ -4,17 +4,36 @@ const { tokenConfig } = require('./../config/config');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
-const getCardsAttachments = async (session) => {
+const getCardsAttachments = async (session, args) => {
+  if (!args) {
+    throw new Error('No personType and/or personChosen');
+  }
+  let employeeId = '';
+  let customerId = '';
+  let title;
+  console.log(args.personChosen);
+  switch (args.personType) {
+    case 'Self':
+      employeeId = session.userData.alenvi.employee_id;
+      title = 'Consulter mon planning';
+      break;
+    case 'Auxiliary':
+      employeeId = args.personChosen.employee_id;
+      title = 'Consulter son planning';
+      break;
+    case 'Customer':
+      customerId = args.personChosen.customer_id;
+      title = 'Consulter son planning';
+  }
   const myCards = [];
   const payload = {
     _id: session.userData.alenvi._id
   };
-  const employeeId = session.userData.alenvi.employee_id;
   const accessToken = jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
-  const url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_person=${employeeId}&access_token=${accessToken}`;
+  const url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&id_employee=${employeeId}&access_token=${accessToken}`;
   myCards.push(
     new builder.HeroCard(session)
-      .title('Consulter mon planning')
+      .title(title)
       .buttons([
         builder.CardAction.openUrl(session, url, '📅  Consulter')
       ])
@@ -22,11 +41,11 @@ const getCardsAttachments = async (session) => {
   return myCards;
 };
 
-const displayCalendar = async (session) => {
+const displayCalendar = async (session, args) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const cards = await getCardsAttachments(session);
+    const cards = await getCardsAttachments(session, args);
     const message = new builder.Message(session)
       .attachmentLayout(builder.AttachmentLayout.carousel)
       .attachments(cards);
