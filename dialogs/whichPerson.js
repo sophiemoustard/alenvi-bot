@@ -52,7 +52,8 @@ const redirectToWhichPeriod = (session, results) => {
         personChosen: session.dialogData.myPersons[results.response.entity],
         personType: session.dialogData.personType
       };
-      return session.replaceDialog('/which_period', params);
+      return session.replaceDialog('/display_calendar', params);
+      // return session.replaceDialog('/which_period', params);
     }
   } else {
     session.cancelDialog(0, '/not_understand');

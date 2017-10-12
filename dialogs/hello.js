@@ -3,6 +3,7 @@
 // =========================================================
 
 const builder = require('botbuilder');
+// const BotMetrics = require('botmetrics');
 
 exports.hello_first = [
   (session) => {
@@ -13,8 +14,26 @@ exports.hello_first = [
   }
 ];
 
+// const whichCommunity = (session, role, sector) => {
+//   if (role === 'admin' || role == 'coach') {
+//     BotMetrics.enrichUser(session.message.address.user.id, { gender: role });
+//   } else {
+//     const corresp = {
+//       community: {
+//         '1a*': 1,
+//         '1b*': 2
+//       },
+//       translate: {
+//         auxiliary: 'auxiliaire'
+//       }
+//     };
+//     BotMetrics.enrichUser(session.message.address.user.id, { gender: `${corresp.translate[role]} ${corresp.community[sector]}` });
+//   }
+// };
+
 const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
+  // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
   } else {
