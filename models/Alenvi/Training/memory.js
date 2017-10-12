@@ -46,5 +46,11 @@ exports.memVideosList = [
     show_link: 'https://vimeo.com/224495770/03cf53a02c',
     script_link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHd3pxcElWOUdpZVk',
     questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSe6U8HazD3KqPTduIvUxWnkoyfuyqNGJVNtuzcSyS6jxzpQlQ/viewform'
+  }, {
+    number: 7,
+    title: 'Les symptômes psycho-comportementaux',
+    image_link: cloudinary.url('images/bot/formation/memoires/movie_7.png', { quality: 'auto' }),
+    show_link: 'https://vimeo.com/237597571/e1012d57f5',
+    questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLScYauOAMbAj7wrcZ4iq8keGDUNrlqjYy1dgBZ-KZ_515OkRzw/viewform'
   }
 ];
