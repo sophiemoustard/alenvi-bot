@@ -114,7 +114,7 @@ exports.moreDetails = async (session, args) => {
         _id: session.userData.alenvi._id
       };
       const accessToken = jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
-      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomerInfo?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&customer_door_code=${customerById.door_code}&customer_inter_code=${customerById.intercom_code}&access_token=${accessToken}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
+      const uri = `${process.env.WEBSITE_HOSTNAME}/editCustomerInfo?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&access_token=${accessToken}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
           attachment: {
