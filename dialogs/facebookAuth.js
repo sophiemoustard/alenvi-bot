@@ -8,7 +8,7 @@ const config = require('../config');
 
 exports.login = (session) => {
   // const uri = 'https://95bf8bf4.ngrok.io/authenticate';
-  const uri = `${process.env.WEBSITE_HOSTNAME}/authenticate`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/bot/authenticate`;
 
   const message = new builder.Message(session).sourceEvent({
     facebook: {
