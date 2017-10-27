@@ -31,6 +31,7 @@ exports.checkUserData = async (session) => {
     session.userData.alenvi.role = userDataAlenvi.role;
     return session.userData.alenvi;
   }
+  // Check if user is still in Ogust
   const userDataOgustRaw = await employee.getEmployeeById(
     session.userData.ogust.tokenConfig.token,
     session.userData.alenvi.employee_id,
@@ -38,12 +39,14 @@ exports.checkUserData = async (session) => {
   );
   // console.log(userDataRaw);
   const userDataOgust = userDataOgustRaw.body.data.user.employee;
+  // If there is no user data in Ogust, disconnect the user from the bot
   if (Object.keys(userDataOgust).length === 0) {
     session.send(`Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)`);
     delete session.userData.alenvi;
     delete session.userData.ogust;
     session.replaceDialog('/logout_facebook');
   }
+  // Get user information
   const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
   const userDataAlenvi = userDataAlenviRaw.body;
   if (userDataOgust.id_customer) {
