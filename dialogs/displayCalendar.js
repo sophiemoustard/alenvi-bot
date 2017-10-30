@@ -11,7 +11,6 @@ const getCardsAttachments = async (session, args) => {
   let employeeId = '';
   let customerId = '';
   let title;
-  console.log(args.personChosen);
   switch (args.personType) {
     case 'Self':
       employeeId = session.userData.alenvi.employee_id;
