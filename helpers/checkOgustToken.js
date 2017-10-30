@@ -2,6 +2,7 @@ const moment = require('moment-timezone');
 const jwt = require('jsonwebtoken');
 const token = require('../models/Ogust/token');
 const { checkUserData } = require('./checkUserData');
+const { storeUserAddress } = require('./storeUserAddress')
 const { tokenConfig } = require('./../config/config');
 
 const addTokenToSession = async (session) => {
@@ -26,6 +27,7 @@ exports.checkToken = async (session) => {
       await addTokenToSession(session);
       await checkUserData(session);
     }
+    await storeUserAddress(session);
     if (session.userData.ogust.tokenConfig.expireDate !== '') {
       const currentDate = moment().tz('Europe/Paris');
       if (moment(currentDate).isAfter(session.userData.ogust.tokenConfig.expireDate)) {

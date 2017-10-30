@@ -10,6 +10,8 @@ const BotmetricsMiddleware = require('botmetrics-botframework-middleware').Botme
   botId: process.env.BOTMETRICS_BOT_ID,
   apiKey: process.env.BOTMETRICS_API_KEY
 });
+
+const { sendMessageToUser } = require('./helpers/sendMessageToUser');
 // const botauth = require('botauth');
 
 // const passport = require('passport');
@@ -67,20 +69,21 @@ bot.use({
   }
 });
 
-const resume = (encodedAddress) => {
-  const stringAddress = decodeURIComponent(encodedAddress);
-  const address = JSON.parse(stringAddress);
-  console.log(address);
-  const msg = new builder.Message().address(address).text('Modification effectuée ! ;)');
-  bot.send(msg.toMessage());
-};
+// const resume = (encodedAddress) => {
+//   const stringAddress = decodeURIComponent(encodedAddress);
+//   const address = JSON.parse(stringAddress);
+//   console.log(address);
+//   const msg = new builder.Message().address(address).text('Modification effectuée ! ;)');
+//   bot.send(msg.toMessage());
+// };
 
 app.post('/api/messages', connector.listen());
-app.get('/editCustomerDone', (req, res) => {
-  console.log('Customer edit done.');
-  resume(req.query.address);
-  res.status(200).send('Customer edit done');
-});
+app.post('sendMessageToUser', sendMessageToUser(bot));
+// app.get('/editCustomerDone', (req, res) => {
+//   console.log('Customer edit done.');
+//   resume(req.query.address);
+//   res.status(200).send('Customer edit done');
+// });
 
 // const facebookConfig = {
 //   clientID: process.env.FACEBOOK_APP_ID || '977382919031323',
