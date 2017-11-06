@@ -5,6 +5,7 @@ const { tokenConfig } = require('../config/config');
 
 exports.storeUserAddress = async (session) => {
   try {
+    session.userData.alenvi.facebook = session.userData.alenvi.facebook || {};
     session.userData.alenvi.facebook.address = session.message.address;
     const userAddress = session.userData.alenvi.facebook.address;
     const payload = {
