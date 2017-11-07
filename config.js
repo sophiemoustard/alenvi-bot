@@ -10,6 +10,7 @@ module.exports = {
       'test': 'G5X9AKSF2',
       '1b*': 'G5QLJ49KL',
       '1a*': 'G5QLHLTPC',
+      '1e*': 'G7W7Y1SV8'
     }
   },
   Cloudinary: {
