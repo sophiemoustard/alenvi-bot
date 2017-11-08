@@ -1,6 +1,4 @@
 const builder = require('botbuilder');
-const jwt = require('jsonwebtoken');
-const { tokenConfig } = require('./../config/config');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
@@ -25,11 +23,7 @@ const getCardsAttachments = async (session, args) => {
       title = 'Consulter son planning';
   }
   const myCards = [];
-  const payload = {
-    _id: session.userData.alenvi._id
-  };
-  const accessToken = jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn });
-  const url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&id_employee=${employeeId}&access_token=${accessToken}`;
+  const url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&id_employee=${employeeId}&access_token=${session.userData.alenvi.token}`;
   myCards.push(
     new builder.HeroCard(session)
       .title(title)

@@ -29,6 +29,7 @@ exports.checkUserData = async (session) => {
     session.userData.alenvi.lastname = userDataAlenvi.lastname;
     session.userData.alenvi.sector = userDataAlenvi.sector;
     session.userData.alenvi.role = userDataAlenvi.role;
+    session.userData.alenvi.token = userDataAlenvi.alenviToken;
     return session.userData.alenvi;
   }
   // Check if user is still in Ogust
@@ -48,7 +49,7 @@ exports.checkUserData = async (session) => {
   }
   // Get user information
   const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
-  const userDataAlenvi = userDataAlenviRaw.body;
+  const userDataAlenvi = userDataAlenviRaw.body.data.user;
   if (userDataOgust.id_customer) {
     session.userData.alenvi.customer_id = userDataOgust.id_customer;
   }
@@ -61,5 +62,6 @@ exports.checkUserData = async (session) => {
   session.userData.alenvi.lastname = userDataOgust.last_name;
   session.userData.alenvi.sector = userDataOgust.sector;
   session.userData.alenvi.role = userDataAlenvi.role;
+  session.userData.alenvi.token = userDataAlenvi.alenviToken;
   return session.userData.alenvi;
 };
