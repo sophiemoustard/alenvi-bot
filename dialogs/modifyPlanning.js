@@ -1,11 +1,12 @@
 require('dotenv').config();
 const builder = require('botbuilder');
-const moment = require('moment-timezone');
+// const moment = require('moment-timezone');
 // const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const employees = require('../models/Ogust/employees');
+const planningUpdates = require('../models/Alenvi/planningUpdates');
 const planning = require('../helpers/planning/format');
-const slack = require('../models/Slack/planning');
+// const slack = require('../models/Slack/planning');
 
 // const services = require('../Ogust/services');
 // const customers = require('../Ogust/customers');
@@ -84,13 +85,11 @@ const handleRequest = async (session, results) => {
       } else { // User well describe his request
         const options = {
           type: session.dialogData.selectedPerson ? 'Modif. Intervention' : 'Heures internes',
-          author: `${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`,
-          dateRequest: moment().tz('Europe/Paris').format('DD/MM/YYYY, HH:mm'),
-          textToSend: results.response,
-          sector: session.userData.alenvi.sector,
-          target: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
+          content: results.response,
+          involved: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
         };
-        await slack.sendRequestToSlack(options);
+        // await planningUpdates.sendRequestToSlack(options);
+        await planningUpdates.storePlanningUpdate(session.userData.alenvi._id, session.userData.alenvi.token, options);
         session.endDialog('Ta demande a bien été envoyée, merci :)');
       }
     } else {
