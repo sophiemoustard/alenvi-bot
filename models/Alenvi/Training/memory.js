@@ -53,5 +53,11 @@ exports.memVideosList = [
     show_link: 'https://vimeo.com/237597571/e1012d57f5',
     script_link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHWmtPaTZjelR4Yzg',
     questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLScYauOAMbAj7wrcZ4iq8keGDUNrlqjYy1dgBZ-KZ_515OkRzw/viewform'
+  }, {
+    number: 8,
+    title: 'La communication',
+    image_link: cloudinary.image('images/bot/formation/memoires/movie_8.png', { effect: 'auto_contrast', quality: 'auto' }),
+    show_link: 'https://vimeo.com/241861431/ca434d62c2',
+    script_link: 'https://drive.google.com/file/d/0B1dy3GSimLUDUTNqUnlDT1BIZEJ0WEpWUVpJaDNpXzFUY21Z/view?usp=sharing'
   }
 ];
