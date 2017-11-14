@@ -15,7 +15,7 @@ exports.storePlanningUpdate = async (id, token, payload) => {
     resolveWithFullResponse: true,
     time: true,
   };
-  const res = await rp.put(options);
+  const res = await rp.post(options);
   if (res.body.success == false) {
     throw new Error(`Error while storing planning update: ${res.body.message}`);
   }
