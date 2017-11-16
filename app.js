@@ -156,6 +156,7 @@ bot.dialog('/', new builder.IntentDialog()
             console.log('DECODED !');
             console.log(decoded);
             session.userData.alenvi = decoded;
+            session.userData.alenvi.token = token;
             session.send(`Je t'ai bien reconnu ${session.userData.alenvi.firstname}, merci de t'être connecté(e) ! :)`);
             session.replaceDialog('/hello');
           }
