@@ -51,6 +51,9 @@ const whichCustomer = async (session) => {
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomers, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
+    if (err.statusCode === 404) {
+      return session.endDialog("Il semble que tu n'aies pas de bénéficiaire pour le moment ! :)");
+    }
     return session.endDialog("Flûte, impossible de récupérer ta liste de bénéficiaires pour le moment :/ Réessaie, et si le problème persiste n'hésite pas à contacter l'équipe technique !");
   }
 };
