@@ -58,6 +58,7 @@ exports.memVideosList = [
     title: 'La communication',
     image_link: cloudinary.url('images/bot/formation/memoires/movie_8.png', { effect: 'auto_contrast', quality: 'auto' }),
     show_link: 'https://vimeo.com/241861431/ca434d62c2',
-    script_link: 'https://drive.google.com/open?id=0B8gI-MT7hHSSREI5N3BON2VQM00'
+    script_link: 'https://drive.google.com/open?id=0B8gI-MT7hHSSREI5N3BON2VQM00',
+    questionnaire_link: 'https://docs.google.com/forms/d/e/1FAIpQLSfJw_NMx0GRH2MI5wvqIudKxoUd4jFe47JxbfHuZ3c3qWFMgw/viewform'
   }
 ];
