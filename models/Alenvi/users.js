@@ -19,3 +19,17 @@ exports.storeUserAddress = async (id, token, payload) => {
   }
   // return res;
 };
+
+exports.getAlenviUserById = async (id) => {
+  const options = {
+    url: `${process.env.API_HOSTNAME}/bot/user/${id}`,
+    json: true,
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.get(options);
+  if (res.body.success == false) {
+    throw new Error(`Error while refreshing infos from Alenvi: ${res.body.message}`);
+  }
+  return res;
+};

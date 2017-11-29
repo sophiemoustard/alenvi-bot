@@ -185,6 +185,7 @@ bot.dialog('/logout_facebook', require('./dialogs/facebookAuth').logout)
   .triggerAction({
     matches: /^d[ée]connexion$/i
   });
+bot.dialog('login_webapp', require('./dialogs/webappAuth').login);
 
 bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
