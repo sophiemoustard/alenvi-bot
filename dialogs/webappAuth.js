@@ -2,7 +2,12 @@ const jwt = require('jsonwebtoken');
 const { getAlenviUserById } = require('../models/Alenvi/users');
 
 exports.login = async (session) => {
-  const token = session.message.sourceEvent.referral.ref;
+  let token = '';
+  if (session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref)  {
+    token = session.message.sourceEvent.postback.referral.ref;
+  } else if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref) {
+    token = session.message.sourceEvent.referral.ref;
+  }
   jwt.verify(token, process.env.TOKEN_SECRET, async (err, decoded) => {
     if (err) {
       console.error('ERROR VERIFY TOKEN');
@@ -28,7 +33,7 @@ exports.login = async (session) => {
         session.userData.alenvi.sector = userDataAlenvi.sector;
         session.userData.alenvi.role = userDataAlenvi.role;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
-        session.send(`Je t'ai bien reconnu ${session.userData.alenvi.firstname}, merci de t'être connecté(e) ! :)`);
+        session.send(`Bienvenue chez Alenvi, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);
@@ -36,4 +41,10 @@ exports.login = async (session) => {
       }
     }
   });
+};
+
+exports.logout = (session) => {
+  delete session.userData.alenvi;
+  delete session.userData.ogust;
+  session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };

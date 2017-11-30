@@ -8,7 +8,7 @@ const builder = require('botbuilder');
 exports.hello_first = [
   (session) => {
     session.sendTyping();
-    if (session.message.sourceEvent.referral.ref) {
+    if ((session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref) || (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref)) {
       return session.replaceDialog('login_webapp');
     }
     session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
