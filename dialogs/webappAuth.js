@@ -1,7 +1,8 @@
+const builder = require('botbuilder');
 const jwt = require('jsonwebtoken');
 const { getAlenviUserById } = require('../models/Alenvi/users');
 
-exports.login = async (session) => {
+exports.autoLogin = async (session) => {
   let token = '';
   if (session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref)  {
     token = session.message.sourceEvent.postback.referral.ref;
@@ -27,7 +28,7 @@ exports.login = async (session) => {
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
         session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
-        session.send(`Bienvenue chez Alenvi, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
+        session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);
@@ -35,4 +36,30 @@ exports.login = async (session) => {
       }
     }
   });
+};
+
+exports.login = async (session) => {
+  const uri = `${process.env.WEBSITE_HOSTNAME}/bot/authenticate`;
+
+  const message = new builder.Message(session).sourceEvent({
+    facebook: {
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'generic',
+          image_aspect_ratio: 'square',
+          elements: [{
+            title: 'Authentification avec identifiants Alenvi',
+            image_url: 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png',
+            buttons: [{
+              type: 'web_url',
+              url: uri,
+              title: 'Se connecter'
+            }],
+          }]
+        }
+      }
+    }
+  });
+  session.endDialog(message);
 };
