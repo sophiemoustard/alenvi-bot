@@ -25,13 +25,7 @@ exports.login = async (session) => {
         const userId = decoded._id;
         const userDataAlenviRaw = await getAlenviUserById(userId);
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
-        session.userData.alenvi = {};
-        session.userData.alenvi._id = userDataAlenvi._id;
-        session.userData.alenvi.firstname = userDataAlenvi.firstname;
-        session.userData.alenvi.lastname = userDataAlenvi.lastname;
-        session.userData.alenvi.employee_id = userDataAlenvi.employee_id;
-        session.userData.alenvi.sector = userDataAlenvi.sector;
-        session.userData.alenvi.role = userDataAlenvi.role;
+        session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
         session.send(`Bienvenue chez Alenvi, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.replaceDialog('/hello');
@@ -41,10 +35,4 @@ exports.login = async (session) => {
       }
     }
   });
-};
-
-exports.logout = (session) => {
-  delete session.userData.alenvi;
-  delete session.userData.ogust;
-  session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };
