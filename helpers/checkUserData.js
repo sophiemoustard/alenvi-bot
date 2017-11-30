@@ -25,10 +25,7 @@ exports.checkUserData = async (session) => {
   session.userData.alenvi.employee_id == 3 || session.userData.alenvi.employee_id == 4) {
     const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
     const userDataAlenvi = userDataAlenviRaw.body.data.user;
-    session.userData.alenvi.firstname = userDataAlenvi.firstname;
-    session.userData.alenvi.lastname = userDataAlenvi.lastname;
-    session.userData.alenvi.sector = userDataAlenvi.sector;
-    session.userData.alenvi.role = userDataAlenvi.role;
+    session.userData.alenvi = userDataAlenvi;
     session.userData.alenvi.token = userDataAlenvi.alenviToken;
     return session.userData.alenvi;
   }
@@ -42,7 +39,7 @@ exports.checkUserData = async (session) => {
   const userDataOgust = userDataOgustRaw.body.data.user.employee;
   // If there is no user data in Ogust, disconnect the user from the bot
   if (Object.keys(userDataOgust).length === 0) {
-    session.send(`Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)`);
+    session.send("Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)");
     delete session.userData.alenvi;
     delete session.userData.ogust;
     session.replaceDialog('/logout_facebook');
