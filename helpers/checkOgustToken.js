@@ -26,13 +26,14 @@ exports.checkToken = async (session) => {
     if (session.userData.ogust.tokenConfig.token === '') {
       await addTokenToSession(session);
       await checkUserData(session);
+      await storeUserAddress(session);
     }
-    await storeUserAddress(session);
     if (session.userData.ogust.tokenConfig.expireDate !== '') {
       const currentDate = moment().tz('Europe/Paris');
       if (moment(currentDate).isAfter(session.userData.ogust.tokenConfig.expireDate)) {
         await addTokenToSession(session);
         await checkUserData(session);
+        await storeUserAddress(session);
       } else {
         return true;
       }
