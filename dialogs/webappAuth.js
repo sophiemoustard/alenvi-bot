@@ -29,7 +29,15 @@ exports.autoLogin = async (session) => {
         session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
         session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
-        session.replaceDialog('/hello');
+        session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :
+        -  Notre charte d’envie
+        -  Et une vidéo qui résume notre vision du métier de l’auxiliaire d’envie
+        C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)`);
+        setTimeout(() => {
+          session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
+          session.endDialog('La charte d’envie: http://blog.alenvi.io/charte-envie');
+        }, 15000);
+        // session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);
         return session.endDialog('Il y a eu un problème avec ta demande :/');
