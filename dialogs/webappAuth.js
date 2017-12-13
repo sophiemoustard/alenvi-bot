@@ -46,28 +46,50 @@ exports.autoLogin = async (session) => {
   });
 };
 
+const getCardAttachment = (session) => {
+  const uri = `${process.env.WEBSITE_HOSTNAME}/bot/authenticate`;
+  return new builder.HeroCard(session)
+    .title('Connexion Alenvi')
+    .images([
+      builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
+    ])
+    .buttons([
+      builder.CardAction.openUrl(session, uri, 'Se connecter')
+    ]);
+};
+
+const showConnectionCard = (session) => {
+  session.sendTyping();
+  const card = getCardAttachment(session);
+  const message = new builder.Message(session).addAttachment(card);
+  session.endDialog(message);
+};
+
 exports.login = async (session) => {
   const uri = `${process.env.WEBSITE_HOSTNAME}/bot/authenticate`;
-
-  const message = new builder.Message(session).sourceEvent({
-    facebook: {
-      attachment: {
-        type: 'template',
-        payload: {
-          template_type: 'generic',
-          image_aspect_ratio: 'square',
-          elements: [{
-            title: 'Authentification avec identifiants Alenvi',
-            image_url: 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png',
-            buttons: [{
-              type: 'web_url',
-              url: uri,
-              title: 'Se connecter'
-            }],
-          }]
+  if (session.message.address.channelId == 'facebook') {
+    const message = new builder.Message(session).sourceEvent({
+      facebook: {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: 'generic',
+            image_aspect_ratio: 'square',
+            elements: [{
+              title: 'Authentification avec identifiants Alenvi',
+              image_url: 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png',
+              buttons: [{
+                type: 'web_url',
+                url: uri,
+                title: 'Se connecter'
+              }],
+            }]
+          }
         }
       }
-    }
-  });
-  session.endDialog(message);
+    });
+    session.endDialog(message);
+  } else {
+    showConnectionCard(session);
+  }
 };
