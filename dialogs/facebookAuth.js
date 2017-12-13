@@ -34,20 +34,26 @@ exports.login = (session) => {
 
 exports.logout = async (session) => {
   try {
-    const options = {
-      url: 'https://graph.facebook.com/v2.6/me/unlink_accounts',
-      method: 'POST',
-      qs: {
-        access_token: process.env.FACEBOOK_PAGE_TOKEN || config.FACEBOOK_PAGE_TOKEN,
-      },
-      body: {
-        psid: session.message.address.user.id,
-      },
-      json: true
-    };
-    const res = await rp(options);
-    if (res.result === 'unlink account success') {
-      return session.endDialog();
+    if (session.message.address.channelId == 'facebook') {
+      const options = {
+        url: 'https://graph.facebook.com/v2.6/me/unlink_accounts',
+        method: 'POST',
+        qs: {
+          access_token: process.env.FACEBOOK_PAGE_TOKEN || config.FACEBOOK_PAGE_TOKEN,
+        },
+        body: {
+          psid: session.message.address.user.id,
+        },
+        json: true
+      };
+      const res = await rp(options);
+      if (res.result === 'unlink account success') {
+        return session.endDialog();
+      }
+    } else {
+      delete session.userData.alenvi;
+      delete session.userData.ogust;
+      return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
     }
   } catch (err) {
     console.log(err);

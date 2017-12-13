@@ -42,7 +42,6 @@ const getCardsAttachments = async (session) => {
   return myCards;
 };
 
-
 const showMyTeam = async (session) => {
   try {
     session.sendTyping();
