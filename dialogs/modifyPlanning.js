@@ -65,70 +65,72 @@ const whichCustomer = async (session) => {
 // =========================================================
 
 const getCardAttachments = async (session) => {
-  try {
-    const payload = {
-      isDate: true,
-      startDate: moment().subtract(1, 'day').tz('Europe/Paris').format('YYYYMMDDHHmm'),
-      endDate: moment().add(10, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
-      idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
+  const payload = {
+    isDate: true,
+    startDate: moment().subtract(1, 'day').tz('Europe/Paris').format('YYYYMMDDHHmm'),
+    endDate: moment().add(10, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
+    idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
+  };
+  const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
+  const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
+  if (Object.keys(myInterventions).length === 0) {
+    return session.endDialog("Tu n'as pour le moment aucune intervention !");
+  }
+  const mySortedInterventions = _.sortBy(myInterventions, ['start_date']);
+  const cards = [];
+  for (const k in mySortedInterventions) {
+    const startHour = moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
+    const endHour = moment(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
+    const interventionInfo = {
+      serviceId: mySortedInterventions[k].id_service,
+      dayShort: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM'),
+      day: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM/YYYY'),
+      customer: session.dialogData.selectedPerson
     };
-    const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
-    const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
-    if (Object.keys(myInterventions).length === 0) {
-      return session.endDialog("Tu n'as pour le moment aucune intervention !");
+    cards.push(
+      new builder.HeroCard(session)
+        .title(`${interventionInfo.dayShort}\n\n${startHour} - ${endHour}`)
+        .buttons([
+          builder.CardAction.dialogAction(session, 'setIntervention', JSON.stringify(interventionInfo), 'Modifier')
+        ])
+    );
+  }
+  return cards;
+};
+
+const whichIntervention = async (session, results) => {
+  try {
+    await checkOgustToken(session);
+    session.sendTyping();
+    if (results.response) {
+      session.dialogData.selectedPerson = results.response.entity;
+      const cards = await getCardAttachments(session);
+      const message = new builder.Message(session)
+        .text("Choisis l'intervention que tu souhaites modifier")
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards);
+      // .suggestedActions(
+      //   builder.SuggestedActions.create(session, [builder.CardAction.dialogAction(session, '', 'Autre intervention')])
+      // );
+      session.send(message);
+      builder.Prompts.choice(session, "Si l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)", 'Autre intervention', { maxRetries: 0 });
+    } else {
+      session.cancelDialog(0, '/not_understand');
     }
-    const mySortedInterventions = _.sortBy(myInterventions, ['start_date']);
-    const cards = [];
-    for (const k in mySortedInterventions) {
-      const startHour = moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
-      const endHour = moment(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
-      const interventionInfo = {
-        serviceId: mySortedInterventions[k].id_service,
-        dayShort: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM'),
-        day: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM/YYYY'),
-        customer: session.dialogData.selectedPerson
-      };
-      cards.push(
-        new builder.HeroCard(session)
-          .title(`${interventionInfo.dayShort}\n\n${startHour} - ${endHour}`)
-          .buttons([
-            builder.CardAction.dialogAction(session, 'setIntervention', JSON.stringify(interventionInfo), 'Modifier')
-          ])
-      );
-    }
-    return cards;
   } catch (e) {
-    console.error(e);
     return session.endDialog('Il y a eu un problème lors de la récupération de tes interventions! :/');
   }
 };
 
-const whichIntervention = async (session, results) => {
-  await checkOgustToken(session);
-  session.sendTyping();
-  if (results.response) {
-    session.dialogData.selectedPerson = results.response.entity;
-    const cards = await getCardAttachments(session);
-    const message = new builder.Message(session)
-      .text("Choisis l'intervention que tu souhaites modifier")
-      .attachmentLayout(builder.AttachmentLayout.carousel)
-      .attachments(cards);
-      // .suggestedActions(
-      //   builder.SuggestedActions.create(session, [builder.CardAction.dialogAction(session, '', 'Autre intervention')])
-      // );
-    session.send(message);
-    builder.Prompts.choice(session, "Si l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)", 'Autre intervention', { maxRetries: 0 });
-  } else {
-    session.cancelDialog(0, '/not_understand');
-  }
-};
-
-const whichStartHour = (session, args) => {
+const whichStartHour = (session, args, next) => {
   session.sendTyping();
   args = args || {};
   if (args.data) {
     session.dialogData.service = JSON.parse(args.data);
     builder.Prompts.time(session, "A quelle heure débute l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
+  } else if (args.reprompt && args.hourInPast && args.service) {
+    session.dialogData.service = args.service;
+    next();
   } else {
     session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
   }
@@ -139,6 +141,8 @@ const whichEndHour = (session, results) => {
   if (results.response) {
     session.dialogData.service.startHour = builder.EntityRecognizer.resolveTime([results.response]);
     builder.Prompts.time(session, "A quelle heure se termine l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
+  } else if (session.dialogData.service.endHour) {
+    builder.Prompts.time(session, "L'heure de fin d'intervention que tu m'as donnée n'est pas valide, peux-tu me la redonner ? (format hh:mm stp)", { maxRetries: 1 });
   } else {
     session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
   }
@@ -169,6 +173,9 @@ const handleRequest = async (session, results) => {
       } else if (session.dialogData.service) { // request handled by Pigi
         session.sendTyping();
         session.dialogData.service.endHour = builder.EntityRecognizer.resolveTime([results.response]);
+        if (moment(session.dialogData.service.endHour).isSameOrBefore(session.dialogData.service.startHour)) {
+          return session.replaceDialog('/set_intervention', { reprompt: true, hourInPast: true, service: session.dialogData.service });
+        }
         const startHour = moment(session.dialogData.service.startHour).tz('Europe/Paris').format('HH:mm');
         const endHour = moment(session.dialogData.service.endHour).tz('Europe/Paris').format('HH:mm');
         const updateServiceParams = {
@@ -203,7 +210,7 @@ const handleRequest = async (session, results) => {
     }
   } catch (err) {
     console.error(err);
-    session.endDialog("Je n'ai pas réussi à envoyer ta demande aux coach, essaie encore stp :/");
+    session.endDialog("Je n'ai pas réussi à envoyer ta demande aux coachs, essaie encore stp :/");
   }
 };
 
