@@ -3,7 +3,7 @@
   "default_number": "Je n'ai pas compris, dis-moi un nombre stp :)",
   "default_confirm": "Je n'ai pas compris, dis-moi 'oui' ou 'non' stp :)",
   "default_choice": "Je n'ai pas compris, choisis une des réponses de la liste stp :)",
-  "default_time": "Je n'ai pas reconnu le temps entré, dis-le moi avec le bon format (MM/DD/YYYY HH:MM:SS) stp :)",
+  "default_time": "Je n'ai pas reconnu le temps entré, dis-le moi avec le bon format (hh:mm) stp :)",
   "default_file": "Je n'ai pas reçu de fichier, réessaye stp :)",
   "default_error": "Désolé mais je me suis écrasé en route ! :( Réessaye autrement stp, et si le problème persiste, essaie de contacter un administrateur !",
   "list_or": " ou ",

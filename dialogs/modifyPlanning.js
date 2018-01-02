@@ -1,9 +1,10 @@
 require('dotenv').config();
 const builder = require('botbuilder');
-// const moment = require('moment-timezone');
-// const _ = require('lodash');
+const moment = require('moment-timezone');
+const _ = require('lodash');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const employees = require('../models/Ogust/employees');
+const services = require('../models/Ogust/services');
 const planningUpdates = require('../models/Alenvi/planningUpdates');
 const planning = require('../helpers/planning/format');
 // const slack = require('../models/Slack/planning');
@@ -48,6 +49,7 @@ const whichCustomer = async (session) => {
     await checkOgustToken(session);
     const myCustomersRaw = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
     const myCustomers = await planning.formatPromptListPersons(session, myCustomersRaw.body.data.customers, 'id_customer');
+    session.dialogData.myCustomers = myCustomers;
     builder.Prompts.choice(session, 'Quel(le) bénéficiaire précisément ?', myCustomers, { listStyle: builder.ListStyle.button, maxRetries: 0 });
   } catch (err) {
     console.error(err);
@@ -62,19 +64,98 @@ const whichCustomer = async (session) => {
 // 'Request to coach' dialog
 // =========================================================
 
+const getCardAttachments = async (session) => {
+  try {
+    const payload = {
+      isDate: true,
+      startDate: moment().subtract(1, 'day').tz('Europe/Paris').format('YYYYMMDDHHmm'),
+      endDate: moment().add(10, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
+      idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
+    };
+    const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
+    const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
+    if (Object.keys(myInterventions).length === 0) {
+      return session.endDialog("Tu n'as pour le moment aucune intervention !");
+    }
+    const mySortedInterventions = _.sortBy(myInterventions, ['start_date']);
+    const cards = [];
+    for (const k in mySortedInterventions) {
+      const startHour = moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
+      const endHour = moment(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
+      const interventionInfo = {
+        serviceId: mySortedInterventions[k].id_service,
+        dayShort: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM'),
+        day: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM/YYYY'),
+        customer: session.dialogData.selectedPerson
+      };
+      cards.push(
+        new builder.HeroCard(session)
+          .title(`${interventionInfo.dayShort}\n\n${startHour} - ${endHour}`)
+          .buttons([
+            builder.CardAction.dialogAction(session, 'setIntervention', JSON.stringify(interventionInfo), 'Modifier')
+          ])
+      );
+    }
+    return cards;
+  } catch (e) {
+    console.error(e);
+    return session.endDialog('Il y a eu un problème lors de la récupération de tes interventions! :/');
+  }
+};
+
+const whichIntervention = async (session, results) => {
+  await checkOgustToken(session);
+  session.sendTyping();
+  if (results.response) {
+    session.dialogData.selectedPerson = results.response.entity;
+    const cards = await getCardAttachments(session);
+    const message = new builder.Message(session)
+      .text("Choisis l'intervention que tu souhaites modifier")
+      .attachmentLayout(builder.AttachmentLayout.carousel)
+      .attachments(cards);
+      // .suggestedActions(
+      //   builder.SuggestedActions.create(session, [builder.CardAction.dialogAction(session, '', 'Autre intervention')])
+      // );
+    session.send(message);
+    builder.Prompts.choice(session, "Si l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)", 'Autre intervention', { maxRetries: 0 });
+  } else {
+    session.cancelDialog(0, '/not_understand');
+  }
+};
+
+const whichStartHour = (session, args) => {
+  session.sendTyping();
+  args = args || {};
+  if (args.data) {
+    session.dialogData.service = JSON.parse(args.data);
+    builder.Prompts.time(session, "A quelle heure débute l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
+  } else {
+    session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
+  }
+};
+
+const whichEndHour = (session, results) => {
+  session.sendTyping();
+  if (results.response) {
+    session.dialogData.service.startHour = builder.EntityRecognizer.resolveTime([results.response]);
+    builder.Prompts.time(session, "A quelle heure se termine l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
+  } else {
+    session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
+  }
+};
+
 const promptDescription = (session, args) => {
   session.sendTyping();
   args = args || {};
   if (args.response) { // Modif. Intervention: Bénéficiaire selected
-    session.dialogData.selectedPerson = args.response.entity;
-    builder.Prompts.text(session, `Décris-moi les modifications d'intervention que tu souhaites déclarer (jour, heure, tâche) concernant ${args.response.entity}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
+    session.dialogData.selectedPerson = args.response.entity === 'Autre intervention' ? session.dialogData.selectedPerson : args.response.entity;
+    builder.Prompts.text(session, `Décris-moi les modifications d'intervention que tu souhaites déclarer (jour, heure, tâche) concernant ${session.dialogData.selectedPerson}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
   } else if (args.resumed) { // User writes anything not related
     session.cancelDialog(0, '/not_understand');
   } else { // Heures Internes
     builder.Prompts.text(session, "Décris-moi les heures internes que tu souhaites déclarer (jour, heure, tâche)  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)");
   }
 };
-
 
 const handleRequest = async (session, results) => {
   try {
@@ -85,7 +166,29 @@ const handleRequest = async (session, results) => {
         session.send('Tu as bien annulé ta demande ! :)');
         // session.replaceDialog('/select_modify_planning');
         session.cancelDialog(0, '/hello');
+      } else if (session.dialogData.service) { // request handled by Pigi
+        session.sendTyping();
+        session.dialogData.service.endHour = builder.EntityRecognizer.resolveTime([results.response]);
+        const startHour = moment(session.dialogData.service.startHour).tz('Europe/Paris').format('HH:mm');
+        const endHour = moment(session.dialogData.service.endHour).tz('Europe/Paris').format('HH:mm');
+        const updateServiceParams = {
+          startDate: moment(`${session.dialogData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm'),
+          endDate: moment(`${session.dialogData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm')
+        };
+        const planningUpdateParams = {
+          type: 'Modif. Intervention',
+          content: `${session.dialogData.service.day}.\nIntervention chez ${session.dialogData.service.customer} de ${startHour} à ${endHour}`,
+          involved: session.dialogData.service.customer,
+          check: {
+            isChecked: true,
+            checkBy: process.env.ALENVI_BOT_ID
+          }
+        };
+        await services.updateServiceById(session.userData.ogust.tokenConfig.token, session.dialogData.service.serviceId, updateServiceParams);
+        await planningUpdates.storePlanningUpdate(session.userData.alenvi._id, session.userData.alenvi.token, planningUpdateParams);
+        session.endDialog('Ta demande a bien été prise en compte, merci :)');
       } else { // User well describe his request
+        session.sendTyping();
         const options = {
           type: session.dialogData.selectedPerson ? 'Modif. Intervention' : 'Heures internes',
           content: results.response,
@@ -104,5 +207,6 @@ const handleRequest = async (session, results) => {
   }
 };
 
-exports.changeIntervention = [whichCustomer, promptDescription, handleRequest];
+exports.changeIntervention = [whichCustomer, whichIntervention, promptDescription, handleRequest];
+exports.setIntervention = [whichStartHour, whichEndHour, handleRequest];
 exports.askForRequest = [promptDescription, handleRequest];

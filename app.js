@@ -199,6 +199,7 @@ bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCale
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
+bot.dialog('/set_intervention', require('./dialogs/modifyPlanning').setIntervention);
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
 bot.dialog('/show_my_customers', require('./dialogs/customers').showCustomers);
@@ -208,6 +209,7 @@ bot.dialog('/show_team', require('./dialogs/team').showTeam);
 
 // bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
 bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
+bot.beginDialogAction('setIntervention', '/set_intervention');
 
 bot.dialog('/select_infos', require('./dialogs/infos').select);
 bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
