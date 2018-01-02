@@ -161,7 +161,7 @@ exports.getSalaries = async (token, id, pageOption) => {
 ** --- pageNum: Y (number of pages)
 ** METHOD: POST
 */
-exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, intervalType, startDate, endDate, status, type, pageOption) => {
+exports.getServices = async (token, id, payload) => {
   const options = {
     url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/services/`,
     json: true,
@@ -169,17 +169,18 @@ exports.getServices = async (token, id, isRange, isDate, slotToSub, slotToAdd, i
       'x-ogust-token': token
     },
     qs: {
-      isRange,
-      isDate,
-      slotToSub,
-      slotToAdd,
-      intervalType,
-      startDate,
-      endDate,
-      status,
-      type,
-      nbPerPage: pageOption.nbPerPage,
-      pageNum: pageOption.pageNum
+      isRange: payload.isRange,
+      isDate: payload.isDate,
+      slotToSub: payload.slotToSub,
+      slotToAdd: payload.slotToAdd,
+      intervalType: payload.intervalType,
+      startDate: payload.startDate,
+      endDate: payload.endDate,
+      status: payload.status,
+      type: payload.type,
+      idCustomer: payload.idCustomer
+      // nbPerPage: payload.pageOption.nbPerPage,
+      // pageNum: payload.pageOption.pageNum
     },
     resolveWithFullResponse: true,
     time: true,

@@ -10,7 +10,8 @@ exports.storePlanningUpdate = async (id, token, payload) => {
     body: {
       content: payload.content,
       type: payload.type,
-      involved: payload.involved
+      involved: payload.involved,
+      check: payload.check ? payload.check : null
     },
     resolveWithFullResponse: true,
     time: true,
