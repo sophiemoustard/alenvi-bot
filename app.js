@@ -199,7 +199,14 @@ bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCale
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
 bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
-bot.dialog('/set_intervention', require('./dialogs/modifyPlanning').setIntervention);
+bot.dialog('/set_intervention', require('./dialogs/modifyPlanning').setIntervention)
+  .reloadAction('restartSetIntervention', 'Recommençons :)', {
+    matches: /^recommencer$/i,
+    dialogArgs: {
+      isReloaded: true
+    }
+  })
+  .cancelAction('cancelSetIntervention', 'Tu as bien annulé ta demande !', { matches: /^annuler|anuler$/i });
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
 bot.dialog('/show_my_customers', require('./dialogs/customers').showCustomers);
