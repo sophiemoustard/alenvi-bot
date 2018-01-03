@@ -79,12 +79,12 @@ const getCardAttachments = async (session) => {
   const mySortedInterventions = _.sortBy(myInterventions, ['start_date']);
   const cards = [];
   for (const k in mySortedInterventions) {
-    const startHour = moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
-    const endHour = moment(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('HH:mm');
+    const startHour = moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
+    const endHour = moment.tz(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
     const interventionInfo = {
       serviceId: mySortedInterventions[k].id_service,
-      dayShort: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM'),
-      day: moment(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm').tz('Europe/Paris').format('DD/MM/YYYY'),
+      dayShort: moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('DD/MM'),
+      day: moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('DD/MM/YYYY'),
       customer: session.dialogData.selectedPerson
     };
     cards.push(
