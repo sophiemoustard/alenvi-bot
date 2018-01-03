@@ -176,8 +176,10 @@ const handleRequest = async (session, results) => {
         if (moment(session.privateConversationData.service.endHour).isSameOrBefore(session.privateConversationData.service.startHour)) {
           return session.replaceDialog('/set_intervention', { reprompt: true, hourInPast: true });
         }
-        const startHour = moment(session.privateConversationData.service.startHour).tz('Europe/Paris').format('HH:mm');
-        const endHour = moment(session.privateConversationData.service.endHour).tz('Europe/Paris').format('HH:mm');
+        const startHour = moment.tz(session.privateConversationData.service.startHour, 'Europe/Paris').format('HH:mm');
+        const endHour = moment.tz(session.privateConversationData.service.endHour, 'Europe/Paris').format('HH:mm');
+        console.log('START', startHour);
+        console.log('END', endHour);
         const updateServiceParams = {
           startDate: moment.tz(`${session.privateConversationData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm'),
           endDate: moment.tz(`${session.privateConversationData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm')
