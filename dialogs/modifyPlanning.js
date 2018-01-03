@@ -125,11 +125,11 @@ const whichIntervention = async (session, results) => {
 const whichStartHour = (session, args, next) => {
   session.sendTyping();
   args = args || {};
-  if (args.data) {
-    session.dialogData.service = JSON.parse(args.data);
-    builder.Prompts.time(session, "A quelle heure débute l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
-  } else if (args.reprompt && args.hourInPast && args.service) {
-    session.dialogData.service = args.service;
+  if (args.data || (session.privateConversationData.service && args.isReloaded)) {
+    session.privateConversationData.service = session.privateConversationData.service || JSON.parse(args.data);
+    builder.Prompts.time(session, "A quelle heure débute l'intervention ? (donne-moi l'heure au format hh:mm stp) \nSi tu souhaites recommencer, dis-moi 'recommencer'.\nPour annuler, dis-moi 'annuler'", { maxRetries: 1 });
+  } else if (args.reprompt && args.hourInPast) { // when reprompt go to next step
+    // session.privateConversationData.service = args.service;
     next();
   } else {
     session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
@@ -139,9 +139,9 @@ const whichStartHour = (session, args, next) => {
 const whichEndHour = (session, results) => {
   session.sendTyping();
   if (results.response) {
-    session.dialogData.service.startHour = builder.EntityRecognizer.resolveTime([results.response]);
+    session.privateConversationData.service.startHour = builder.EntityRecognizer.resolveTime([results.response]);
     builder.Prompts.time(session, "A quelle heure se termine l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
-  } else if (session.dialogData.service.endHour) {
+  } else if (session.privateConversationData.service.endHour) { // endHour is set but invalid so we ask for it again
     builder.Prompts.time(session, "L'heure de fin d'intervention que tu m'as donnée n'est pas valide, peux-tu me la redonner ? (format hh:mm stp)", { maxRetries: 1 });
   } else {
     session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
@@ -170,29 +170,30 @@ const handleRequest = async (session, results) => {
         session.send('Tu as bien annulé ta demande ! :)');
         // session.replaceDialog('/select_modify_planning');
         session.cancelDialog(0, '/hello');
-      } else if (session.dialogData.service) { // request handled by Pigi
+      } else if (session.privateConversationData.service) { // request handled by Pigi
         session.sendTyping();
-        session.dialogData.service.endHour = builder.EntityRecognizer.resolveTime([results.response]);
-        if (moment(session.dialogData.service.endHour).isSameOrBefore(session.dialogData.service.startHour)) {
-          return session.replaceDialog('/set_intervention', { reprompt: true, hourInPast: true, service: session.dialogData.service });
+        session.privateConversationData.service.endHour = builder.EntityRecognizer.resolveTime([results.response]);
+        if (moment(session.privateConversationData.service.endHour).isSameOrBefore(session.privateConversationData.service.startHour)) {
+          return session.replaceDialog('/set_intervention', { reprompt: true, hourInPast: true });
         }
-        const startHour = moment(session.dialogData.service.startHour).tz('Europe/Paris').format('HH:mm');
-        const endHour = moment(session.dialogData.service.endHour).tz('Europe/Paris').format('HH:mm');
+        const startHour = moment(session.privateConversationData.service.startHour).tz('Europe/Paris').format('HH:mm');
+        const endHour = moment(session.privateConversationData.service.endHour).tz('Europe/Paris').format('HH:mm');
         const updateServiceParams = {
-          startDate: moment(`${session.dialogData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm'),
-          endDate: moment(`${session.dialogData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm')
+          startDate: moment(`${session.privateConversationData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm'),
+          endDate: moment(`${session.privateConversationData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true).tz('Europe/Paris').format('YYYYMMDDHHmm')
         };
         const planningUpdateParams = {
           type: 'Modif. Intervention',
-          content: `${session.dialogData.service.day}.\nIntervention chez ${session.dialogData.service.customer} de ${startHour} à ${endHour}`,
-          involved: session.dialogData.service.customer,
+          content: `${session.privateConversationData.service.day}.\nIntervention chez ${session.privateConversationData.service.customer} de ${startHour} à ${endHour}`,
+          involved: session.privateConversationData.service.customer,
           check: {
             isChecked: true,
             checkBy: process.env.ALENVI_BOT_ID
           }
         };
-        await services.updateServiceById(session.userData.ogust.tokenConfig.token, session.dialogData.service.serviceId, updateServiceParams);
+        await services.updateServiceById(session.userData.ogust.tokenConfig.token, session.privateConversationData.service.serviceId, updateServiceParams);
         await planningUpdates.storePlanningUpdate(session.userData.alenvi._id, session.userData.alenvi.token, planningUpdateParams);
+        delete session.privateConversationData.service;
         session.endDialog('Ta demande a bien été prise en compte, merci :)');
       } else { // User well describe his request
         session.sendTyping();
