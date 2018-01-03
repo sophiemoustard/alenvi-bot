@@ -176,8 +176,8 @@ const handleRequest = async (session, results) => {
         if (moment(session.privateConversationData.service.endHour).isSameOrBefore(session.privateConversationData.service.startHour)) {
           return session.replaceDialog('/set_intervention', { reprompt: true, hourInPast: true });
         }
-        console.log('START NOT FORMATTED', session.privateConversationData.startHour);
-        console.log('END NOT FORMATTED', session.privateConversationData.endHour);
+        console.log('START NOT FORMATTED', session.privateConversationData.service.startHour);
+        console.log('END NOT FORMATTED', session.privateConversationData.service.endHour);
         const startHour = moment.tz(session.privateConversationData.service.startHour, 'Europe/Paris').format('HH:mm');
         const endHour = moment.tz(session.privateConversationData.service.endHour, 'Europe/Paris').format('HH:mm');
         console.log('START', startHour);
