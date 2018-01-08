@@ -30,7 +30,7 @@ const redirectToDeclarationSelected = (session, results) => {
           session.replaceDialog('/ask_for_request');
           break;
         case 'Modif. intervention':
-          session.replaceDialog('/change_intervention');
+          session.replaceDialog('/select_intervention');
           break;
       }
     } else {
@@ -68,9 +68,10 @@ const getCardAttachments = async (session) => {
   const payload = {
     isDate: true,
     startDate: moment().subtract(1, 'day').tz('Europe/Paris').format('YYYYMMDDHHmm'),
-    endDate: moment().add(10, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
+    endDate: moment().add(5, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
     idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
   };
+  console.log('PAYLOAD', payload);
   const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
   const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
   if (Object.keys(myInterventions).length === 0) {
@@ -83,7 +84,7 @@ const getCardAttachments = async (session) => {
     const endHour = moment.tz(mySortedInterventions[k].end_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('HH:mm');
     const interventionInfo = {
       serviceId: mySortedInterventions[k].id_service,
-      dayShort: moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('DD/MM'),
+      dayShort: moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('dddd DD/MM'),
       day: moment.tz(mySortedInterventions[k].start_date, 'YYYYMMDDHHmm', 'Europe/Paris').format('DD/MM/YYYY'),
       customer: session.dialogData.selectedPerson
     };
@@ -106,14 +107,14 @@ const whichIntervention = async (session, results) => {
       session.dialogData.selectedPerson = results.response.entity;
       const cards = await getCardAttachments(session);
       const message = new builder.Message(session)
-        .text("Choisis l'intervention que tu souhaites modifier")
+        .text("Choisis l'intervention que tu souhaites modifier\nSi l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)")
         .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards);
-      // .suggestedActions(
-      //   builder.SuggestedActions.create(session, [builder.CardAction.dialogAction(session, '', 'Autre intervention')])
-      // );
-      session.send(message);
-      builder.Prompts.choice(session, "Si l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)", 'Autre intervention', { maxRetries: 0 });
+        .attachments(cards)
+        .suggestedActions(builder.SuggestedActions.create(
+          session, [builder.CardAction.dialogAction(session, 'askForRequest', session.dialogData.selectedPerson, 'Autre intervention')]
+        ));
+      session.endDialog(message);
+      // builder.Prompts.choice(session, "Si l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)", 'Autre intervention', { maxRetries: 0 });
     } else {
       session.cancelDialog(0, '/not_understand');
     }
@@ -125,9 +126,9 @@ const whichIntervention = async (session, results) => {
 const whichStartHour = (session, args, next) => {
   session.sendTyping();
   args = args || {};
-  if (args.data || (session.privateConversationData.service && args.isReloaded)) {
-    session.privateConversationData.service = session.privateConversationData.service || JSON.parse(args.data);
-    builder.Prompts.time(session, "A quelle heure débute l'intervention ? (donne-moi l'heure au format hh:mm stp) \nSi tu souhaites recommencer, dis-moi 'recommencer'.\nPour annuler, dis-moi 'annuler'", { maxRetries: 1 });
+  if (args.data) {
+    session.privateConversationData.service = JSON.parse(args.data);
+    builder.Prompts.time(session, "A quelle heure débute l'intervention ?\nPour annuler, dis-moi 'annuler'", { maxRetries: 1 });
   } else if (args.reprompt && args.hourInPast) { // when reprompt go to next step
     // session.privateConversationData.service = args.service;
     next();
@@ -140,7 +141,7 @@ const whichEndHour = (session, results) => {
   session.sendTyping();
   if (results.response) {
     session.privateConversationData.service.startHour = builder.EntityRecognizer.resolveTime([results.response]);
-    builder.Prompts.time(session, "A quelle heure se termine l'intervention ? (donne-moi l'heure au format hh:mm stp)", { maxRetries: 1 });
+    builder.Prompts.time(session, "A quelle heure se termine l'intervention ?", { maxRetries: 1 });
   } else if (session.privateConversationData.service.endHour) { // endHour is set but invalid so we ask for it again
     builder.Prompts.time(session, "L'heure de fin d'intervention que tu m'as donnée n'est pas valide, peux-tu me la redonner ? (format hh:mm stp)", { maxRetries: 1 });
   } else {
@@ -151,8 +152,8 @@ const whichEndHour = (session, results) => {
 const promptDescription = (session, args) => {
   session.sendTyping();
   args = args || {};
-  if (args.response) { // Modif. Intervention: Bénéficiaire selected
-    session.dialogData.selectedPerson = args.response.entity === 'Autre intervention' ? session.dialogData.selectedPerson : args.response.entity;
+  if (args.data) { // Modif. Intervention: Bénéficiaire selected
+    session.dialogData.selectedPerson = args.data;
     builder.Prompts.text(session, `Décris-moi les modifications d'intervention que tu souhaites déclarer (jour, heure, tâche) concernant ${session.dialogData.selectedPerson}  \nSi tu souhaites annuler ta demande, dis-moi 'annuler' ! ;)`);
   } else if (args.resumed) { // User writes anything not related
     session.cancelDialog(0, '/not_understand');
@@ -215,6 +216,6 @@ const handleRequest = async (session, results) => {
   }
 };
 
-exports.changeIntervention = [whichCustomer, whichIntervention, promptDescription, handleRequest];
+exports.selectIntervention = [whichCustomer, whichIntervention];
 exports.setIntervention = [whichStartHour, whichEndHour, handleRequest];
 exports.askForRequest = [promptDescription, handleRequest];

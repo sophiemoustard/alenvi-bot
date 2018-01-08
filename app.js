@@ -198,14 +198,8 @@ bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPerio
 bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCalendar);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
-bot.dialog('/change_intervention', require('./dialogs/modifyPlanning').changeIntervention);
+bot.dialog('/select_intervention', require('./dialogs/modifyPlanning').selectIntervention);
 bot.dialog('/set_intervention', require('./dialogs/modifyPlanning').setIntervention)
-  .reloadAction('restartSetIntervention', 'Recommençons :)', {
-    matches: /^recommencer$/i,
-    dialogArgs: {
-      isReloaded: true
-    }
-  })
   .cancelAction('cancelSetIntervention', 'Tu as bien annulé ta demande !', { matches: /^annuler|anuler$/i });
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
@@ -217,6 +211,7 @@ bot.dialog('/show_team', require('./dialogs/team').showTeam);
 // bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
 bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
 bot.beginDialogAction('setIntervention', '/set_intervention');
+bot.beginDialogAction('askForRequest', '/ask_for_request');
 
 bot.dialog('/select_infos', require('./dialogs/infos').select);
 bot.dialog('/hr_docs', require('./dialogs/HRDocs').showHRDocs);
