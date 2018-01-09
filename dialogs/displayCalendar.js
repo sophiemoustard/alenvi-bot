@@ -8,22 +8,25 @@ const getCardsAttachments = async (session, args) => {
   }
   let employeeId = '';
   let customerId = '';
+  let url = '';
   let title;
   switch (args.personType) {
     case 'Self':
       employeeId = session.userData.alenvi.employee_id;
       title = 'Consulter mon planning';
+      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=true`;
       break;
     case 'Auxiliary':
       employeeId = args.personChosen.employee_id;
       title = 'Consulter son planning';
+      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=false`;
       break;
     case 'Customer':
       customerId = args.personChosen.customer_id;
       title = 'Consulter son planning';
+      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&access_token=${session.userData.alenvi.token}`;
   }
   const myCards = [];
-  const url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&id_employee=${employeeId}&access_token=${session.userData.alenvi.token}`;
   myCards.push(
     new builder.HeroCard(session)
       .title(title)
