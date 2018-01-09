@@ -71,7 +71,6 @@ const getCardAttachments = async (session) => {
     endDate: moment().add(5, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
     idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
   };
-  console.log('PAYLOAD', payload);
   const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
   const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
   if (Object.keys(myInterventions).length === 0) {
