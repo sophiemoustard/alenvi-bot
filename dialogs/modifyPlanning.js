@@ -188,7 +188,8 @@ const handleRequest = async (session, results) => {
           involved: session.privateConversationData.service.customer,
           check: {
             isChecked: true,
-            checkBy: process.env.ALENVI_BOT_ID
+            checkBy: process.env.ALENVI_BOT_ID,
+            checkedAt: new Date()
           }
         };
         await services.updateServiceById(session.userData.ogust.tokenConfig.token, session.privateConversationData.service.serviceId, updateServiceParams);
