@@ -106,7 +106,7 @@ const whichIntervention = async (session, results) => {
       session.dialogData.selectedPerson = results.response.entity;
       const cards = await getCardAttachments(session);
       const message = new builder.Message(session)
-        .text("Choisis l'intervention que tu souhaites modifier\nSi l'intervention que tu souhaites modifier n'apparaît pas, clique sur 'Autre intervention' :)")
+        .text("Choisis l'intervention que tu souhaites modifier.\nSi elle n'apparaît pas, clique sur 'Autre intervention' :)")
         .attachmentLayout(builder.AttachmentLayout.carousel)
         .attachments(cards)
         .suggestedActions(builder.SuggestedActions.create(
