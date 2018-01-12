@@ -28,13 +28,22 @@ const getCommunityWorkingHoursByDay = async (session, dateOgust) => {
     if (myTeam[i].id_employee != session.userData.alenvi.employee_id) {
       const employeeId = myTeam[i].id_employee;
       // Get all interventions for an employee
+      const payload = {
+        isRange: 'false',
+        isDate: 'true',
+        slotToSub: '',
+        slotToAdd: '',
+        intervalType: '',
+        startDate: `${dateOgust.periodStart}0000`,
+        endDate: `${dateOgust.periodEnd}2359`,
+        status: '',
+        type: '',
+        pageOption: { nbPerPage: 20, pageNum: 1 }
+      };
       const employeePlanningByDayRaw = await employees.getServices(
         session.userData.ogust.tokenConfig.token,
         employeeId,
-        'false', 'true', '', '', '',
-        `${dateOgust.periodStart}0000`, `${dateOgust.periodEnd}2359`,
-        '', '',
-        { nbPerPage: 20, pageNum: 1 }
+        payload
       );
       const employeePlanningByDay = employeePlanningByDayRaw.body.data.servicesRaw.array_service.result;
       // Create the object to return
