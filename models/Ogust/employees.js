@@ -178,9 +178,9 @@ exports.getServices = async (token, id, payload) => {
       endDate: payload.endDate,
       status: payload.status,
       type: payload.type,
-      idCustomer: payload.idCustomer
-      // nbPerPage: payload.pageOption.nbPerPage,
-      // pageNum: payload.pageOption.pageNum
+      idCustomer: payload.idCustomer,
+      nbPerPage: payload.pageOption.nbPerPage,
+      pageNum: payload.pageOption.pageNum
     },
     resolveWithFullResponse: true,
     time: true,

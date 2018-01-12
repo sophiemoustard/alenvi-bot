@@ -69,7 +69,8 @@ const getCardAttachments = async (session) => {
     isDate: true,
     startDate: moment().subtract(1, 'day').tz('Europe/Paris').format('YYYYMMDDHHmm'),
     endDate: moment().add(5, 'days').tz('Europe/Paris').format('YYYYMMDDHHmm'),
-    idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id
+    idCustomer: session.dialogData.myCustomers[session.dialogData.selectedPerson].customer_id,
+    pageOption: {}
   };
   const myInterventionsRaw = await employees.getServices(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id, payload);
   const myInterventions = myInterventionsRaw.body.data.servicesRaw.array_service.result;
@@ -118,6 +119,7 @@ const whichIntervention = async (session, results) => {
       session.cancelDialog(0, '/not_understand');
     }
   } catch (e) {
+    console.error(e);
     return session.endDialog('Il y a eu un problème lors de la récupération de tes interventions! :/');
   }
 };
