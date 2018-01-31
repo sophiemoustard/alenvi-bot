@@ -17,8 +17,8 @@ const planning = require('../helpers/planning/format');
 // =========================================================
 
 const whichDeclaration = async (session) => {
-  await checkOgustToken(session);
   session.sendTyping();
+  await checkOgustToken(session);
   builder.Prompts.choice(session, 'Que souhaites-tu déclarer ?', 'Heures internes|Modif. intervention', { maxRetries: 0 });
 };
 
@@ -101,8 +101,8 @@ const getCardAttachments = async (session) => {
 
 const whichIntervention = async (session, results) => {
   try {
-    await checkOgustToken(session);
     session.sendTyping();
+    await checkOgustToken(session);
     if (results.response) {
       session.dialogData.selectedPerson = results.response.entity;
       const cards = await getCardAttachments(session);

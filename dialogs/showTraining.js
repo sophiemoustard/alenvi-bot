@@ -11,8 +11,8 @@ cloudinary.config(cloudinaryConfig);
 
 const whichTrainingType = async (session, args, next) => {
   try {
-    await checkOgustToken(session);
     session.sendTyping();
+    await checkOgustToken(session);
     session.dialogData.trainingType = args.trainingType || '';
     switch (session.dialogData.trainingType) {
       case 'memory':

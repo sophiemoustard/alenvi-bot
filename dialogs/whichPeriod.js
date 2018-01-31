@@ -10,8 +10,8 @@ const whichPeriod = async (session, args) => {
       Customer: 'son planning',
       Community: 'le planning de ta communauté'
     };
-    await checkOgustToken(session);
     session.sendTyping();
+    await checkOgustToken(session);
     session.dialogData.personChosen = args.personChosen || '';
     session.dialogData.personType = args.personType || '';
     builder.Prompts.choice(session, `Pour quelle période souhaites-tu consulter ${targetPlanning[session.dialogData.personType]} ?`, 'A la journée|A la semaine|Au mois', { maxRetries: 0 });
