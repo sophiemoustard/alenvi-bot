@@ -5,8 +5,8 @@ const { getNewsAlenvi } = require('../helpers/getNewsAlenvi');
 
 const showNewsAlenvi = async (session) => {
   try {
-    await checkOgustToken(session);
     session.sendTyping();
+    await checkOgustToken(session);
     const newsAlenvi = await getNewsAlenvi();
     if (newsAlenvi.length === 0) {
       throw new Error('No files found');

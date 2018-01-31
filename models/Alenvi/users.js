@@ -36,8 +36,11 @@ exports.getAlenviUserById = async (id) => {
 
 exports.getAlenviUsers = async (token, params) => {
   const options = {
-    url: `${process.env.API_HOSTNAME}/users`,
+    url: `${process.env.API_HOSTNAME}/bot/users`,
     json: true,
+    headers: {
+      'x-access-token': token
+    },
     qs: params,
     resolveWithFullResponse: true,
     time: true,

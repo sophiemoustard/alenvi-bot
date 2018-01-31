@@ -11,8 +11,8 @@ const whichPerson = async (session, args) => {
     let personTypeId;
     let promptMsg;
     session.dialogData.personType = args.personType || '';
-    await checkOgustToken(session);
     session.sendTyping();
+    await checkOgustToken(session);
     switch (args.personType) {
       case 'Customer':
         myRawPersons = await getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
