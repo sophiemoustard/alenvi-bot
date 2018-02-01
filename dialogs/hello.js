@@ -39,9 +39,9 @@ const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
-    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
   } else {
-    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Equipe|Infos|Formation|URGENCE', { maxRetries: 0 });
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
   }
 };
 
@@ -58,8 +58,8 @@ const redirectMenuResult = (session, results) => {
         case 'Bénéficiaires':
           session.replaceDialog('/show_my_customers');
           break;
-        case 'Equipe':
-          session.replaceDialog('/show_team');
+        case 'Répertoire':
+          session.replaceDialog('/select_directory');
           break;
         case 'Infos':
           session.replaceDialog('/select_infos');

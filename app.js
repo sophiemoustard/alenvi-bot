@@ -206,6 +206,8 @@ bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest
 bot.dialog('/show_my_customers', require('./dialogs/customers').showCustomers);
 bot.dialog('/my_customers_more_details', require('./dialogs/customers').moreDetails);
 
+bot.dialog('/select_directory', require('./dialogs/team').selectDirectory);
+bot.dialog('/show_sector_team', require('./dialogs/team').showSectorTeam);
 bot.dialog('/show_team', require('./dialogs/team').showTeam);
 
 // bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
