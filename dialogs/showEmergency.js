@@ -6,7 +6,7 @@ const users = require('./../models/Alenvi/users');
 
 const whichEmergency = async (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'De quoi as-tu besoin ?', 'Doc d\'urgence|Contacter Permanent', { listStyle: builder.ListStyle.button, maxRetries: 0 });
+  builder.Prompts.choice(session, 'De quoi as-tu besoin ?', 'Doc d\'urgence|Contacter Permanent(s)', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const showEmergency = async (session) => {
@@ -30,14 +30,39 @@ const showEmergency = async (session) => {
   }
 };
 
+const getCardsAttachments = async (session) => {
+  const myCards = [];
+  const usersConstrainedRaw = await users.getAlenviUsers(session.userData.alenvi.token, { isConstrained: true });
+  const usersConstrained = usersConstrainedRaw.body.data.users;
+  for (const k in usersConstrained) {
+    const person = `${usersConstrained[k].firstname} ${usersConstrained[k].lastname}`;
+    const mobilePhone = usersConstrained[k].mobilePhone || 'N/A';
+    const contact = `https://m.me/${usersConstrained[k].facebook.facebookId}`;
+    const picture = usersConstrained[k].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
+    myCards.push(
+      new builder.ThumbnailCard(session)
+        .title(person)
+        .text(mobilePhone)
+        .images([
+          builder.CardImage.create(session, picture)
+        ])
+        .buttons([
+          builder.CardAction.openUrl(session, contact, 'Contacter')
+        ])
+    );
+  }
+  return myCards;
+};
+
 const showPermanentCoach = async (session) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const userConstrainedRaw = await users.getAlenviUsers(session.userData.alenvi.token, { isConstrained: true });
-    const userConstrained = userConstrainedRaw.body.data.users;
-    console.log(userConstrained);
-    return session.endDialog('Coucou c\'est nous !');
+    const cards = await getCardsAttachments(session);
+    const message = new builder.Message(session)
+      .attachmentLayout(builder.AttachmentLayout.carousel)
+      .attachments(cards);
+    return session.endDialog(message);
   } catch (e) {
     console.error(e);
     if (e.statusCode === '404') {
@@ -53,11 +78,9 @@ const redirectToEmergencySelected = (session, results) => {
       switch (results.response.entity) {
         case 'Doc d\'urgence':
           showEmergency(session);
-          // session.replaceDialog('/display_calendar', { personType: 'Self' });
           break;
-        case 'Contacter Permanent':
+        case 'Contacter Permanent(s)':
           showPermanentCoach(session);
-          // session.replaceDialog('/which_person', { personType: 'Auxiliary' });
           break;
         default:
           break;
