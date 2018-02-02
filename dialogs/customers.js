@@ -39,6 +39,7 @@ const getCardsAttachments = async (session) => {
       const encoded = encodeURI(`${myCustomers[k].main_address.line} ${myCustomers[k].main_address.zip}`);
       const person = await formatPerson(myCustomers[k]);
       const text = await formatText(myCustomers[k]);
+      const uri = `${process.env.WEBSITE_HOSTNAME}/bot/editCustomerInfo?id_customer=${myCustomers[k].id_customer}&_id=${session.userData.alenvi._id}&access_token=${session.userData.alenvi.token}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       myCards.push(
         new builder.HeroCard(session)
           .title(person)
@@ -50,7 +51,8 @@ const getCardsAttachments = async (session) => {
           .tap(builder.CardAction.openUrl(session, `http://maps.google.fr/maps/place/${encoded}/`))
           .buttons([
             // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].comment, 'Plus de détails...')
-            builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].id_customer, 'Plus de détails...')
+            // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].id_customer, 'Plus de détails...')
+            builder.CardAction.openUrl(session, uri, 'Ouvrir') // TO CHANGE TO HAVE A WEBVIEW
           ])
       );
     }
@@ -66,48 +68,48 @@ exports.moreDetails = async (session, args) => {
     if (args.data) {
       const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
-      let customerContactDetails = [];
-      const customerDetailsTitles = {
-        customerContactDetails: 'Coordonnées bénéficiaire',
-        pathology: 'Pathologie',
-        pathologyComment: 'Commentaires',
-        interventionDetails: 'Détails intervention',
-        miscComments: 'Autres'
-      };
-      if (customerById.landline) {
-        customerContactDetails.push(customerById.landline);
-      }
-      if (customerById.mobile_phone) {
-        customerContactDetails.push(customerById.mobile_phone);
-      }
-      if (!customerContactDetails.length) {
-        customerContactDetails = '';
-      }
-      const thirdPartyInfoRaw = await customers.getThirdPartyInformationByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, 'C', { nbPerPage: 10, pageNum: 1 });
-      const thirdPartyInfo = thirdPartyInfoRaw.body.data.info.thirdPartyInformations.array_values || {};
-      const customerDetails = {};
-      customerDetails.customerContactDetails = customerContactDetails;
-      customerDetails.pathology = thirdPartyInfo.NIVEAU;
-      customerDetails.pathologyComment = thirdPartyInfo.COMMNIV || '';
-      customerDetails.interventionDetails = thirdPartyInfo.DETAILEVE || '';
-      customerDetails.miscComments = thirdPartyInfo.AUTRESCOMM || '';
-      let title = '';
-      let text = '';
-      for (const k in customerDetails) {
-        if (customerDetails[k] && customerDetails[k] !== '') {
-          session.sendTyping();
-          title = `## ${customerDetailsTitles[k]}`;
-          if (k === 'customerContactDetails') {
-            text = customerDetails[k].join('  \n');
-          } else {
-            text = customerDetails[k];
-          }
-          session.send(`${title} \n\n ${text}`);
-        }
-      }
-      if (title === '' && text === '') {
-        session.send('Le bénéficiaire ne possède pas plus de détails.');
-      }
+      // let customerContactDetails = [];
+      // const customerDetailsTitles = {
+      //   customerContactDetails: 'Coordonnées bénéficiaire',
+      //   pathology: 'Pathologie',
+      //   pathologyComment: 'Commentaires',
+      //   interventionDetails: 'Détails intervention',
+      //   miscComments: 'Autres'
+      // };
+      // if (customerById.landline) {
+      //   customerContactDetails.push(customerById.landline);
+      // }
+      // if (customerById.mobile_phone) {
+      //   customerContactDetails.push(customerById.mobile_phone);
+      // }
+      // if (!customerContactDetails.length) {
+      //   customerContactDetails = '';
+      // }
+      // const thirdPartyInfoRaw = await customers.getThirdPartyInformationByCustomerId(session.userData.ogust.tokenConfig.token, customerById.id_customer, 'C', { nbPerPage: 10, pageNum: 1 });
+      // const thirdPartyInfo = thirdPartyInfoRaw.body.data.info.thirdPartyInformations.array_values || {};
+      // const customerDetails = {};
+      // customerDetails.customerContactDetails = customerContactDetails;
+      // customerDetails.pathology = thirdPartyInfo.NIVEAU;
+      // customerDetails.pathologyComment = thirdPartyInfo.COMMNIV || '';
+      // customerDetails.interventionDetails = thirdPartyInfo.DETAILEVE || '';
+      // customerDetails.miscComments = thirdPartyInfo.AUTRESCOMM || '';
+      // let title = '';
+      // let text = '';
+      // for (const k in customerDetails) {
+      //   if (customerDetails[k] && customerDetails[k] !== '') {
+      //     session.sendTyping();
+      //     title = `## ${customerDetailsTitles[k]}`;
+      //     if (k === 'customerContactDetails') {
+      //       text = customerDetails[k].join('  \n');
+      //     } else {
+      //       text = customerDetails[k];
+      //     }
+      //     session.send(`${title} \n\n ${text}`);
+      //   }
+      // }
+      // if (title === '' && text === '') {
+      //   session.send('Le bénéficiaire ne possède pas plus de détails.');
+      // }
       const uri = `${process.env.WEBSITE_HOSTNAME}/bot/editCustomerInfo?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&access_token=${session.userData.alenvi.token}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
       console.log(session.userData.alenvi.token);
       const msg = new builder.Message(session).sourceEvent({
