@@ -1,4 +1,5 @@
 const builder = require('botbuilder');
+const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 // const { getTeamBySector } = require('../helpers/team');
@@ -6,7 +7,6 @@ const { getAlenviUsers } = require('../models/Alenvi/users');
 const { getList } = require('../models/Ogust/getList');
 
 const whichDirectory = async (session) => {
-  console.log(session.message);
   session.sendTyping();
   await checkOgustToken(session);
   builder.Prompts.choice(session, 'Quelle section veux-tu consulter ?', 'Mon équipe|Autres communautés|Alenvi-bureau', { maxRetries: 0 });
@@ -71,24 +71,28 @@ const getCardsAttachments = async (session, params) => {
   // const myRawTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const myRawTeam = await getAlenviUsers(session.userData.alenvi.token, params);
   const myTeam = myRawTeam.body.data.users;
-  const lengthTeam = myTeam.length;
+  const mySortedTeam = _.sortBy(myTeam, ['lastname']);
+  const lengthTeam = mySortedTeam.length;
   for (let i = 0; i < lengthTeam; i++) {
-    if (myTeam[i].employee_id == session.userData.alenvi.employee_id && lengthTeam === 1) {
+    if (mySortedTeam[i].employee_id == session.userData.alenvi.employee_id && lengthTeam === 1) {
       return session.endDialog('Il semble que tu sois le premier membre de ta communauté ! :)');
     }
-    if (myTeam[i].employee_id != session.userData.alenvi.employee_id) {
-      const person = await formatPerson(myTeam[i]);
-      const mobilePhone = myTeam[i].mobilePhone || 'N/A';
-      const contact = myTeam[i].facebook && myTeam[i].facebook.address ? `https://m.me/${myTeam[i].facebook.address.user.id}` : null;
-      const picture = myTeam[i].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
+    if (mySortedTeam[i].employee_id != session.userData.alenvi.employee_id && mySortedTeam[i].firstname !== 'Admin' && mySortedTeam[i].firstname !== 'Pigi') {
+      const person = await formatPerson(mySortedTeam[i]);
+      const mobilePhone = mySortedTeam[i].mobilePhone || null;
+      // const contact = mySortedTeam[i].facebook && mySortedTeam[i].facebook.address ? `https://m.me/${mySortedTeam[i].facebook.address.user.id}` : null;
+      const picture = mySortedTeam[i].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
       const buttons = [];
-      if (contact) {
-        buttons.push(builder.CardAction.openUrl(session, contact, 'Contacter'));
+      // if (contact) {
+      //   buttons.push(builder.CardAction.openUrl(session, contact, 'Contacter'));
+      // }
+      if (mobilePhone) {
+        buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, 'Contacter'));
       }
       myCards.push(
         new builder.ThumbnailCard(session)
           .title(person)
-          .text(mobilePhone)
+          // .text(mobilePhone)
           .images([
             builder.CardImage.create(session, picture)
           ])
