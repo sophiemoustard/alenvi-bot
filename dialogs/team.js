@@ -87,7 +87,7 @@ const getCardsAttachments = async (session, params) => {
       //   buttons.push(builder.CardAction.openUrl(session, contact, 'Contacter'));
       // }
       if (mobilePhone) {
-        buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, 'Contacter'));
+        buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, '📱 Contacter'));
       }
       myCards.push(
         new builder.ThumbnailCard(session)
