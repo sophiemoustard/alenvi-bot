@@ -52,7 +52,7 @@ const getCardsAttachments = async (session) => {
           .buttons([
             // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].comment, 'Plus de détails...')
             // builder.CardAction.dialogAction(session, 'myCustomersMoreDetails', myCustomers[k].id_customer, 'Plus de détails...')
-            builder.CardAction.openUrl(session, uri, 'Ouvrir') // TO CHANGE TO HAVE A WEBVIEW
+            builder.CardAction.openUrl(session, uri, 'Consulter')
           ])
       );
     }
