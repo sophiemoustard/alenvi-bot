@@ -40,13 +40,14 @@ const getCardsAttachments = async (session) => {
     // const contact = `https://m.me/${usersConstrained[k].facebook.facebookId}`;
     const picture = usersConstrained[k].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
     const buttons = [];
+    console.log(mobilePhone);
     if (mobilePhone) {
       buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, '📱 Contacter'));
     }
     myCards.push(
       new builder.ThumbnailCard(session)
         .title(person)
-        .text(mobilePhone)
+        // .text(mobilePhone)
         .images([
           builder.CardImage.create(session, picture)
         ])
