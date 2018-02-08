@@ -9,7 +9,7 @@ const { getList } = require('../models/Ogust/getList');
 const whichDirectory = async (session) => {
   session.sendTyping();
   await checkOgustToken(session);
-  builder.Prompts.choice(session, 'Quelle section veux-tu consulter ?', 'Mon équipe|Autres communautés|Alenvi-bureau', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quelle personne souhaites-tu contacter ?', 'Mon équipe|Autres communautés|Alenvi bureau', { maxRetries: 0 });
 };
 
 const redirectToDirectorySelected = (session, results) => {
@@ -22,7 +22,7 @@ const redirectToDirectorySelected = (session, results) => {
         case 'Autres communautés':
           session.replaceDialog('/show_sector_team');
           break;
-        case 'Alenvi-bureau':
+        case 'Alenvi bureau':
           session.replaceDialog('/show_team', { staff: true });
           break;
       }
