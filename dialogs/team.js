@@ -83,11 +83,8 @@ const getCardsAttachments = async (session, params) => {
       // const contact = mySortedTeam[i].facebook && mySortedTeam[i].facebook.address ? `https://m.me/${mySortedTeam[i].facebook.address.user.id}` : null;
       const picture = mySortedTeam[i].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
       const buttons = [];
-      // if (contact) {
-      //   buttons.push(builder.CardAction.openUrl(session, contact, 'Contacter'));
-      // }
       if (mobilePhone) {
-        buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, '📱 Contacter'));
+        buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, `📱 ${mobilePhone}`));
       }
       myCards.push(
         new builder.ThumbnailCard(session)
