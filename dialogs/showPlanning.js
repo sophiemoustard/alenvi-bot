@@ -6,26 +6,26 @@ const builder = require('botbuilder');
 
 const whichPlanning = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Le mien|Un(e) auxiliaire|Un(e) bénéficiaire|Ma communauté', { listStyle: builder.ListStyle.button, maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quel planning souhaites-tu consulter en particulier ?', 'Auxiliaire|Bénéficiaire', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const redirectToDaySelected = (session, results) => {
   if (results.response) {
     if (session.userData.alenvi) {
       switch (results.response.entity) {
-        case 'Le mien':
+        case 'Auxiliaire':
           // session.replaceDialog('/which_person', { personType: 'Self' });
           session.replaceDialog('/display_calendar', { personType: 'Self' });
           break;
-        case 'Un(e) auxiliaire':
-          session.replaceDialog('/which_person', { personType: 'Auxiliary' });
-          break;
-        case 'Un(e) bénéficiaire':
+        // case 'Un(e) auxiliaire':
+        //   session.replaceDialog('/which_person', { personType: 'Auxiliary' });
+        //   break;
+        case 'Bénéficiaire':
           session.replaceDialog('/which_person', { personType: 'Customer' });
           break;
-        case 'Ma communauté':
-          session.replaceDialog('/which_person', { personType: 'Community' });
-          break;
+        // case 'Ma communauté':
+        //   session.replaceDialog('/which_person', { personType: 'Community' });
+        //   break;
         default:
           break;
       }
