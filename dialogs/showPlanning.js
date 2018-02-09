@@ -15,7 +15,7 @@ const redirectToDaySelected = (session, results) => {
       switch (results.response.entity) {
         case 'Auxiliaire':
           // session.replaceDialog('/which_person', { personType: 'Self' });
-          session.replaceDialog('/display_calendar', { personType: 'Self' });
+          session.replaceDialog('/display_calendar', { personType: 'Auxiliary' });
           break;
         // case 'Un(e) auxiliaire':
         //   session.replaceDialog('/which_person', { personType: 'Auxiliary' });

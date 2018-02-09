@@ -11,16 +11,16 @@ const getCardsAttachments = async (session, args) => {
   let url = '';
   let title;
   switch (args.personType) {
-    case 'Self':
+    case 'Auxiliary':
       employeeId = session.userData.alenvi.employee_id;
-      title = 'Consulter mon planning';
+      title = 'Consulter planning';
       url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=true`;
       break;
-    case 'Auxiliary':
-      employeeId = args.personChosen.employee_id;
-      title = 'Consulter son planning';
-      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=false`;
-      break;
+    // case 'Auxiliary':
+    //   employeeId = args.personChosen.employee_id;
+    //   title = 'Consulter son planning';
+    //   url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=false`;
+    //   break;
     case 'Customer':
       customerId = args.personChosen.customer_id;
       title = 'Consulter son planning';
