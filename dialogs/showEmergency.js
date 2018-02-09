@@ -6,7 +6,7 @@ const users = require('./../models/Alenvi/users');
 
 const whichEmergency = async (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'De quoi as-tu besoin ?', 'Doc d\'urgence|Contacter Permanent(s)', { listStyle: builder.ListStyle.button, maxRetries: 0 });
+  builder.Prompts.choice(session, 'De quoi as-tu besoin ?', 'Doc d\'urgence|Contacter Permanence', { listStyle: builder.ListStyle.button, maxRetries: 0 });
 };
 
 const showEmergency = async (session) => {
@@ -81,7 +81,7 @@ const redirectToEmergencySelected = (session, results) => {
         case 'Doc d\'urgence':
           showEmergency(session);
           break;
-        case 'Contacter Permanent(s)':
+        case 'Contacter Permanence':
           showPermanentCoach(session);
           break;
         default:
