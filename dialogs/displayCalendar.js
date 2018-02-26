@@ -14,7 +14,7 @@ const getCardsAttachments = async (session, args) => {
     case 'Auxiliary':
       employeeId = session.userData.alenvi.employee_id;
       title = 'Consulter planning';
-      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=true`;
+      url = `${process.env.WEBSITE_HOSTNAME}/bot/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}`;
       break;
     // case 'Auxiliary':
     //   employeeId = args.personChosen.employee_id;
@@ -24,7 +24,7 @@ const getCardsAttachments = async (session, args) => {
     case 'Customer':
       customerId = args.personChosen.customer_id;
       title = 'Consulter son planning';
-      url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_customer=${customerId}&access_token=${session.userData.alenvi.token}`;
+      url = `${process.env.WEBSITE_HOSTNAME}/bot/calendar?id_customer=${customerId}&access_token=${session.userData.alenvi.token}`;
   }
   const myCards = [];
   myCards.push(
