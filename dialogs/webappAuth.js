@@ -47,9 +47,6 @@ exports.autoLogin = async (session) => {
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
         session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
-        if (!session.userData.alenvi.administrative.signup.complete) {
-          showEndSignupCard(session);
-        }
         session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :
         -  Notre charte d’envie
@@ -57,8 +54,11 @@ exports.autoLogin = async (session) => {
         C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)`);
         setTimeout(() => {
           session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
-          session.endDialog('La charte d’envie: http://blog.alenvi.io/charte-envie');
+          session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
         }, 15000);
+        if (!session.userData.alenvi.administrative.signup.complete) {
+          showEndSignupCard(session);
+        }
         // session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);

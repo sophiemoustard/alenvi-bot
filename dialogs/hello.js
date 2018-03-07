@@ -35,9 +35,31 @@ exports.hello_first = [
 //   }
 // };
 
+const getEndSignupCardAttachment = (session) => {
+  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi.token}&token=${session.userData.alenvi._id}`;
+  return new builder.HeroCard(session)
+    .title('Terminer inscription')
+    .images([
+      builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
+    ])
+    .buttons([
+      builder.CardAction.openUrl(session, uri, 'Terminer l\'inscription')
+    ]);
+};
+
+const showEndSignupCard = (session) => {
+  session.sendTyping();
+  const card = getEndSignupCardAttachment(session);
+  const message = new builder.Message(session).addAttachment(card);
+  session.endDialog(message);
+};
+
 const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
+  if (!session.userData.alenvi.administrative.signup.complete) {
+    showEndSignupCard(session);
+  }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
   } else {
