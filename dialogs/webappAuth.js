@@ -2,6 +2,25 @@ const builder = require('botbuilder');
 const jwt = require('jsonwebtoken');
 const { getAlenviUserById } = require('../models/Alenvi/users');
 
+const getEndSignupCardAttachment = (session) => {
+  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi.token}&token=${session.userData.alenvi._id}`;
+  return new builder.HeroCard(session)
+    .title('Terminer inscription')
+    .images([
+      builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
+    ])
+    .buttons([
+      builder.CardAction.openUrl(session, uri, 'Terminer l\'inscription')
+    ]);
+};
+
+const showEndSignupCard = (session) => {
+  session.sendTyping();
+  const card = getEndSignupCardAttachment(session);
+  const message = new builder.Message(session).addAttachment(card);
+  session.endDialog(message);
+};
+
 exports.autoLogin = async (session) => {
   let token = '';
   if (session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref)  {
@@ -28,6 +47,9 @@ exports.autoLogin = async (session) => {
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
         session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
+        if (!session.userData.alenvi.administrative.signup.complete) {
+          showEndSignupCard(session);
+        }
         session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :
         -  Notre charte d’envie
