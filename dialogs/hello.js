@@ -36,7 +36,7 @@ exports.hello_first = [
 // };
 
 const getEndSignupCardAttachment = (session) => {
-  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi.token}&token=${session.userData.alenvi._id}`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi._id}&token=${session.userData.alenvi.token}`;
   return new builder.HeroCard(session)
     .title('Terminer inscription')
     .images([
