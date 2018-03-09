@@ -57,7 +57,7 @@ const showEndSignupCard = (session) => {
 const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
-  if (!session.userData.alenvi.administrative.signup.complete) {
+  if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
     showEndSignupCard(session);
   }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
