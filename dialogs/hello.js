@@ -39,6 +39,7 @@ const getEndSignupCardAttachment = (session) => {
   const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi._id}&token=${session.userData.alenvi.token}`;
   return new builder.HeroCard(session)
     .title('Terminer inscription')
+    .text('Merci de bien vouloir terminer ton inscription ! :)')
     .images([
       builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
     ])
@@ -58,7 +59,7 @@ const rootGreetingMenu = (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
-    showEndSignupCard(session);
+    return showEndSignupCard(session);
   }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
