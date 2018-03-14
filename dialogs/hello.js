@@ -60,7 +60,7 @@ const showEndSignupCard = (session) => {
 const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
-  if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day')) {
+  if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
     await sendEndorsementToSlack(session);
   }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
