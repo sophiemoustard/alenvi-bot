@@ -3,7 +3,9 @@
 // =========================================================
 
 const builder = require('botbuilder');
+const moment = require('moment');
 // const BotMetrics = require('botmetrics');
+const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
 
 exports.hello_first = [
   (session) => {
@@ -55,9 +57,12 @@ const showEndSignupCard = (session) => {
   session.endDialog(message);
 };
 
-const rootGreetingMenu = (session) => {
+const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
+  if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day')) {
+    await sendEndorsementToSlack(session);
+  }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
     return showEndSignupCard(session);
   }
