@@ -71,6 +71,7 @@ const getCardsAttachments = async (session, params) => {
   // const myRawTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const myRawTeam = await getAlenviUsers(session.userData.alenvi.token, params);
   const myTeam = myRawTeam.body.data.users;
+  console.log(myTeam);
   const mySortedTeam = _.sortBy(myTeam, ['lastname']);
   const lengthTeam = mySortedTeam.length;
   for (let i = 0; i < lengthTeam; i++) {
@@ -81,7 +82,7 @@ const getCardsAttachments = async (session, params) => {
       const person = await formatPerson(mySortedTeam[i]);
       const mobilePhone = mySortedTeam[i].mobilePhone || null;
       // const contact = mySortedTeam[i].facebook && mySortedTeam[i].facebook.address ? `https://m.me/${mySortedTeam[i].facebook.address.user.id}` : null;
-      const picture = mySortedTeam[i].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
+      const picture = mySortedTeam[i].picture && mySortedTeam[i].picture.link ? mySortedTeam[i].picture.link : 'https://cdn.head-fi.org/g/2283245_l.jpg';
       const buttons = [];
       if (mobilePhone) {
         buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, `📱 ${mobilePhone}`));
