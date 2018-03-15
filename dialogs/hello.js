@@ -6,6 +6,7 @@ const builder = require('botbuilder');
 const moment = require('moment');
 // const BotMetrics = require('botmetrics');
 const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
+const { getAlenviUserById } = require('../models/Alenvi/users');
 
 exports.hello_first = [
   (session) => {
@@ -58,8 +59,16 @@ const showEndSignupCard = (session) => {
 };
 
 const rootGreetingMenu = async (session) => {
+  console.log(session.message.sourceEvent);
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
+  if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'signup_complete') {
+    const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
+    const userDataAlenvi = userDataAlenviRaw.body.data.user;
+    session.userData.alenvi = userDataAlenvi;
+    session.userData.alenvi.token = userDataAlenvi.alenviToken;
+    session.send("Merci d'avoir completé ton inscription ! :)");
+  }
   if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
     await sendEndorsementToSlack(session);
   }
