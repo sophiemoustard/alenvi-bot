@@ -25,9 +25,6 @@ exports.autoLogin = async (session) => {
   let token = '';
   if (session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref) {
     token = session.message.sourceEvent.postback.referral.ref;
-  } else if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'signpup_complete') {
-    session.send("Merci d'avoir completé ton inscription ! :)");
-    session.replaceDialog('/hello');
   } else if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref) {
     token = session.message.sourceEvent.referral.ref;
   }
