@@ -71,7 +71,6 @@ const getCardsAttachments = async (session, params) => {
   // const myRawTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const myRawTeam = await getAlenviUsers(session.userData.alenvi.token, params);
   const myTeam = myRawTeam.body.data.users;
-  console.log(myTeam);
   const mySortedTeam = _.sortBy(myTeam, ['lastname']);
   const lengthTeam = mySortedTeam.length;
   for (let i = 0; i < lengthTeam; i++) {
