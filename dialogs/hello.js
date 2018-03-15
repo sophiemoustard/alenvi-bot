@@ -59,7 +59,6 @@ const showEndSignupCard = (session) => {
 };
 
 const rootGreetingMenu = async (session) => {
-  console.log(session.message.sourceEvent);
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
   if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'signup_complete') {
