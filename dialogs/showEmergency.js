@@ -38,7 +38,7 @@ const getCardsAttachments = async (session) => {
     const person = `${usersConstrained[k].firstname} ${usersConstrained[k].lastname}`;
     const mobilePhone = usersConstrained[k].mobilePhone || null;
     // const contact = `https://m.me/${usersConstrained[k].facebook.facebookId}`;
-    const picture = usersConstrained[k].picture || 'https://cdn.head-fi.org/g/2283245_l.jpg';
+    const picture = usersConstrained[k].picture && usersConstrained[k].picture.link ? usersConstrained[k].picture.link : 'https://cdn.head-fi.org/g/2283245_l.jpg';
     const buttons = [];
     if (mobilePhone) {
       buttons.push(builder.CardAction.openUrl(session, `tel:+33${mobilePhone}`, `📱 ${mobilePhone}`));
