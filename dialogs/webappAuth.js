@@ -1,6 +1,7 @@
 const builder = require('botbuilder');
 const jwt = require('jsonwebtoken');
 const { getAlenviUserById } = require('../models/Alenvi/users');
+const { storeUserAddress } = require('../helpers/storeUserAddress');
 
 // const getEndSignupCardAttachment = (session) => {
 //   const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi.token}&token=${session.userData.alenvi._id}`;
@@ -47,6 +48,7 @@ exports.autoLogin = async (session) => {
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
         session.userData.alenvi = userDataAlenvi;
         session.userData.alenvi.token = userDataAlenvi.alenviToken;
+        await storeUserAddress(session);
         session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :
         -  Notre charte d’envie

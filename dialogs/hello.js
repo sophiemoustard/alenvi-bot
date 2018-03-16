@@ -55,7 +55,7 @@ const showEndSignupCard = (session) => {
   session.sendTyping();
   const card = getEndSignupCardAttachment(session);
   const message = new builder.Message(session).addAttachment(card);
-  session.endDialog(message);
+  session.send(message);
 };
 
 const rootGreetingMenu = async (session) => {
@@ -72,7 +72,7 @@ const rootGreetingMenu = async (session) => {
     await sendEndorsementToSlack(session);
   }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
-    return showEndSignupCard(session);
+    showEndSignupCard(session);
   }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
