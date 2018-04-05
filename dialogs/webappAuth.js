@@ -47,7 +47,6 @@ exports.autoLogin = async (session) => {
         const userDataAlenviRaw = await getAlenviUserById(userId);
         const userDataAlenvi = userDataAlenviRaw.body.data.user;
         session.userData.alenvi = userDataAlenvi;
-        session.userData.alenvi.token = userDataAlenvi.alenviToken;
         await storeUserAddress(session);
         session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
         session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :

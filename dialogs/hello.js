@@ -6,7 +6,8 @@ const builder = require('botbuilder');
 const moment = require('moment');
 // const BotMetrics = require('botmetrics');
 const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
-const { getAlenviUserById } = require('../models/Alenvi/users');
+// const { getAlenviUserById } = require('../models/Alenvi/users');
+const { checkToken } = require('../helpers/checkOgustToken');
 
 exports.hello_first = [
   (session) => {
@@ -39,7 +40,7 @@ exports.hello_first = [
 // };
 
 const getEndSignupCardAttachment = (session) => {
-  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi._id}&token=${session.userData.alenvi.token}&step=${session.userData.alenvi.administrative.signup.step}`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/signupComplete?id=${session.userData.alenvi._id}&token=${session.userData.alenvi.token}`;
   return new builder.HeroCard(session)
     .title('Terminer inscription')
     .text('Merci de bien vouloir terminer ton inscription ! :)')
@@ -62,16 +63,14 @@ const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
   if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'signup_complete') {
-    const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
-    const userDataAlenvi = userDataAlenviRaw.body.data.user;
-    session.userData.alenvi = userDataAlenvi;
-    session.userData.alenvi.token = userDataAlenvi.alenviToken;
+    await checkToken(session);
     session.send("Merci d'avoir completé ton inscription ! :)");
   }
   if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
     await sendEndorsementToSlack(session);
   }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
+    await checkToken(session);
     showEndSignupCard(session);
   }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {

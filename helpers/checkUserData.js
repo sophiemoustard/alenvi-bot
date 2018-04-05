@@ -51,9 +51,10 @@ exports.checkUserData = async (session) => {
   // Get user information
   const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
   const userDataAlenvi = userDataAlenviRaw.body.data.user;
+  session.userData.alenvi = userDataAlenvi;
   // diff between alenvi user and ogust user data and update user in Alenvi DB
   const diff = diffAlenviOgust(userDataAlenvi, userDataOgust, ['firstname', 'lastname', 'local.email', 'sector', 'mobilePhone'], ['first_name', 'last_name', 'email', 'sector', 'mobile_phone']);
-  await updateAlenviUserById(session.userData.alenvi._id, userDataAlenvi.alenviToken, diff);
+  await updateAlenviUserById(session.userData.alenvi._id, userDataAlenvi.token, diff);
   if (userDataOgust.id_customer) {
     session.userData.alenvi.customer_id = userDataOgust.id_customer;
   }
@@ -64,8 +65,5 @@ exports.checkUserData = async (session) => {
     session.userData.alenvi.firstname = userDataOgust.first_name;
   }
   session.userData.alenvi.lastname = userDataOgust.last_name;
-  session.userData.alenvi.sector = userDataOgust.sector;
-  session.userData.alenvi.role = userDataAlenvi.role;
-  session.userData.alenvi.token = userDataAlenvi.alenviToken;
   return session.userData.alenvi;
 };
