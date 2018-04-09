@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 // const _ = require('lodash');
 
 const builder = require('botbuilder');
+const azure = require('botbuilder-azure');
 
 const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
   botId: process.env.BOTMETRICS_BOT_ID,
@@ -27,6 +28,26 @@ const app = restify.createServer();
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
 
+// Azure cosmoDB connection settings
+const documentDbOptions = {
+  host: process.env.MICROSOFT_COSMODB_HOST,
+  masterKey: process.env.MICROSOFT_COSMODB_MASTER_KEY,
+  database: 'botdocdb',
+  collection: 'botdata'
+};
+
+const docDbClient = new azure.DocumentDbClient(documentDbOptions);
+const tableStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
+
+// const mongoOptions = {
+//   ip: 'localhost',
+//   port: '27017',
+//   database: 'BotStorage',
+//   collection: 'StateData'
+// };
+// 
+// const mongoStorage = botbuilderMongo.GetMongoDBLayer(mongoOptions);
+
 // =========================================================
 // Bot Setup
 // =========================================================
@@ -37,7 +58,7 @@ const connector = new builder.ChatConnector({
   appPassword: process.env.MICROSOFT_APP_PASSWORD,
 });
 
-const bot = new builder.UniversalBot(connector);
+const bot = new builder.UniversalBot(connector).set('storage', tableStorage);
 
 bot.set('persistConversationData', true);
 
