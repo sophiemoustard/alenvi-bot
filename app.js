@@ -46,7 +46,8 @@ const mongoOptions = {
   database: process.env.MONGO_DB,
   collection: 'BotStateStorage',
   username: process.env.MONGO_USERNAME || '',
-  password: process.env.MONGO_PWD || ''
+  password: process.env.MONGO_PWD || '',
+  queryString: process.env.MONGO_QUERY || ''
 };
 
 const mongoStorage = botbuilderMongo.GetMongoDBLayer(mongoOptions);
