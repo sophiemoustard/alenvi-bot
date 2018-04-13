@@ -56,7 +56,7 @@ const showEndSignupCard = (session) => {
   session.sendTyping();
   const card = getEndSignupCardAttachment(session);
   const message = new builder.Message(session).addAttachment(card);
-  session.send(message);
+  session.endDialog(message);
 };
 
 const rootGreetingMenu = async (session) => {
@@ -71,7 +71,7 @@ const rootGreetingMenu = async (session) => {
   }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
     await checkToken(session);
-    showEndSignupCard(session);
+    return showEndSignupCard(session);
   }
   if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
