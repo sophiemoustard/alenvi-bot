@@ -66,9 +66,9 @@ const rootGreetingMenu = async (session) => {
     await checkToken(session);
     session.send("Merci d'avoir completé ton inscription ! :)");
   }
-  if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
-    await sendEndorsementToSlack(session);
-  }
+  // if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
+  //   await sendEndorsementToSlack(session);
+  // }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
     await checkToken(session);
     return showEndSignupCard(session);
