@@ -3,15 +3,14 @@
 // =========================================================
 
 const builder = require('botbuilder');
-const moment = require('moment');
+// const moment = require('moment');
 // const BotMetrics = require('botmetrics');
-const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
+// const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
 // const { getAlenviUserById } = require('../models/Alenvi/users');
 const { checkToken } = require('../helpers/checkOgustToken');
 
 exports.hello_first = [
   (session) => {
-    console.log(session.message.sourceEvent);
     session.sendTyping();
     if ((session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref) || (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref)) {
       return session.replaceDialog('/autoLogin_webapp');
@@ -56,7 +55,7 @@ const showEndSignupCard = (session) => {
   session.sendTyping();
   const card = getEndSignupCardAttachment(session);
   const message = new builder.Message(session).addAttachment(card);
-  session.endDialog(message);
+  session.send(message);
 };
 
 const rootGreetingMenu = async (session) => {
@@ -71,13 +70,14 @@ const rootGreetingMenu = async (session) => {
   // }
   if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
     await checkToken(session);
-    return showEndSignupCard(session);
+    showEndSignupCard(session);
   }
-  if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
-    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
-  } else {
-    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
-  }
+  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
+  // if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
+  //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
+  // } else {
+  //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
+  // }
 };
 
 const redirectMenuResult = (session, results) => {
