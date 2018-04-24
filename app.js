@@ -207,13 +207,17 @@ bot.dialog('/', new builder.IntentDialog()
 
 bot.dialog('/not_understand', require('./dialogs/notUnderstand'));
 
-bot.dialog('/login_facebook', require('./dialogs/facebookAuth').login);
-bot.dialog('/logout_facebook', require('./dialogs/facebookAuth').logout)
+// bot.dialog('/login_facebook', require('./dialogs/facebookAuth').login);
+// bot.dialog('/logout_facebook', require('./dialogs/facebookAuth').logout)
+//   .triggerAction({
+//     matches: /^d[ée]connexion$/i
+//   });
+bot.dialog('/autoLogin_webapp', require('./dialogs/webappAuth').autoLogin);
+bot.dialog('/login_webapp', require('./dialogs/webappAuth').login);
+bot.dialog('/logout_webapp', require('./dialogs/webappAuth').logout)
   .triggerAction({
     matches: /^d[ée]connexion$/i
   });
-bot.dialog('/autoLogin_webapp', require('./dialogs/webappAuth').autoLogin);
-bot.dialog('/login_webapp', require('./dialogs/webappAuth').login);
 
 bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
