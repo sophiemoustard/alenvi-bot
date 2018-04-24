@@ -116,3 +116,9 @@ exports.login = async (session) => {
     showConnectionCard(session);
   }
 };
+
+exports.logout = (session) => {
+  delete session.userData.alenvi;
+  delete session.userData.ogust;
+  return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
+};
