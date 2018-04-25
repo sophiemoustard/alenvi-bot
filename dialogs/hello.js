@@ -40,7 +40,7 @@ exports.hello_first = [
 // };
 
 const getEndSignupCardAttachment = (session) => {
-  const uri = `${process.env.WEBSITE_HOSTNAME}/optionalDocuments`;
+  const uri = `${process.env.WEBSITE_HOSTNAME}/signup/optionalDocuments`;
   return new builder.HeroCard(session)
     .title('Envoi documents optionels')
     .text('Merci de bien vouloir cliquer sur le lien pour envoyer tes justificatifs (facture téléphone, navigo, attestation sécu,...) :)')
@@ -48,7 +48,7 @@ const getEndSignupCardAttachment = (session) => {
       builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
     ])
     .buttons([
-      builder.CardAction.openUrl(session, uri, 'Terminer l\'inscription')
+      builder.CardAction.openUrl(session, uri, 'Clique ici')
     ]);
 };
 
