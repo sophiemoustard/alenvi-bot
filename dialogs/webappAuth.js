@@ -124,6 +124,5 @@ exports.login = async (session) => {
 exports.logout = (session) => {
   delete session.userData.alenvi;
   delete session.userData.ogust;
-  delete session.userData.reminderSet;
   return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };
