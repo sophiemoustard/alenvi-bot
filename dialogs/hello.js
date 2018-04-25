@@ -3,12 +3,12 @@
 // =========================================================
 
 const builder = require('botbuilder');
-const later = require('later');
 // const moment = require('moment');
 // const BotMetrics = require('botmetrics');
 // const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
 // const { getAlenviUserById } = require('../models/Alenvi/users');
 const { checkToken } = require('../helpers/checkOgustToken');
+const reminder = require('../helpers/reminder');
 
 exports.hello_first = [
   (session) => {
@@ -39,25 +39,8 @@ exports.hello_first = [
 //   }
 // };
 
-const getEndSignupCardAttachment = (session) => {
-  const uri = `${process.env.WEBSITE_HOSTNAME}/signup/optionalDocuments`;
-  return new builder.HeroCard(session)
-    .title('Envoi documents optionels')
-    .text('Merci de bien vouloir cliquer sur le lien pour envoyer tes justificatifs (facture téléphone, navigo, attestation sécu,...) :)')
-    .images([
-      builder.CardImage.create(session, 'https://res.cloudinary.com/alenvi/image/upload/v1499948101/images/bot/Pigi.png')
-    ])
-    .buttons([
-      builder.CardAction.openUrl(session, uri, 'Clique ici')
-    ]);
-};
-
-const showOptionalDocsCard = (session) => {
-  session.sendTyping();
-  const card = getEndSignupCardAttachment(session);
-  const message = new builder.Message(session).addAttachment(card);
-  session.send(message);
-};
+let reminderDocs;
+let reminderSet = false;
 
 const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
@@ -66,27 +49,24 @@ const rootGreetingMenu = async (session) => {
   //   await checkToken(session);
   //   session.send("Merci d'avoir completé ton inscription ! :)");
   // }
-  let reminder = null;
   if (session.userData.alenvi.administrative) {
     if ((session.userData.alenvi.administrative.navigoInvoice && session.userData.alenvi.administrative.navigoInvoice.has && !session.userData.alenvi.administrative.navigoInvoice.link)
       || (session.userData.alenvi.administrative.mutualFund && session.userData.alenvi.administrative.mutualFund.has && !session.userData.alenvi.administrative.mutualFund.link)
       || (session.userData.alenvi.administrative.phoneInvoice && session.userData.alenvi.administrative.phoneInvoice.has && !session.userData.alenvi.administrative.phoneInvoice.link)
       || (session.userData.alenvi.administrative.certificates && session.userData.alenvi.administrative.certificates.has && session.userData.alenvi.administrative.certificates.docs.length === 0)) {
-      if (!session.userData.reminderSet) {
-        later.date.localTime();
-        const sched = later.parse.text('at 18:30 on Monday');
-        reminder = later.setInterval(async () => {
-          await checkToken(session);
-          showOptionalDocsCard(session);
-        }, sched);
-        session.userData.reminderSet = true;
+      if (!reminderSet) {
+        reminderDocs = await reminder.optionalDocs(session, 'at 18:30 on Monday');
+        reminderSet = true;
       }
     }
   }
   if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') {
     session.sendTyping();
     await checkToken(session);
-    reminder.clear();
+    if (reminderSet && reminderDocs) {
+      reminderDocs.clear();
+    }
+    reminderSet = false;
     session.send("Merci d'avoir completé ton inscription ! :)");
   }
   // if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
