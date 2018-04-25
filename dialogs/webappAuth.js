@@ -61,9 +61,10 @@ exports.autoLogin = async (session) => {
             //   showEndSignupCard(session);
             // }
             session.userData.firstConnection = true;
-            session.replaceDialog('/hello');
+            return session.replaceDialog('/hello');
           }, 10000);
         }
+        session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);
         return session.endDialog('Il y a eu un problème avec ta demande :/');
@@ -123,5 +124,6 @@ exports.login = async (session) => {
 exports.logout = (session) => {
   delete session.userData.alenvi;
   delete session.userData.ogust;
+  delete session.userData.reminderSet;
   return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };
