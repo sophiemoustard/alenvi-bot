@@ -74,7 +74,7 @@ const rootGreetingMenu = async (session) => {
       || (session.userData.alenvi.administrative.certificates && session.userData.alenvi.administrative.certificates.has && session.userData.alenvi.administrative.certificates.docs.length === 0)) {
       if (!session.userData.reminderSet) {
         later.date.localTime();
-        const sched = later.parse.text('at 13:50');
+        const sched = later.parse.text('at 18:30 on Monday');
         reminder = later.setInterval(async () => {
           await checkToken(session);
           showOptionalDocsCard(session);
