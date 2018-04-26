@@ -55,6 +55,7 @@ const rootGreetingMenu = async (session) => {
       || (session.userData.alenvi.administrative.phoneInvoice && session.userData.alenvi.administrative.phoneInvoice.has && !session.userData.alenvi.administrative.phoneInvoice.link)
       || (session.userData.alenvi.administrative.certificates && session.userData.alenvi.administrative.certificates.has && session.userData.alenvi.administrative.certificates.docs.length === 0)) {
       if (!reminderSet) {
+        console.log('Setting optionalDocs reminder...');
         reminderDocs = await reminder.optionalDocs(session, 'at 18:30 on Monday');
         reminderSet = true;
       }
@@ -64,6 +65,7 @@ const rootGreetingMenu = async (session) => {
     session.sendTyping();
     await checkToken(session);
     if (reminderSet && reminderDocs) {
+      console.log('Clearing optionalDocs reminder...');
       reminderDocs.clear();
     }
     reminderSet = false;
