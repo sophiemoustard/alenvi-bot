@@ -54,14 +54,14 @@ exports.autoLogin = async (session) => {
         -  Notre charte d’envie
         -  Et une vidéo qui résume notre vision du métier de l’auxiliaire d’envie
         C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)`);
-          setTimeout(() => {
+          return setTimeout(() => {
             session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
             session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
             // if (!session.userData.alenvi.administrative.signup.complete) {
             //   showEndSignupCard(session);
             // }
             session.userData.firstConnection = true;
-            return session.replaceDialog('/hello');
+            session.replaceDialog('/hello');
           }, 10000);
         }
         session.replaceDialog('/hello');
