@@ -8,7 +8,7 @@ const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const getFirstEmployeeCustomer = async (session) => {
   try {
     const myCustomersRaw = await getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
-    const myCustomers = myCustomersRaw.body.data.customers.filter(customer => !customer.last_name.match(/alenvi/i));
+    const myCustomers = myCustomersRaw.body.data.customers.filter(customer => !customer.last_name.match(/^alenvi/i));
     const firstEmployeeCustomer = _.sortBy(myCustomers, ['last_name']).slice(0, 1);
     return firstEmployeeCustomer;
   } catch (e) {
@@ -21,28 +21,22 @@ const getCardsAttachments = async (session, args) => {
   if (!args) {
     throw new Error('No personType and/or personChosen');
   }
+  const title = 'Consulter planning';
+  const { sector } = session.userData.alenvi;
   let employeeId = '';
   let customerId = '';
   let url = '';
-  let title;
   let customer;
   switch (args.personType) {
     case 'Auxiliary':
       employeeId = session.userData.alenvi.employee_id;
-      title = 'Consulter planning';
       url = `${process.env.WEBSITE_HOSTNAME}/bot/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}`;
       break;
-    // case 'Auxiliary':
-    //   employeeId = args.personChosen.employee_id;
-    //   title = 'Consulter son planning';
-    //   url = `${process.env.WEBSITE_HOSTNAME}/calendar?id_employee=${employeeId}&access_token=${session.userData.alenvi.token}&self=false`;
-    //   break;
     case 'Customer':
       customer = await getFirstEmployeeCustomer(session);
       // customerId = args.personChosen.customer_id;
       customerId = customer[0].id_customer;
-      title = 'Consulter son planning';
-      url = `${process.env.WEBSITE_HOSTNAME}/bot/calendar?id_customer=${customerId}&access_token=${session.userData.alenvi.token}`;
+      url = `${process.env.WEBSITE_HOSTNAME}/bot/calendar?id_customer=${customerId}&sector=${sector}&access_token=${session.userData.alenvi.token}`;
   }
   const myCards = [];
   myCards.push(
