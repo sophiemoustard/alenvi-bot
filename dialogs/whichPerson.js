@@ -18,7 +18,7 @@ const whichPerson = async (session, args) => {
         myRawPersons = await getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
         myRawPersons = myRawPersons.body.data.customers;
         if (myRawPersons.length == 0) {
-          return session.endDialog(`Il semble que tu n'aies pas encore de bénéficiaire !`);
+          return session.endDialog("Il semble que tu n'aies pas encore de bénéficiaire !");
         }
         personTypeId = 'id_customer';
         promptMsg = 'Quel(le) bénéficiaire précisément ?';

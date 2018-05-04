@@ -21,7 +21,7 @@ const redirectToDaySelected = (session, results) => {
         //   session.replaceDialog('/which_person', { personType: 'Auxiliary' });
         //   break;
         case 'Bénéficiaires':
-          session.replaceDialog('/which_person', { personType: 'Customer' });
+          session.replaceDialog('/display_calendar', { personType: 'Customer' });
           break;
         // case 'Ma communauté':
         //   session.replaceDialog('/which_person', { personType: 'Community' });
