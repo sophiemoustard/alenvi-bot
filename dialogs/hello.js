@@ -8,6 +8,7 @@ const builder = require('botbuilder');
 // const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
 // const { getAlenviUserById } = require('../models/Alenvi/users');
 const { checkToken } = require('../helpers/checkOgustToken');
+const { checkOptionalDocs } = require('../helpers/checkOptionalDocs');
 const reminder = require('../helpers/reminder');
 
 exports.hello_first = [
@@ -50,10 +51,7 @@ const rootGreetingMenu = async (session) => {
   //   session.send("Merci d'avoir completé ton inscription ! :)");
   // }
   if (session.userData.alenvi.administrative) {
-    if ((session.userData.alenvi.administrative.navigoInvoice && session.userData.alenvi.administrative.navigoInvoice.has && !session.userData.alenvi.administrative.navigoInvoice.link)
-      || (session.userData.alenvi.administrative.mutualFund && session.userData.alenvi.administrative.mutualFund.has && !session.userData.alenvi.administrative.mutualFund.link)
-      || (session.userData.alenvi.administrative.phoneInvoice && session.userData.alenvi.administrative.phoneInvoice.has && !session.userData.alenvi.administrative.phoneInvoice.link)
-      || (session.userData.alenvi.administrative.certificates && session.userData.alenvi.administrative.certificates.has && session.userData.alenvi.administrative.certificates.docs.length === 0)) {
+    if (!checkOptionalDocs(session.userData.alenvi.administrative)) {
       if (!reminderSet) {
         console.log('Setting optionalDocs reminder...');
         reminderDocs = await reminder.optionalDocs(session, 'at 18:30 on Monday');
@@ -61,7 +59,7 @@ const rootGreetingMenu = async (session) => {
       }
     }
   }
-  if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') {
+  if ((session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') || (session.userData.alenvi.administrative && checkOptionalDocs(session.userData.alenvi.administrative))) {
     session.sendTyping();
     await checkToken(session);
     if (reminderSet && reminderDocs) {
@@ -69,7 +67,9 @@ const rootGreetingMenu = async (session) => {
       reminderDocs.clear();
     }
     reminderSet = false;
-    session.send("Merci d'avoir completé ton inscription ! :)");
+    if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') {
+      session.send("Merci d'avoir completé ton inscription ! :)");
+    }
   }
   // if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
   //   await sendEndorsementToSlack(session);
