@@ -32,8 +32,13 @@ const getCardsAttachments = (session) => {
       .title('Evaluation des risques professionnels')
       .buttons([
         builder.CardAction.openUrl(session, 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE', 'Visionner')
+      ]),
+    new builder.HeroCard(session)
+      .title("Protocole d'accord pré électoral élections CSE")
+      .buttons([
+        builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=1coedSMEz9WrQYgQdW5zpCu6ZsNP8hABU', 'Visionner')
       ])
-  ]
+  ];
 };
 
 const showHRDocs = async (session) => {
