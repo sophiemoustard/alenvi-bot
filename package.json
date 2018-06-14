@@ -15,32 +15,32 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "botauth": "^0.2.12",
-    "botbuilder": "^3.11.0",
-    "botbuilder-azure": "^3.0.4",
-    "botbuilder-mongodb": "^3.1.0",
+    "botbuilder": "^3.15.0",
+    "botbuilder-azure": "^3.1.0",
+    "botbuilder-mongodb": "^3.1.1",
     "botmetrics": "0.0.10",
     "botmetrics-botframework-middleware": "0.0.1",
-    "cloudinary": "^1.9.0",
+    "cloudinary": "^1.11.0",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "express": "^4.16.2",
     "googleapis": "^20.1.0",
     "jsonwebtoken": "^7.4.1",
     "later": "^1.2.0",
-    "lodash": "^4.17.4",
-    "moment": "^2.19.0",
+    "lodash": "^4.17.10",
+    "moment": "^2.22.2",
     "moment-timezone": "^0.5.13",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "path": "^0.12.7",
-    "request": "^2.83.0",
+    "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "restify": "^4.3.0",
-    "twilio": "^3.8.0"
+    "twilio": "^3.17.2"
   },
   "devDependencies": {
-    "eslint": "^4.8.0",
+    "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^11.2.0",
-    "eslint-plugin-import": "^2.3.0"
+    "eslint-plugin-import": "^2.12.0"
   }
 }
