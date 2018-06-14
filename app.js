@@ -1,11 +1,9 @@
 require('dotenv').config();
 const path = require('path');
-// const rp = require('request-promise');
 const jwt = require('jsonwebtoken');
 // const _ = require('lodash');
 
 const builder = require('botbuilder');
-// const azure = require('botbuilder-azure');
 const botbuilderMongo = require('botbuilder-mongodb');
 
 const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
@@ -14,12 +12,6 @@ const BotmetricsMiddleware = require('botmetrics-botframework-middleware').Botme
 });
 
 const { sendMessageToUser } = require('./helpers/sendMessageToUser');
-// const botauth = require('botauth');
-
-// const passport = require('passport');
-// const FacebookStrategy = require('passport-facebook').Strategy;
-
-// const config = require('./config');
 
 const PORT = process.env.PORT || '3978';
 
@@ -28,17 +20,6 @@ const restify = require('restify');
 const app = restify.createServer();
 app.use(restify.bodyParser());
 app.use(restify.queryParser());
-
-// Azure cosmoDB connection settings
-// const documentDbOptions = {
-//   host: process.env.MICROSOFT_COSMODB_HOST,
-//   masterKey: process.env.MICROSOFT_COSMODB_MASTER_KEY,
-//   database: 'botdocdb',
-//   collection: 'botdata'
-// };
-// 
-// const docDbClient = new azure.DocumentDbClient(documentDbOptions);
-// const tableStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
 
 const mongoOptions = {
   ip: process.env.MONGO_HOST,
@@ -106,34 +87,6 @@ bot.use({
 
 app.post('/api/messages', connector.listen());
 app.post('sendMessageToUser', sendMessageToUser(bot));
-// app.get('/editCustomerDone', (req, res) => {
-//   console.log('Customer edit done.');
-//   resume(req.query.address);
-//   res.status(200).send('Customer edit done');
-// });
-
-// const facebookConfig = {
-//   clientID: process.env.FACEBOOK_APP_ID || '***REMOVED***',
-//   clientSecret: process.env.FACEBOOK_APP_SECRET || '***REMOVED***',
-//   callbackURL: 'http://localhost:3000/api/users/authenticate/facebook/callback',
-//   session: false,
-//   profileFields: ['id', 'emails', 'name', 'photos']
-// }
-
-// const ba = new botauth.BotAuthenticator(app, bot, {
-//   baseUrl: config.WEBSITE_HOSTNAME, secret: config.***REMOVED***,
-// }).provider('facebook', options => new FacebookStrategy({
-//   clientID: process.env.FACEBOOK_APP_ID || config.FACEBOOK_APP_ID,
-//   clientSecret: process.env.FACEBOOK_APP_SECRET || config.FACEBOOK_APP_SECRET,
-//   callbackURL: options.callbackURL,
-//   profileFields: ['id', 'emails', 'name', 'photos'],
-// }, (accessToken, refreshToken, profile, done) => {
-//   profile.accessToken = accessToken;
-//   profile.refreshToken = refreshToken;
-//   console.log(profile);
-//   return done(null, profile);
-// }));
-
 app.get('/', (req, res) => {
   res.send('Alenvi bot :)');
 });
@@ -260,95 +213,6 @@ bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
 
 bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
-
-// =========================================================
-// Tests
-// =========================================================
-
-// bot.dialog("/connection", [].concat(
-//   ba.authenticate("facebook"),
-//   (session, results) => {
-//     console.log("/CONNECTION");
-//     //get the facebook profile
-//     session.sendTyping();
-//     var user = ba.profile(session, "facebook");
-//     console.log('FACEBOOK USER:')
-//     console.log(user);
-//     if (user) {
-//       if (user.id) {
-//         session.userData.facebook = user;
-//         var payload = {};
-//         if (user.emails) {
-//           payload = {
-//             'email': user.emails[0].value,
-//             'id': user.id
-//           }
-//         }
-//         else
-//           payload = {
-//             'id': user.id
-//           }
-//         var newPayload = _.pickBy(payload);
-//         rp.post({
-//           url: "http://localhost:3000/api/users/botauth/facebook",
-//           json: true,
-//           body: newPayload,
-//           resolveWithFullResponse: true,
-//           time: true
-//         }).then(function(parsedBody) {
-//           console.log(parsedBody.body);
-//           console.log("Duration: " + parsedBody.timings.end);
-//           session.userData.alenvi = parsedBody.body.data;
-//           session.send("Merci "
-//           + session.userData.alenvi.user.firstname
-//           + ", tu es maintenant bien lié à Alenvi grâce à Facebook ! :)");
-//           session.beginDialog('/hello');
-//         }).catch(function(err) {
-//           console.error(err);
-//           if (err.statusCode == 404)
-//             session.endDialog("Je n'arrive pas à te trouver chez Alenvi :( "
-//             + Essaie de contacter un(e) coach,
-//             + il / elle devrait pouvoir résoudre ce problème !");
-//         })
-//       }
-//     }
-//   }
-// ))
-
-// bot.dialog("/disconnection", [
-//   (session, args, next) => {
-//     console.log("/LOGOUT");
-//     session.sendTyping();
-//     builder.Prompts.confirm(session, "Es-tu sûr de vouloir te déconnecter ?");
-//   }, (session, args) => {
-//     session.sendTyping();
-//     if(args.response) {
-//       ba.logout(session, "facebook");
-//       session.endDialog("Tu es bien déconnecté. J'espère te revoir bientôt !");
-//       // session.beginDialog('/hello_first');
-//     } else {
-//       session.endDialog("Tu es toujours connecté :)");
-//     }
-//   }
-// ])
-
-// rp.post({
-//   uri: "https://login.microsoftonline.com/common/oauth2/v2.0/token",
-//   form: {
-//     grant_type: "client_credentials",
-//     client_id: "***REMOVED***",
-//     client_secret: "***REMOVED***",
-//     scope: "https://graph.microsoft.com/.default"
-//   },
-//   json: true,
-//   // resolveWithFullResponse: true,
-//   // time: true
-// }).then(function (parsedBody) {
-//   console.log(parsedBody);
-//   // console.log("Duration: " + parsedBody.timings.end);
-// }).catch(function (err) {
-//   console.error(err);
-// })
 
 
 // Setup Server
