@@ -97,7 +97,7 @@ const redirectMenuResult = (session, results) => {
           session.replaceDialog('/select_modify_planning');
           break;
         case 'Bénéficiaires':
-          session.replaceDialog('/show_my_customers');
+          session.replaceDialog('/which_customers');
           break;
         case 'Répertoire':
           session.replaceDialog('/select_directory');

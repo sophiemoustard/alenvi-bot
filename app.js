@@ -187,7 +187,8 @@ bot.dialog('/set_intervention', require('./dialogs/modifyPlanning').setIntervent
   .cancelAction('cancelSetIntervention', 'Tu as bien annulé ta demande !', { matches: /^annuler|anuler$/i });
 bot.dialog('/ask_for_request', require('./dialogs/modifyPlanning').askForRequest);
 
-bot.dialog('/show_my_customers', require('./dialogs/customers').showCustomers);
+bot.dialog('/which_customers', require('./dialogs/customers').whichCustomers);
+bot.dialog('/show_customers', require('./dialogs/customers').showCustomers);
 bot.dialog('/my_customers_more_details', require('./dialogs/customers').moreDetails);
 
 bot.dialog('/select_directory', require('./dialogs/team').selectDirectory);

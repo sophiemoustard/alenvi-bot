@@ -28,6 +28,24 @@ exports.getCustomerByCustomerId = async (token, id, pageOption) => {
   return res;
 };
 
+exports.getCustomers = async (token, qs) => {
+  const options = {
+    url: `${process.env.API_HOSTNAME}/ogust/customers`,
+    json: true,
+    headers: {
+      'x-ogust-token': token
+    },
+    qs,
+    resolveWithFullResponse: true,
+    time: true,
+  };
+  const res = await rp.get(options);
+  if (res.body.success == false) {
+    throw new Error(`Error while getting customer by id: ${res.body.message}`);
+  }
+  return res;
+};
+
 exports.getThirdPartyInformationByCustomerId = async (token, id, thirdParty, pageOption) => {
   const options = {
     url: `${process.env.API_HOSTNAME}/ogust/customers/${id}/moreInfo`,
