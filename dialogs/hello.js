@@ -54,7 +54,7 @@ const rootGreetingMenu = async (session) => {
     if (!checkOptionalDocs(session.userData.alenvi.administrative)) {
       if (!reminderSet) {
         console.log('Setting optionalDocs reminder...');
-        reminderDocs = await reminder.optionalDocs(session, 'at 18:30 on Monday');
+        reminderDocs = await reminder.optionalDocs(session, 'every 1 day at 18:30');
         reminderSet = true;
       }
     }

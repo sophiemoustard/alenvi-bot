@@ -1,5 +1,5 @@
 exports.checkOptionalDocs = (adminObj) => {
-  const optionalDocs = ['navigoInvoice', 'mutualFund', 'phoneInvoice', 'certificates'];
+  const optionalDocs = ['navigoInvoice', 'mutualFund', 'phoneInvoice', 'certificates', 'healthAttest'];
   return optionalDocs.every((value) => {
     if (!adminObj[value]) {
       return true;
