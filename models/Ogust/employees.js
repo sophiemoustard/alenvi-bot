@@ -163,7 +163,7 @@ exports.getSalaries = async (token, id, pageOption) => {
 */
 exports.getServices = async (token, id, payload) => {
   const options = {
-    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/services/`,
+    url: `${process.env.API_HOSTNAME}/ogust/employees/${id}/services`,
     json: true,
     headers: {
       'x-ogust-token': token
