@@ -128,7 +128,6 @@ exports.getSalaries = async (token, id, pageOption) => {
       'x-ogust-token': token
     },
     qs: {
-      id_employee: id,
       nbperpage: pageOption.nbPerPage,
       pagenum: pageOption.pageNum
     },
