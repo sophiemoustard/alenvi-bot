@@ -213,8 +213,13 @@ bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 
 bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
 
-bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
+bot.dialog('/le_jeu_du_plus_ou_moins', require('./dialogs/gaming').intro)
+  .triggerAction({
+    matches: /^jeu$/i
+  });
+bot.dialog('le_jeu_comme_je_veux', require('./dialogs/gaming').gameplay);
 
+bot.endConversationAction('goodbye', 'Goodbye :)', { matches: /^goodbye/i });
 
 // Setup Server
 app.listen(PORT, () => {
