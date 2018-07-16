@@ -6,10 +6,10 @@ const jwt = require('jsonwebtoken');
 const builder = require('botbuilder');
 const botbuilderMongo = require('botbuilder-mongodb');
 
-const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
-  botId: process.env.BOTMETRICS_BOT_ID,
-  apiKey: process.env.BOTMETRICS_API_KEY
-});
+// const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
+//   botId: process.env.BOTMETRICS_BOT_ID,
+//   apiKey: process.env.BOTMETRICS_API_KEY
+// });
 
 const { sendMessageToUser } = require('./helpers/sendMessageToUser');
 
@@ -60,11 +60,18 @@ const logUserConversation = (event) => {
   }
 };
 
+const dashbotApiMap = { facebook: process.env.DASHBOT_API_KEY_FB };
+const dashbot = require('dashbot')(dashbotApiMap).microsoft;
+
+dashbot.setFacebookToken(process.env.FACEBOOK_PAGE_TOKEN);
+
+bot.use(dashbot);
+
 // Middleware for logging
 bot.use({
   receive(event, next) {
     logUserConversation(event);
-    BotmetricsMiddleware.receive();
+    // BotmetricsMiddleware.receive();
     next();
   },
   // botbuilder: (session, next) => {
@@ -72,7 +79,7 @@ bot.use({
   // },
   send(event, next) {
     logUserConversation(event);
-    BotmetricsMiddleware.send();
+    // BotmetricsMiddleware.send();
     next();
   }
 });
