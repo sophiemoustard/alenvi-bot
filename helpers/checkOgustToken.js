@@ -8,8 +8,10 @@ const { tokenConfig } = require('./../config/config');
 const addTokenToSession = async (session) => {
   console.log('Get a new token...');
   const payload = {
-    _id: session.userData.alenvi._id
+    _id: session.userData.alenvi._id,
+    role: session.userData.alenvi.role
   };
+  console.log('ROLE', payload);
   const getToken = await token.getToken(jwt.sign(payload, tokenConfig.secret, { expiresIn: tokenConfig.expiresIn }));
   const currentDate = moment().tz('Europe/Paris');
   session.userData.ogust.tokenConfig.token = getToken.body.data.token;
