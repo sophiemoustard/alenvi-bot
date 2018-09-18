@@ -78,7 +78,7 @@ const rootGreetingMenu = async (session) => {
   //    await checkToken(session);
   //    showEndSignupCard(session);
   //  }
-  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
   // if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
   //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
   // } else {
@@ -104,6 +104,9 @@ const redirectMenuResult = (session, results) => {
           break;
         case 'Infos':
           session.replaceDialog('/select_infos');
+          break;
+        case 'Administratif':
+          session.replaceDialog('/administrative');
           break;
         case 'Formation':
           session.replaceDialog('/training_choice');

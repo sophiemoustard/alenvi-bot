@@ -6,18 +6,21 @@ const builder = require('botbuilder');
 
 const whichInfo = (session) => {
   session.sendTyping();
-  builder.Prompts.choice(session, 'Quelle information souhaites-tu obtenir précisément ?', 'Contacts utiles|Actualités Alenvi', { maxRetries: 0 });
+  builder.Prompts.choice(session, 'Quelle information souhaites-tu obtenir précisément ?', 'Feuilles de paie|Infos perso|Documents', { maxRetries: 0 });
 };
 
 const redirectToInfoSelected = (session, results) => {
   if (results.response) {
     if (session.userData.alenvi) {
       switch (results.response.entity) {
-        case 'Contacts utiles':
-          session.replaceDialog('/usefull_contacts');
+        case 'Feuilles de paie':
+          session.replaceDialog('/select_pay_sheets');
           break;
-        case 'Actualités Alenvi':
-          session.replaceDialog('/show_news_alenvi');
+        case 'Infos perso':
+          session.replaceDialog('/show_personnal_info');
+          break;
+        case 'Documents':
+          session.replaceDialog('/hr_docs');
           break;
         default:
           break;
