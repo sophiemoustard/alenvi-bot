@@ -78,7 +78,24 @@ const rootGreetingMenu = async (session) => {
   //    await checkToken(session);
   //    showEndSignupCard(session);
   //  }
-  builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
+  if (session.userData.alenvi.firstConnection) {
+    const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
+    const myCards = [];
+    const cards = myCards.push(
+      new builder.HeroCard(session)
+        .title('Mes informations personnelles')
+        .buttons([
+          builder.CardAction.openUrl(session, url, 'Mettre à jour')
+        ])
+    );
+    const message = new builder.Message(session)
+      .attachmentLayout(builder.AttachmentLayout.carousel)
+      .attachments(cards);
+    session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
+    session.endDialog(message);
+  } else {
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
+  }
   // if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
   //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
   // } else {
