@@ -78,7 +78,8 @@ const rootGreetingMenu = async (session) => {
   //    await checkToken(session);
   //    showEndSignupCard(session);
   //  }
-  if (session.userData.alenvi.firstConnection) {
+  if (session.userData.firstConnection) {
+    console.log('test');
     const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
     const myCards = [];
     const cards = myCards.push(
