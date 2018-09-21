@@ -37,6 +37,32 @@ exports.hello_first = [
 //   }
 // };
 
+const getPersonalInfoAttachments = async (session) => {
+  const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
+  const myCards = [];
+  myCards.push(
+    new builder.HeroCard(session)
+      .title('Mes informations personnelles')
+      .buttons([
+        builder.CardAction.openUrl(session, url, 'Mettre à jour')
+      ])
+  );
+  return myCards;
+};
+
+const displayMyInfoCard = async (session) => {
+  try {
+    const cards = await getPersonalInfoAttachments(session);
+    const message = new builder.Message(session)
+      .attachmentLayout(builder.AttachmentLayout.carousel)
+      .attachments(cards);
+    session.endDialog(message);
+  } catch (err) {
+    console.error(err);
+    return session.endDialog("Je n'ai pas réussi à récupérer tes informations personnelles :/");
+  }
+};
+
 const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
@@ -52,20 +78,9 @@ const rootGreetingMenu = async (session) => {
   //    showEndSignupCard(session);
   //  }
   if (session.userData.firstConnection) {
-    const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
-    const myCards = [];
-    const cards = myCards.push(
-      new builder.HeroCard(session)
-        .title('Mes informations personnelles')
-        .buttons([
-          builder.CardAction.openUrl(session, url, 'Mettre à jour')
-        ])
-    );
-    const message = new builder.Message(session)
-      .attachmentLayout(builder.AttachmentLayout.carousel)
-      .attachments(cards);
     session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
-    session.endDialog(message);
+    displayMyInfoCard(session);
+    session.userData.firstConnection = false;
   } else {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
   }
