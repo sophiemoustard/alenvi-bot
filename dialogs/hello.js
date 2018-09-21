@@ -7,9 +7,6 @@ const builder = require('botbuilder');
 // const BotMetrics = require('botmetrics');
 // const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
 // const { getAlenviUserById } = require('../models/Alenvi/users');
-const { checkToken } = require('../helpers/checkOgustToken');
-const { checkOptionalDocs } = require('../helpers/checkOptionalDocs');
-const reminder = require('../helpers/reminder');
 
 exports.hello_first = [
   (session) => {
@@ -40,9 +37,6 @@ exports.hello_first = [
 //   }
 // };
 
-let reminderDocs;
-let reminderSet = false;
-
 const rootGreetingMenu = async (session) => {
   session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
   // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
@@ -50,27 +44,6 @@ const rootGreetingMenu = async (session) => {
   //   await checkToken(session);
   //   session.send("Merci d'avoir completé ton inscription ! :)");
   // }
-  if (session.userData.alenvi.administrative) {
-    if (!checkOptionalDocs(session.userData.alenvi.administrative)) {
-      if (!reminderSet) {
-        console.log('Setting optionalDocs reminder...');
-        reminderDocs = await reminder.optionalDocs(session, 'every 1 day at 18:30');
-        reminderSet = true;
-      }
-    }
-  }
-  if ((session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') || (session.userData.alenvi.administrative && checkOptionalDocs(session.userData.alenvi.administrative))) {
-    session.sendTyping();
-    await checkToken(session);
-    if (reminderSet && reminderDocs) {
-      console.log('Clearing optionalDocs reminder...');
-      reminderDocs.clear();
-    }
-    reminderSet = false;
-    if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'optional_docs_complete') {
-      session.send("Merci d'avoir completé ton inscription ! :)");
-    }
-  }
   // if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
   //   await sendEndorsementToSlack(session);
   // }
@@ -79,7 +52,6 @@ const rootGreetingMenu = async (session) => {
   //    showEndSignupCard(session);
   //  }
   if (session.userData.firstConnection) {
-    console.log('test');
     const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
     const myCards = [];
     const cards = myCards.push(
