@@ -78,7 +78,6 @@ const rootGreetingMenu = async (session) => {
   //    showEndSignupCard(session);
   //  }
   if (session.userData.firstConnection) {
-    session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
     displayMyInfoCard(session);
     session.userData.firstConnection = false;
   } else {

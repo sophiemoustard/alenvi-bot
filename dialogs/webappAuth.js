@@ -53,7 +53,8 @@ exports.autoLogin = async (session) => {
           session.send(`Avant ton arrivée chez Alenvi, j’aimerais partager avec toi :
         -  Notre charte d’envie
         -  Et une vidéo qui résume notre vision du métier de l’auxiliaire d’envie
-        C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)`);
+        C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)
+        Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ `);
           return setTimeout(() => {
             session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
             session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
