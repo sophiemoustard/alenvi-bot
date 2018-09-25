@@ -56,14 +56,14 @@ exports.autoLogin = async (session) => {
         // C’est super si tu peux prendre le temps de lire ce texte et visionner cette vidéo avant ton arrivée :)
           session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
           // return setTimeout(() => {
-            // session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
-            // session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
-            if (!session.userData.alenvi.administrative.signup.complete) {
-              showEndSignupCard(session);
-            }
-            session.userData.firstConnection = true;
-            session.replaceDialog('/hello');
-          }, 10000);
+          // session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
+          // session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
+          // if (!session.userData.alenvi.administrative.signup.complete) {
+          //   showEndSignupCard(session);
+          // }
+          session.userData.firstConnection = true;
+          session.replaceDialog('/hello');
+          // }, 10000);
         }
         session.replaceDialog('/hello');
       } catch (e) {
