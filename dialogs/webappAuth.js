@@ -58,9 +58,9 @@ exports.autoLogin = async (session) => {
           // return setTimeout(() => {
             // session.send('La vidéo: https://www.facebook.com/alenviservices/videos/2117859944894421');
             // session.send('La charte d’envie: http://blog.alenvi.io/charte-envie');
-            // if (!session.userData.alenvi.administrative.signup.complete) {
-            //   showEndSignupCard(session);
-            // }
+            if (!session.userData.alenvi.administrative.signup.complete) {
+              showEndSignupCard(session);
+            }
             session.userData.firstConnection = true;
             session.replaceDialog('/hello');
           }, 10000);
