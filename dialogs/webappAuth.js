@@ -64,8 +64,9 @@ exports.autoLogin = async (session) => {
           session.userData.firstConnection = true;
           session.replaceDialog('/hello');
           // }, 10000);
+        } else {
+          session.replaceDialog('/hello');
         }
-        session.replaceDialog('/hello');
       } catch (e) {
         console.error(e);
         return session.endDialog('Il y a eu un problème avec ta demande :/');
