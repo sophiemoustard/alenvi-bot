@@ -3,7 +3,7 @@ const builder = require('botbuilder');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const { getTeamBySector } = require('../helpers/team');
 const { formatPromptListPersons } = require('../helpers/planning/format');
-const { getCustomers } = require('./../models/Ogust/employees');
+const { getCustomers } = require('../models/Ogust/employees');
 
 const whichPerson = async (session, args) => {
   try {

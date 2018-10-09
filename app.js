@@ -183,9 +183,9 @@ bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
 
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
-bot.dialog('/which_person', require('./dialogs/whichPerson').whichPerson);
-bot.dialog('/which_period', require('./dialogs/whichPeriod').whichPeriod);
-bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPeriodUnit);
+// bot.dialog('/which_person', require('./dialogs/whichPerson.old').whichPerson);
+// bot.dialog('/which_period', require('./dialogs/whichPeriod.old').whichPeriod);
+// bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPeriodUnit);
 bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCalendar);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
@@ -222,7 +222,7 @@ bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
 bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 
-bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
+// bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
 
 bot.dialog('/le_jeu_du_plus_ou_moins', require('./dialogs/gaming').intro)
   .triggerAction({

@@ -14,7 +14,7 @@ exports.hello_first = [
     if ((session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref) || (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref)) {
       return session.replaceDialog('/autoLogin_webapp');
     }
-    session.send("Hello ! Je m'appelle Pigi, le petit oiseau qui facilite ton quotidien chez Alenvi 😉");
+    session.send("Hello ! Je m'appelle Compani, le petit robot qui facilite ton quotidien chez Alenvi 😉");
     session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier grâce à tes identifiants, pour que je puisse te reconnaître ?");
     session.replaceDialog('/login_webapp');
   }
