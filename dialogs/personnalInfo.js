@@ -3,7 +3,7 @@ const builder = require('botbuilder');
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 
 const getCardsAttachments = async (session) => {
-  const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
+  const url = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}`;
   const myCards = [];
   myCards.push(
     new builder.HeroCard(session)
