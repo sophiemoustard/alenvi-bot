@@ -40,7 +40,6 @@ exports.autoLogin = async (session) => {
 };
 
 exports.logout = (session) => {
-  delete session.userData.alenvi;
-  delete session.userData.ogust;
+  delete session.userData;
   return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };
