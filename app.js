@@ -76,7 +76,7 @@ app.get('/', (req, res) => {
   res.send('Alenvi bot :)');
 });
 
-// First time connection & so root dialog
+// First time connection
 bot.on('conversationUpdate', (message) => {
   if (message.membersAdded) {
     message.membersAdded.forEach((identity) => {
@@ -91,6 +91,18 @@ bot.on('conversationUpdate', (message) => {
 //   console.error(e);
 //   throw new Error(`Error in the bot: ${e}`);
 // })
+
+// Root dialog
+bot.dialog('/', new builder.IntentDialog()
+  .onDefault((session) => {
+    session.sendTyping();
+    if (!session.userData.alenvi) {
+      session.replaceDialog('/hello_first');
+    } else {
+      session.replaceDialog('/hello');
+    }
+  })
+);
 
 // =========================================================
 // Dialogs routing
