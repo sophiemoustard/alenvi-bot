@@ -2,7 +2,6 @@ const builder = require('botbuilder');
 const _ = require('lodash');
 
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-// const { getTeamBySector } = require('../helpers/team');
 const { getAlenviUsers } = require('../models/Alenvi/users');
 const { getList } = require('../models/Ogust/getList');
 
@@ -68,7 +67,6 @@ const formatPerson = async (coworker) => {
 
 const getCardsAttachments = async (session, params) => {
   const myCards = [];
-  // const myRawTeam = await getTeamBySector(session, session.userData.alenvi.sector);
   const myRawTeam = await getAlenviUsers(session.userData.alenvi.token, params);
   const myTeam = myRawTeam.body.data.users;
   const mySortedTeam = _.sortBy(myTeam, ['lastname']);
@@ -80,7 +78,6 @@ const getCardsAttachments = async (session, params) => {
     if (mySortedTeam[i].employee_id != session.userData.alenvi.employee_id && mySortedTeam[i].firstname !== 'Admin' && mySortedTeam[i].firstname !== 'Pigi') {
       const person = await formatPerson(mySortedTeam[i]);
       const mobilePhone = mySortedTeam[i].mobilePhone || null;
-      // const contact = mySortedTeam[i].facebook && mySortedTeam[i].facebook.address ? `https://m.me/${mySortedTeam[i].facebook.address.user.id}` : null;
       const picture = mySortedTeam[i].picture && mySortedTeam[i].picture.link ? mySortedTeam[i].picture.link : 'https://cdn.head-fi.org/g/2283245_l.jpg';
       const buttons = [];
       if (mobilePhone) {
@@ -89,7 +86,6 @@ const getCardsAttachments = async (session, params) => {
       myCards.push(
         new builder.ThumbnailCard(session)
           .title(person)
-          // .text(mobilePhone)
           .images([
             builder.CardImage.create(session, picture)
           ])
@@ -104,7 +100,9 @@ const showMyTeam = async (session, results) => {
   try {
     session.sendTyping();
     await checkOgustToken(session);
-    const queryParams = {};
+    const queryParams = {
+      isActive: true
+    };
     console.log('RESULTS', results);
     if (results.response) {
       if (session.dialogData.sectors) {

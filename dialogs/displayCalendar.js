@@ -1,21 +1,5 @@
 const builder = require('botbuilder');
-// const _ = require('lodash');
-
-// const { getCustomers } = require('../models/Ogust/employees');
-
 const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
-
-// const getFirstEmployeeCustomer = async (session) => {
-//   try {
-//     const myCustomersRaw = await getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
-//     const myCustomers = myCustomersRaw.body.data.customers.filter(customer => !customer.last_name.match(/^alenvi/i));
-//     const firstEmployeeCustomer = _.sortBy(myCustomers, ['last_name']).slice(0, 1);
-//     return firstEmployeeCustomer;
-//   } catch (e) {
-//     console.error(e);
-//     return session.endDialog("Mince, je n'ai pas réussi à récupérer tes bénéficiaires");
-//   }
-// };
 
 const getCardsAttachments = async (session, args) => {
   if (!args) {

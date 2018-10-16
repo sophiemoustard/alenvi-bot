@@ -22,7 +22,6 @@ const whichTrainingType = async (session, args, next) => {
 
       case 'com': {
         session.dialogData.trainingTypeData = comVideosList;
-        // const comVideosListCategories = Object.keys(comVideosList.categories);
         builder.Prompts.choice(session, 'Quelle partie souhaites-tu consulter ?', 'Ecoute active', { maxRetries: 0 });
         break;
       }
@@ -51,7 +50,6 @@ const displayTrainingCards = async (session, results) => {
         const buttonList = [];
         let showLink;
         if (cards[i].show_link) {
-          //   buttonList.push(builder.CardAction.openUrl(session, cards[i].show_link, 'Visionner'));
           showLink = cards[i].show_link;
         }
         if (cards[i].script_link) {

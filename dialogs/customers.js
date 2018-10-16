@@ -71,7 +71,6 @@ const getCardsAttachments = async (session, self) => {
   const myFilteredCustomers = _.filter(myCustomers, customer => !customer.last_name.match(/^ALENVI/i));
   if (myFilteredCustomers.length === 0) throw new Error('No customers found');
   for (let i = 0, l = myFilteredCustomers.length; i < l; i++) {
-    // if (myFilteredCustomers[i].id_customer != '286871430') {
     const encoded = encodeURI(`${myFilteredCustomers[i].main_address.line} ${myFilteredCustomers[i].main_address.zip}`);
     const person = await formatPerson(myFilteredCustomers[i]);
     const text = await formatText(myFilteredCustomers[i]);
@@ -79,7 +78,6 @@ const getCardsAttachments = async (session, self) => {
     myCards.push(
       new builder.HeroCard(session)
         .title(person)
-        // .subtitle(`${myFilteredCustomers[i].main_address.line} ${myFilteredCustomers[i].main_address.zip} ${myFilteredCustomers[i].main_address.city}`)
         .text(text)
         .images([
           builder.CardImage.create(session, `https://maps.googleapis.com/maps/api/staticmap?center=${encoded}&zoom=14&size=640x640&markers=${encoded}`)
@@ -89,9 +87,7 @@ const getCardsAttachments = async (session, self) => {
           builder.CardAction.openUrl(session, uri, 'Consulter')
         ])
     );
-    // }
   }
-  // "url":"http://maps.google.fr/maps/place/" + customer.main_address.line + customer.main_address.zip_code + "/",
   return myCards;
 };
 
@@ -113,13 +109,6 @@ exports.moreDetails = async (session, args) => {
               image_aspect_ratio: 'square',
               elements: [{
                 title: 'Modification fiche',
-                // default_action: {
-                //   type: 'web_url',
-                //   url: uri,
-                //   messenger_extensions: true,
-                //   webview_height_ratio: 'tall',
-                //   webview_share_button: 'hide'
-                // },
                 buttons: [{
                   type: 'web_url',
                   url: uri,

@@ -37,7 +37,6 @@ const getCardsAttachments = async (session) => {
   for (const k in usersConstrained) {
     const person = `${usersConstrained[k].firstname} ${usersConstrained[k].lastname}`;
     const mobilePhone = usersConstrained[k].mobilePhone || null;
-    // const contact = `https://m.me/${usersConstrained[k].facebook.facebookId}`;
     const picture = usersConstrained[k].picture && usersConstrained[k].picture.link ? usersConstrained[k].picture.link : 'https://cdn.head-fi.org/g/2283245_l.jpg';
     const buttons = [];
     if (mobilePhone) {
@@ -46,7 +45,6 @@ const getCardsAttachments = async (session) => {
     myCards.push(
       new builder.ThumbnailCard(session)
         .title(person)
-        // .text(mobilePhone)
         .images([
           builder.CardImage.create(session, picture)
         ])

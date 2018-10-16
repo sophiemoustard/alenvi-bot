@@ -7,10 +7,6 @@ const employees = require('../models/Ogust/employees');
 const services = require('../models/Ogust/services');
 const planningUpdates = require('../models/Alenvi/planningUpdates');
 const planning = require('../helpers/planning/format');
-// const slack = require('../models/Slack/planning');
-
-// const services = require('../Ogust/services');
-// const customers = require('../Ogust/customers');
 
 // =========================================================
 // Root 'Select modify planning' dialog
@@ -131,7 +127,6 @@ const whichStartHour = (session, args, next) => {
     session.privateConversationData.service = JSON.parse(args.data);
     builder.Prompts.time(session, "A quelle heure débute l'intervention ?\nPour annuler, dis-moi 'annuler'", { maxRetries: 1 });
   } else if (args.reprompt && args.hourInPast) { // when reprompt go to next step
-    // session.privateConversationData.service = args.service;
     next();
   } else {
     session.endDialog('Il y a eu un problème lors de la modification de ton intervention. Essaie une nouvelle fois stp :/');
@@ -205,7 +200,6 @@ const handleRequest = async (session, results) => {
           content: results.response,
           involved: session.dialogData.selectedPerson ? session.dialogData.selectedPerson : (`${session.userData.alenvi.firstname} ${session.userData.alenvi.lastname}`),
         };
-        // await planningUpdates.sendRequestToSlack(options);
         await planningUpdates.storePlanningUpdate(session.userData.alenvi._id, session.userData.alenvi.token, options);
         session.endDialog('Ta demande a bien été envoyée, merci :)');
       }

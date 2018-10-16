@@ -3,10 +3,6 @@
 // =========================================================
 
 const builder = require('botbuilder');
-// const moment = require('moment');
-// const BotMetrics = require('botmetrics');
-// const { sendEndorsementToSlack } = require('../helpers/sendEndorsement');
-// const { getAlenviUserById } = require('../models/Alenvi/users');
 
 exports.hello_first = [
   (session) => {
@@ -19,23 +15,6 @@ exports.hello_first = [
     session.replaceDialog('/login_webapp');
   }
 ];
-
-// const whichCommunity = (session, role, sector) => {
-//   if (role === 'admin' || role == 'coach') {
-//     BotMetrics.enrichUser(session.message.address.user.id, { gender: role });
-//   } else {
-//     const corresp = {
-//       community: {
-//         '1a*': 1,
-//         '1b*': 2
-//       },
-//       translate: {
-//         auxiliary: 'auxiliaire'
-//       }
-//     };
-//     BotMetrics.enrichUser(session.message.address.user.id, { gender: `${corresp.translate[role]} ${corresp.community[sector]}` });
-//   }
-// };
 
 const getPersonalInfoAttachments = async (session) => {
   const url = `${process.env.WEBSITE_HOSTNAME}/bot/auxiliaries/${session.userData.alenvi._id}?&access_token=${session.userData.alenvi.token}`;
@@ -64,30 +43,14 @@ const displayMyInfoCard = async (session) => {
 };
 
 const rootGreetingMenu = async (session) => {
-  session.sendTyping(); // Hello ${session.userData.alenvi.firstname}!
-  // whichCommunity(session, session.userData.alenvi.role, session.userData.alenvi.sector);
-  // if (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref === 'signup_complete') {
-  //   await checkToken(session);
-  //   session.send("Merci d'avoir completé ton inscription ! :)");
-  // }
-  // if (moment(session.userData.alenvi.createdAt).add('45', 'days').isSame(moment(), 'day') && session.userData.alenvi.administrative && !session.userData.alenvi.administrative.endorsement) {
-  //   await sendEndorsementToSlack(session);
-  // }
-  //  if (session.userData.alenvi.administrative && !session.userData.alenvi.administrative.signup.complete) {
-  //    await checkToken(session);
-  //    showEndSignupCard(session);
-  //  }
-  if (session.userData.firstConnection) {
+  session.sendTyping();
+  if (!session.userData.hasConnected) {
+    session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
+    session.userData.hasConnected = true;
     displayMyInfoCard(session);
-    session.userData.firstConnection = false;
   } else {
     builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
   }
-  // if (session.userData.alenvi.role == 'admin' || session.userData.alenvi.role == 'coach') {
-  //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE|Accueil aux.', { maxRetries: 0 });
-  // } else {
-  //   builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Formation|URGENCE', { maxRetries: 0 });
-  // }
 };
 
 const redirectMenuResult = (session, results) => {

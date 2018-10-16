@@ -17,7 +17,7 @@ const getCardsAttachments = async (session) => {
     session.userData.alenvi.employee_id, { nbPerPage: 24, pageNum: 1 });
   const mySalaries = mySalariesRaw.body.data.salaries.array_salary.result;
   if (Object.keys(mySalaries).length == 0) {
-    session.endDialog(`Tu n'as pour le moment aucun bulletin de salaire !`);
+    session.endDialog('Tu n\'as pour le moment aucun bulletin de salaire !');
   }
   const cards = [];
   moment.locale('fr');

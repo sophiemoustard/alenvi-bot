@@ -1,15 +1,8 @@
 require('dotenv').config();
 const path = require('path');
-const jwt = require('jsonwebtoken');
-// const _ = require('lodash');
 
 const builder = require('botbuilder');
 const botbuilderMongo = require('botbuilder-mongodb');
-
-// const BotmetricsMiddleware = require('botmetrics-botframework-middleware').BotmetricsMiddleware({
-//   botId: process.env.BOTMETRICS_BOT_ID,
-//   apiKey: process.env.BOTMETRICS_API_KEY
-// });
 
 const { sendMessageToUser } = require('./helpers/sendMessageToUser');
 
@@ -43,8 +36,6 @@ const connector = new builder.ChatConnector({
   appPassword: process.env.MICROSOFT_APP_PASSWORD,
 });
 
-// const inMemoryStorage = new builder.MemoryBotStorage();
-
 const bot = new builder.UniversalBot(connector).set('storage', mongoStorage);
 
 bot.set('persistConversationData', true);
@@ -71,26 +62,13 @@ bot.use(dashbot);
 bot.use({
   receive(event, next) {
     logUserConversation(event);
-    // BotmetricsMiddleware.receive();
     next();
   },
-  // botbuilder: (session, next) => {
-  //   console.log(session.message.text);
-  // },
   send(event, next) {
     logUserConversation(event);
-    // BotmetricsMiddleware.send();
     next();
   }
 });
-
-// const resume = (encodedAddress) => {
-//   const stringAddress = decodeURIComponent(encodedAddress);
-//   const address = JSON.parse(stringAddress);
-//   console.log(address);
-//   const msg = new builder.Message().address(address).text('Modification effectuée ! ;)');
-//   bot.send(msg.toMessage());
-// };
 
 app.post('/api/messages', connector.listen());
 app.post('sendMessageToUser', sendMessageToUser(bot));
@@ -98,7 +76,7 @@ app.get('/', (req, res) => {
   res.send('Alenvi bot :)');
 });
 
-// First time connection
+// First time connection & so root dialog
 bot.on('conversationUpdate', (message) => {
   if (message.membersAdded) {
     message.membersAdded.forEach((identity) => {
@@ -115,63 +93,11 @@ bot.on('conversationUpdate', (message) => {
 // })
 
 // =========================================================
-// Root Dialog
-// =========================================================
-
-bot.dialog('/', new builder.IntentDialog()
-  // .matches(/^cc|coucou|bonjour|bonsoir|hello|hi|hey|salut/i, '/hello')
-
-  // .matches(/^connexion/i, "/connection")
-  // .matches(/Consulter planning/i, "/show_planning")
-  // .matches(/^log in|login/i, "/login")
-  .onDefault((session) => {
-    if (session.message.sourceEvent.account_linking) {
-      const token = session.message.sourceEvent.account_linking.authorization_code;
-      const authorizationStatus = session.message.sourceEvent.account_linking.status;
-      if (authorizationStatus === 'linked') {
-        jwt.verify(token, process.env.TOKEN_SECRET, (err, decoded) => {
-          if (err) {
-            console.error('ERROR VERIFY TOKEN');
-            console.error(err);
-            if (err.name === 'JsonWebTokenError') {
-              session.endDialog('Il y a eu un problème avec ta demande :/');
-            }
-            if (err.name === 'TokenExpiredError') {
-              session.endDialog('Ta demande a expiré !');
-            }
-          } else {
-            console.log('DECODED !');
-            console.log(decoded);
-            session.userData.alenvi = decoded;
-            session.userData.alenvi.token = token;
-            session.send(`Je t'ai bien reconnu ${session.userData.alenvi.firstname}, merci de t'être connecté(e) ! :)`);
-            session.replaceDialog('/hello');
-          }
-        });
-      } else if (authorizationStatus === 'unlinked') {
-        delete session.userData.alenvi;
-        delete session.userData.ogust;
-        session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
-      } else {
-        session.endDialog('Il y a eu un problème au moment de déconnecter ton compte Alenvi ! :/');
-      }
-    } else {
-      session.replaceDialog('/not_understand');
-    }
-  })
-);
-
-// =========================================================
 // Dialogs routing
 // =========================================================
 
 bot.dialog('/not_understand', require('./dialogs/notUnderstand'));
 
-// bot.dialog('/login_facebook', require('./dialogs/facebookAuth').login);
-// bot.dialog('/logout_facebook', require('./dialogs/facebookAuth').logout)
-//   .triggerAction({
-//     matches: /^d[ée]connexion$/i
-//   });
 bot.dialog('/autoLogin_webapp', require('./dialogs/webappAuth').autoLogin);
 bot.dialog('/login_webapp', require('./dialogs/webappAuth').login);
 bot.dialog('/logout_webapp', require('./dialogs/webappAuth').logout)
@@ -183,9 +109,6 @@ bot.dialog('/hello_first', require('./dialogs/hello').hello_first);
 bot.dialog('/hello', require('./dialogs/hello').hello);
 
 bot.dialog('/select_show_planning', require('./dialogs/showPlanning').select);
-// bot.dialog('/which_person', require('./dialogs/whichPerson.old').whichPerson);
-// bot.dialog('/which_period', require('./dialogs/whichPeriod.old').whichPeriod);
-// bot.dialog('/which_period_unit', require('./dialogs/whichPeriodUnit').whichPeriodUnit);
 bot.dialog('/display_calendar', require('./dialogs/displayCalendar').displayCalendar);
 
 bot.dialog('/select_modify_planning', require('./dialogs/modifyPlanning').select);
@@ -202,7 +125,6 @@ bot.dialog('/select_directory', require('./dialogs/team').selectDirectory);
 bot.dialog('/show_sector_team', require('./dialogs/team').showSectorTeam);
 bot.dialog('/show_team', require('./dialogs/team').showTeam);
 
-// bot.beginDialogAction('deconnexion', '/logout_facebook', { matches: /^d[ée]connexion$/i });
 bot.beginDialogAction('myCustomersMoreDetails', '/my_customers_more_details');
 bot.beginDialogAction('setIntervention', '/set_intervention');
 bot.beginDialogAction('askForRequest', '/ask_for_request');
@@ -222,7 +144,6 @@ bot.dialog('/show_training', require('./dialogs/showTraining').showTraining);
 
 bot.dialog('/show_emergency', require('./dialogs/showEmergency').showEmergency);
 
-// bot.dialog('/ask_phone_nbr', require('./dialogs/askPhoneNbr').askPhoneNbr);
 
 bot.dialog('/le_jeu_du_plus_ou_moins', require('./dialogs/gaming').intro)
   .triggerAction({

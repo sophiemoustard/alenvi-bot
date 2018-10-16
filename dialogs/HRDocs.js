@@ -9,12 +9,12 @@ const checkOgustToken = require('../helpers/checkOgustToken').checkToken;
 const getCardsAttachments = (session) => {
   return [
     new builder.HeroCard(session)
-      .title(`Conditions de remboursement de mutuelle`)
+      .title('Conditions de remboursement de mutuelle')
       .buttons([
         builder.CardAction.openUrl(session, 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing', 'Visionner')
       ]),
     new builder.HeroCard(session)
-      .title(`Accord d'intéressement`)
+      .title('Accord d\'intéressement')
       .buttons([
         builder.CardAction.openUrl(session, 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeUxoN2RTVmlOUVk', 'Visionner')
       ]),
