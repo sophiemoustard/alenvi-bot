@@ -11,8 +11,7 @@ exports.hello_first = [
       return session.replaceDialog('/autoLogin_webapp');
     }
     session.send("Hello ! Je m'appelle Compani, le petit robot qui facilite ton quotidien chez Alenvi 😉");
-    session.send("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier grâce à tes identifiants, pour que je puisse te reconnaître ?");
-    session.replaceDialog('/login_webapp');
+    session.endDialog("Il semblerait que nous ne nous connaissions pas encore ! Peux-tu t'authentifier sur l'application Compani ? Tu y trouveras un bouton Messenger pour revenir me parler ! :)");
   }
 ];
 
