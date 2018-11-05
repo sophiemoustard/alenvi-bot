@@ -74,7 +74,7 @@ const getCardsAttachments = async (session, self) => {
     const encoded = encodeURI(`${myFilteredCustomers[i].main_address.line} ${myFilteredCustomers[i].main_address.zip}`);
     const person = await formatPerson(myFilteredCustomers[i]);
     const text = await formatText(myFilteredCustomers[i]);
-    const uri = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}/customers/${myFilteredCustomers.id_customer}`;
+    const uri = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}/customers/${myFilteredCustomers[i].id_customer}`;
     myCards.push(
       new builder.HeroCard(session)
         .title(person)
