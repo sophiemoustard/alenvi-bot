@@ -98,8 +98,7 @@ exports.moreDetails = async (session, args) => {
     if (args.data) {
       const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
-      const uri = `${process.env.WEBSITE_HOSTNAME}/bot/editCustomerInfo?id_customer=${customerById.id_customer}&_id=${session.userData.alenvi._id}&access_token=${session.userData.alenvi.token}&address=${encodeURIComponent(JSON.stringify(session.message.address))}`;
-      console.log(session.userData.alenvi.token);
+      const uri = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}/customers/${customerById.id_customer}`;
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
           attachment: {
