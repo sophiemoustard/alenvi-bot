@@ -44,7 +44,7 @@ const displayMyInfoCard = async (session) => {
 const rootGreetingMenu = async (session) => {
   session.sendTyping();
   if (!session.userData.hasConnected) {
-    session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésites pas à revenir me parler ensuite! ^_^ ');
+    session.send('Pour finaliser ton inscription chez Alenvi, merci de bien vouloir mettre à jour tes informations personnelles en cliquant ci-dessous. Et n’hésite pas à revenir me parler ensuite! ^_^ ');
     session.userData.hasConnected = true;
     displayMyInfoCard(session);
   } else {
