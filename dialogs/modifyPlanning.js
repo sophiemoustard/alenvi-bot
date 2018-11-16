@@ -176,8 +176,8 @@ const handleRequest = async (session, results) => {
         const startHour = moment.tz(session.privateConversationData.service.startHour, 'Europe/Paris').format('HH:mm');
         const endHour = moment.tz(session.privateConversationData.service.endHour, 'Europe/Paris').format('HH:mm');
         const updateServiceParams = {
-          startDate: moment.tz(`${session.privateConversationData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm'),
-          endDate: moment.tz(`${session.privateConversationData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm')
+          start_date: moment.tz(`${session.privateConversationData.service.day}-${startHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm'),
+          end_date: moment.tz(`${session.privateConversationData.service.day}-${endHour}`, 'DD/MM/YYYY-HH:mm', true, 'Europe/Paris').format('YYYYMMDDHHmm')
         };
         const planningUpdateParams = {
           type: 'Modif. Intervention',
