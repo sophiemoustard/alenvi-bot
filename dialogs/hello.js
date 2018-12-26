@@ -16,7 +16,7 @@ exports.hello_first = [
 ];
 
 const getPersonalInfoAttachments = async (session) => {
-  const url = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}`;
+  const url = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/${session.userData.alenvi._id}`;
   const myCards = [];
   myCards.push(
     new builder.HeroCard(session)

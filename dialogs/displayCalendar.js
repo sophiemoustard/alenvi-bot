@@ -6,14 +6,13 @@ const getCardsAttachments = async (session, args) => {
     throw new Error('No personType and/or personChosen');
   }
   const title = 'Consulter planning';
-  const { _id } = session.userData.alenvi;
   let url = '';
   switch (args.personType) {
     case 'Auxiliary':
-      url = `${process.env.WEBSITE_HOSTNAME}/ni/${_id}/planning?auxiliary=true&self=true`;
+      url = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/planning?auxiliary=true&self=true`;
       break;
     case 'Customer':
-      url = `${process.env.WEBSITE_HOSTNAME}/ni/${_id}/planning?customer=true`;
+      url = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/planning?customer=true`;
   }
   const myCards = [];
   myCards.push(
