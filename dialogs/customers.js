@@ -74,7 +74,7 @@ const getCardsAttachments = async (session, self) => {
     const encoded = encodeURI(`${myFilteredCustomers[i].main_address.line} ${myFilteredCustomers[i].main_address.zip}`);
     const person = await formatPerson(myFilteredCustomers[i]);
     const text = await formatText(myFilteredCustomers[i]);
-    const uri = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}/customers/${myFilteredCustomers[i].id_customer}`;
+    const uri = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/customers/${myFilteredCustomers[i].id_customer}`;
     myCards.push(
       new builder.HeroCard(session)
         .title(person)
@@ -98,7 +98,7 @@ exports.moreDetails = async (session, args) => {
     if (args.data) {
       const myRawCustomers = await employees.getCustomers(session.userData.ogust.tokenConfig.token, session.userData.alenvi.employee_id);
       const customerById = _.find(myRawCustomers.body.data.customers, customer => customer.id_customer === args.data);
-      const uri = `${process.env.WEBSITE_HOSTNAME}/ni/${session.userData.alenvi._id}/customers/${customerById.id_customer}`;
+      const uri = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/customers/${customerById.id_customer}`;
       const msg = new builder.Message(session).sourceEvent({
         facebook: {
           attachment: {
