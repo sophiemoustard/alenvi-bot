@@ -1,8 +1,6 @@
 const rp = require('request-promise');
-
-const employee = require('../models/Ogust/employees');
-const { diffAlenviOgust } = require('../helpers/diffAlenviOgust');
-const { updateAlenviUserById } = require('../models/Alenvi/users');
+const moment = require('moment-timezone');
+const { storeUserAddress } = require('./storeUserAddress');
 
 const getAlenviUserById = async (id) => {
   const options = {
@@ -18,52 +16,57 @@ const getAlenviUserById = async (id) => {
   return res;
 };
 
-/*
-** Get user data from Ogust base and compare it to alenvi user data
-** Method: POST
-*/
-exports.checkUserData = async (session) => {
+const refreshAlenviToken = async (session) => {
+  try {
+    if (session.userData.alenvi.refreshToken) {
+      const data = {};
+      data.refreshToken = session.userData.alenvi.refreshToken;
+      const newToken = await rp.post({
+        url: `${process.env.API_HOSTNAME}/users/refreshToken`,
+        json: true,
+        resolveWithFullResponse: true,
+        time: true,
+        body: data
+      });
+      session.userData.alenvi.token = newToken.data.data.token;
+      session.userData.alenvi.tokenExpiresIn = newToken.data.data.expiresIn;
+      return false;
+    }
+    delete session.userData.alenvi.token;
+    delete session.userData.alenvi.tokenExpiresIn;
+  } catch (e) {
+    console.error(e.response.message);
+    if (e.response.status === 404) {
+      delete session.userData.alenvi.token;
+      delete session.userData.alenvi.refreshToken;
+      delete session.userData.alenvi.tokenExpiresIn;
+    }
+    return false;
+  }
+};
+
+const checkUserData = async (session) => {
   console.log('Refreshing Alenvi user data...');
-  // Special update for Alenvi Guillaume / Clément / Thibault / Admin
-  if (session.userData.alenvi.employee_id == 1 || session.userData.alenvi.employee_id == 2 ||
-  session.userData.alenvi.employee_id == 3 || session.userData.alenvi.employee_id == 4) {
-    const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
-    const userDataAlenvi = userDataAlenviRaw.body.data.user;
-    session.userData.alenvi = userDataAlenvi;
-    session.userData.alenvi.token = userDataAlenvi.alenviToken;
-    return session.userData.alenvi;
-  }
-  // Check if user is still in Ogust
-  const userDataOgustRaw = await employee.getEmployeeById(
-    session.userData.ogust.tokenConfig.token,
-    session.userData.alenvi.employee_id,
-    { nbPerPage: 1, pageNum: 1 }
-  );
-  // console.log(userDataRaw);
-  const userDataOgust = userDataOgustRaw.body.data.user.employee;
-  // If there is no user data in Ogust, disconnect the user from the bot
-  if (Object.keys(userDataOgust).length === 0) {
-    session.send("Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)");
-    delete session.userData.alenvi;
-    delete session.userData.ogust;
-    session.replaceDialog('/logout_facebook');
-  }
-  // Get user information
   const userDataAlenviRaw = await getAlenviUserById(session.userData.alenvi._id);
   const userDataAlenvi = userDataAlenviRaw.body.data.user;
   session.userData.alenvi = userDataAlenvi;
-  // diff between alenvi user and ogust user data and update user in Alenvi DB
-  const diff = diffAlenviOgust(userDataAlenvi, userDataOgust, ['firstname', 'lastname', 'local.email', 'sector', 'mobilePhone'], ['first_name', 'last_name', 'email', 'sector', 'mobile_phone']);
-  await updateAlenviUserById(session.userData.alenvi._id, userDataAlenvi.token, diff);
-  if (userDataOgust.id_customer) {
-    session.userData.alenvi.customer_id = userDataOgust.id_customer;
-  }
-  if (userDataOgust.id_employee) {
-    session.userData.alenvi.employee_id = userDataOgust.id_employee;
-  }
-  if (userDataOgust.first_name) {
-    session.userData.alenvi.firstname = userDataOgust.first_name;
-  }
-  session.userData.alenvi.lastname = userDataOgust.last_name;
   return session.userData.alenvi;
+};
+
+exports.checkToken = async (session) => {
+  try {
+    if (!session.userData.alenvi.refreshToken) {
+      session.send("Il semble que tu ne fasses plus partie des employé(e)s d'Alenvi, je dois te déconnecter... Toute l'équipe te remercie d'avoir participé à l'aventure ! :)");
+      delete session.userData.alenvi;
+      session.replaceDialog('/logout_facebook');
+    }
+    if (session.userData.alenvi.token === '' || moment(moment().tz('Europe/Paris')).isAfter(session.userData.alenvi.expiresDate)) {
+      await refreshAlenviToken(session);
+    }
+    await checkUserData(session);
+    await storeUserAddress(session);
+  } catch (err) {
+    console.error(err);
+    return session.endDialog("Oups ! Il y a eu une erreur au moment de rafraichir tes informations personnelles :/ Si ce problème persiste, n'hésite pas à contacter l'équipe technique !");
+  }
 };
