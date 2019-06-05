@@ -1,7 +1,9 @@
 // const builder = require('botbuilder');
 const jwt = require('jsonwebtoken');
-const { getAlenviUserById } = require('../models/Alenvi/users');
-const { storeUserAddress } = require('../helpers/storeUserAddress');
+const moment = require('moment-timezone');
+const pick = require('lodash/pick');
+
+const { getUserById } = require('../api/users');
 
 exports.autoLogin = async (session) => {
   let token = '';
@@ -22,17 +24,18 @@ exports.autoLogin = async (session) => {
       }
     } else {
       try {
-        console.log('DECODED !');
-        console.log(decoded);
         const userId = decoded._id;
-        const userDataAlenviRaw = await getAlenviUserById(userId);
-        const userDataAlenvi = userDataAlenviRaw.body.data.user;
-        session.userData.alenvi = userDataAlenvi;
-        await storeUserAddress(session);
-        session.send(`Bienvenue, ${session.userData.alenvi.firstname}! Merci de t'être connecté(e) ! :)`);
+        const expDate = moment.unix(decoded.exp).toDate();
+        const userDataRaw = await getUserById(userId, token);
+        session.userData = pick(userDataRaw.data.data.user, ['_id', 'identity']);
+        session.userData.auth = {
+          token,
+          exp: expDate,
+        };
+        session.send(`Bienvenue, ${session.userData.identity.firstname}! Merci de t'être connecté(e) ! :)`);
         session.replaceDialog('/hello');
       } catch (e) {
-        console.error(e);
+        console.error(e.response.data);
         return session.endDialog('Il y a eu un problème avec ta demande :/');
       }
     }
