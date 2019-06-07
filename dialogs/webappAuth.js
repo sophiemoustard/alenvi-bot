@@ -27,7 +27,7 @@ exports.autoLogin = async (session) => {
         const userId = decoded._id;
         const expDate = moment.unix(decoded.exp).toDate();
         const userDataRaw = await getUserById(userId, token);
-        session.userData = pick(userDataRaw.data.data.user, ['_id', 'identity']);
+        session.userData = pick(userDataRaw.data.data.user, ['_id', 'identity', 'refreshToken']);
         session.userData.auth = {
           token,
           exp: expDate,
@@ -43,6 +43,6 @@ exports.autoLogin = async (session) => {
 };
 
 exports.logout = (session) => {
-  delete session.userData;
+  session.userData = {};
   return session.endDialog('Compte bien déconnecté ! Reviens-vite :)');
 };
