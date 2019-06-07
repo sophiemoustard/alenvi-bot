@@ -7,7 +7,6 @@ const builder = require('botbuilder');
 exports.hello_first = [
   (session) => {
     session.sendTyping();
-    console.log('session msg ref', session.message.sourceEvent);
     if ((session.message.sourceEvent.postback && session.message.sourceEvent.postback.referral && session.message.sourceEvent.postback.referral.ref) || (session.message.sourceEvent.referral && session.message.sourceEvent.referral.ref)) {
       return session.replaceDialog('/autoLogin_webapp');
     }
