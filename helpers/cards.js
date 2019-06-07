@@ -2,7 +2,7 @@ const builder = require('botbuilder');
 
 
 exports.createUrlCards = (session, data) => {
-  const baseUrl = `${process.env.WEBSITE_HOSTNAME}`;
+  const baseUrl = process.env.WEBSITE_HOSTNAME;
   const myCards = [];
   for (const card of data) {
     myCards.push(

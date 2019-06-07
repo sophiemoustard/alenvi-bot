@@ -6,7 +6,7 @@ const { refreshToken } = require('../api/users');
 exports.checkToken = async (session) => {
   try {
     if (has(session.userData, 'auth') && has(session.userData, 'refreshToken')) {
-      if (moment(session.userData.auth.exp).isAfter(moment())) {
+      if (moment(session.userData.auth.exp).isAfter()) {
         const tokenRaw = await refreshToken({ refreshToken: session.userData.refreshToken });
         session.userData.auth.token = tokenRaw.data.data.token;
       }
