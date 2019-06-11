@@ -1,36 +1,16 @@
-const builder = require('botbuilder');
+const { checkToken } = require('../helpers/checkToken');
+const { createUrlCards, displayCards } = require('../helpers/cards');
 
-// =========================================================
-// Root 'Infos' dialog
-// =========================================================
-
-const whichInfo = (session) => {
-  session.sendTyping();
-  builder.Prompts.choice(session, 'Choisis ta rubrique :) ', 'Feuilles de paie|Infos perso|Documents', { maxRetries: 0 });
+const displayAdministrative = async (session) => {
+  await checkToken(session);
+  const data = [
+    { title: 'Infos personnelles', path: `auxiliaries/${session.userData._id}` },
+    { title: 'Paye', path: 'auxiliaries/paye' },
+    { title: 'Documents', path: 'auxiliaries/docs' },
+    { title: 'Contrats', path: 'auxiliaries/contracts' },
+  ];
+  const cards = createUrlCards(session, data);
+  displayCards(session, cards);
 };
 
-const redirectToInfoSelected = (session, results) => {
-  if (results.response) {
-    if (session.userData.alenvi) {
-      switch (results.response.entity) {
-        case 'Feuilles de paie':
-          session.replaceDialog('/select_pay_sheets');
-          break;
-        case 'Infos perso':
-          session.replaceDialog('/show_personnal_info');
-          break;
-        case 'Documents':
-          session.replaceDialog('/hr_docs');
-          break;
-        default:
-          break;
-      }
-    } else {
-      session.endDialog('Vous devez vous connecter pour accéder à cette fonctionnalité ! :)');
-    }
-  } else {
-    session.cancelDialog(0, '/not_understand');
-  }
-};
-
-exports.select = [whichInfo, redirectToInfoSelected];
+exports.displayAdministrative = [displayAdministrative];

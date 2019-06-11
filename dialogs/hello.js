@@ -16,7 +16,7 @@ exports.hello_first = [
 ];
 
 const getPersonalInfoAttachments = async (session) => {
-  const url = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/${session.userData.alenvi._id}`;
+  const url = `${process.env.WEBSITE_HOSTNAME}/auxiliaries/${session.userData._id}`;
   const myCards = [];
   myCards.push(
     new builder.HeroCard(session)
@@ -48,40 +48,25 @@ const rootGreetingMenu = async (session) => {
     session.userData.hasConnected = true;
     displayMyInfoCard(session);
   } else {
-    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Consulter planning|Modifier planning|Bénéficiaires|Répertoire|Infos|Administratif|Formation|URGENCE', { maxRetries: 0 });
+    builder.Prompts.choice(session, 'Comment puis-je t’aider ? 😉', 'Planning|Bénéficiaires|Administratif|Equipe', { maxRetries: 0 });
   }
 };
 
 const redirectMenuResult = (session, results) => {
   if (results.response) {
-    if (session.userData.alenvi) {
+    if (session.userData) {
       switch (results.response.entity) {
-        case 'Consulter planning':
-          session.replaceDialog('/select_show_planning');
-          break;
-        case 'Modifier planning':
-          session.replaceDialog('/select_modify_planning');
+        case 'Planning':
+          session.replaceDialog('/planning');
           break;
         case 'Bénéficiaires':
-          session.replaceDialog('/which_customers');
-          break;
-        case 'Répertoire':
-          session.replaceDialog('/select_directory');
-          break;
-        case 'Infos':
-          session.replaceDialog('/select_infos');
+          session.replaceDialog('/customers');
           break;
         case 'Administratif':
           session.replaceDialog('/administrative');
           break;
-        case 'Formation':
-          session.replaceDialog('/training_choice');
-          break;
-        case 'URGENCE':
-          session.replaceDialog('/show_emergency');
-          break;
-        case 'Accueil aux.':
-          session.replaceDialog('/ask_phone_nbr');
+        case 'Equipe':
+          session.replaceDialog('/team');
           break;
       }
     }
